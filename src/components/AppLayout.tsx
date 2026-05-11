@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "@tanstack/react-router";
+import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   FileText,
@@ -12,18 +12,56 @@ import {
   Languages,
   FolderKanban,
   BarChart3,
+  LogOut,
+  Sparkles,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+import { seedDemoData } from "@/lib/seed";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export function AppLayout() {
   const { t, lang, toggle } = useI18n();
   const loc = useLocation();
+  const nav = useNavigate();
+  const { profile, user, companyName, roles, signOut } = useAuth();
+  const qc = useQueryClient();
+  const [seeding, setSeeding] = useState(false);
 
-  const nav = [
+  const initials = (profile?.display_name || user?.email || "U")
+    .split(/[ @.]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase())
+    .join("");
+
+  const handleSeed = async () => {
+    if (!profile?.company_id) return;
+    setSeeding(true);
+    const r = await seedDemoData(profile.company_id);
+    setSeeding(false);
+    if (r.skipped) toast.info("Workspace already has data.");
+    else {
+      toast.success("Demo data loaded.");
+      qc.invalidateQueries();
+    }
+  };
+
+  const nav_items = [
     { to: "/app", label: t("dashboard"), icon: LayoutDashboard, exact: true },
     { to: "/app/procedures", label: t("procedures"), icon: FileText },
     { to: "/app/qualifications", label: t("qualifications"), icon: BadgeCheck },
@@ -48,7 +86,7 @@ export function AppLayout() {
           </div>
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {nav.map((item) => {
+          {nav_items.map((item) => {
             const active = item.exact
               ? loc.pathname === item.to
               : loc.pathname.startsWith(item.to);
@@ -99,17 +137,47 @@ export function AppLayout() {
             <Bell className="size-4" />
             <span className="absolute top-1.5 end-1.5 size-2 rounded-full bg-primary" />
           </Button>
-          <div className="flex items-center gap-2 ps-2 border-s border-border">
-            <Avatar className="size-8">
-              <AvatarFallback className="bg-accent text-accent-foreground text-xs">
-                QC
-              </AvatarFallback>
-            </Avatar>
-            <div className="hidden sm:block text-xs leading-tight">
-              <div className="font-medium">QA/QC Manager</div>
-              <div className="text-muted-foreground">Aramco GOSP-7</div>
-            </div>
-          </div>
+          <Button variant="outline" size="sm" onClick={handleSeed} disabled={seeding} className="hidden md:inline-flex">
+            <Sparkles className="size-4 me-1" /> {seeding ? "Seeding…" : "Seed demo data"}
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 ps-2 border-s border-border outline-none">
+                <Avatar className="size-8">
+                  <AvatarFallback className="bg-accent text-accent-foreground text-xs">
+                    {initials || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden sm:block text-xs leading-tight text-start">
+                  <div className="font-medium">{profile?.display_name || user?.email}</div>
+                  <div className="text-muted-foreground truncate max-w-[140px]">
+                    {companyName ?? "—"}
+                  </div>
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                <div className="text-xs text-muted-foreground">Signed in as</div>
+                <div className="truncate">{user?.email}</div>
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  {roles.join(", ") || "no role"}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => nav({ to: "/app/settings" })}>
+                <Settings className="size-4 me-2" /> Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  await signOut();
+                  nav({ to: "/login" });
+                }}
+              >
+                <LogOut className="size-4 me-2" /> Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <Outlet />
