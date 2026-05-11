@@ -86,7 +86,7 @@ export function AppLayout() {
           </div>
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {nav.map((item) => {
+          {nav_items.map((item) => {
             const active = item.exact
               ? loc.pathname === item.to
               : loc.pathname.startsWith(item.to);
