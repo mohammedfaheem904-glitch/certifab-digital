@@ -7,11 +7,15 @@ export function ModulePage({
   title,
   subtitle,
   primaryAction,
+  action,
   children,
 }: {
   title: string;
   subtitle?: string;
+  /** Backwards-compat: simple label-only button. */
   primaryAction?: string;
+  /** Custom right-side action (e.g. NewRecordDialog). Overrides primaryAction. */
+  action?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -25,11 +29,11 @@ export function ModulePage({
           <Button variant="outline" size="sm">
             <Download className="size-4 me-1" /> Export
           </Button>
-          {primaryAction && (
+          {action ?? (primaryAction && (
             <Button size="sm" className="bg-[image:var(--gradient-primary)] text-primary-foreground hover:opacity-90 shadow-[var(--shadow-glow)]">
               <Plus className="size-4 me-1" /> {primaryAction}
             </Button>
-          )}
+          ))}
         </div>
       </div>
 
