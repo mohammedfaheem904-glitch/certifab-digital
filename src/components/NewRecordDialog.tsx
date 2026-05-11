@@ -45,7 +45,7 @@ export function NewRecordDialog({
       return;
     }
     setBusy(true);
-    const { error } = await supabase.from(table).insert({ ...values, company_id: profile.company_id });
+    const { error } = await (supabase.from(table as any) as any).insert({ ...values, company_id: profile.company_id });
     setBusy(false);
     if (error) {
       toast.error(error.message);
