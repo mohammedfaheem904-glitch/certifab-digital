@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
 
 const LoginRoute = LoginRouteImport.update({
@@ -35,6 +36,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppQualificationsRoute = AppQualificationsRouteImport.update({
+  id: '/qualifications',
+  path: '/qualifications',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProceduresRoute = AppProceduresRouteImport.update({
   id: '/procedures',
   path: '/procedures',
@@ -46,12 +52,14 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/app/procedures': typeof AppProceduresRoute
+  '/app/qualifications': typeof AppQualificationsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/app/procedures': typeof AppProceduresRoute
+  '/app/qualifications': typeof AppQualificationsRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -60,14 +68,28 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/app/procedures': typeof AppProceduresRoute
+  '/app/qualifications': typeof AppQualificationsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/login' | '/app/procedures' | '/app/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/login'
+    | '/app/procedures'
+    | '/app/qualifications'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/app/procedures' | '/app'
-  id: '__root__' | '/' | '/app' | '/login' | '/app/procedures' | '/app/'
+  to: '/' | '/login' | '/app/procedures' | '/app/qualifications' | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/login'
+    | '/app/procedures'
+    | '/app/qualifications'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +128,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/qualifications': {
+      id: '/app/qualifications'
+      path: '/qualifications'
+      fullPath: '/app/qualifications'
+      preLoaderRoute: typeof AppQualificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/procedures': {
       id: '/app/procedures'
       path: '/procedures'
@@ -118,11 +147,13 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppProceduresRoute: typeof AppProceduresRoute
+  AppQualificationsRoute: typeof AppQualificationsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppProceduresRoute: AppProceduresRoute,
+  AppQualificationsRoute: AppQualificationsRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
