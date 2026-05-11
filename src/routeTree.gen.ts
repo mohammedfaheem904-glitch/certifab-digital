@@ -16,6 +16,7 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppWeldsRouteImport } from './routes/app.welds'
 import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
+import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -52,11 +53,17 @@ const AppProceduresRoute = AppProceduresRouteImport.update({
   path: '/procedures',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInspectionsRoute = AppInspectionsRouteImport.update({
+  id: '/inspections',
+  path: '/inspections',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/app/inspections': typeof AppInspectionsRoute
   '/app/procedures': typeof AppProceduresRoute
   '/app/qualifications': typeof AppQualificationsRoute
   '/app/welds': typeof AppWeldsRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/app/inspections': typeof AppInspectionsRoute
   '/app/procedures': typeof AppProceduresRoute
   '/app/qualifications': typeof AppQualificationsRoute
   '/app/welds': typeof AppWeldsRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/app/inspections': typeof AppInspectionsRoute
   '/app/procedures': typeof AppProceduresRoute
   '/app/qualifications': typeof AppQualificationsRoute
   '/app/welds': typeof AppWeldsRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
+    | '/app/inspections'
     | '/app/procedures'
     | '/app/qualifications'
     | '/app/welds'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/app/inspections'
     | '/app/procedures'
     | '/app/qualifications'
     | '/app/welds'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
+    | '/app/inspections'
     | '/app/procedures'
     | '/app/qualifications'
     | '/app/welds'
@@ -166,10 +178,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProceduresRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/inspections': {
+      id: '/app/inspections'
+      path: '/inspections'
+      fullPath: '/app/inspections'
+      preLoaderRoute: typeof AppInspectionsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppInspectionsRoute: typeof AppInspectionsRoute
   AppProceduresRoute: typeof AppProceduresRoute
   AppQualificationsRoute: typeof AppQualificationsRoute
   AppWeldsRoute: typeof AppWeldsRoute
@@ -177,6 +197,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppInspectionsRoute: AppInspectionsRoute,
   AppProceduresRoute: AppProceduresRoute,
   AppQualificationsRoute: AppQualificationsRoute,
   AppWeldsRoute: AppWeldsRoute,
