@@ -17,6 +17,7 @@ import { Route as AppWeldsRouteImport } from './routes/app.welds'
 import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
 import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
+import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -58,11 +59,17 @@ const AppInspectionsRoute = AppInspectionsRouteImport.update({
   path: '/inspections',
   getParentRoute: () => AppRoute,
 } as any)
+const AppEquipmentRoute = AppEquipmentRouteImport.update({
+  id: '/equipment',
+  path: '/equipment',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
   '/app/procedures': typeof AppProceduresRoute
   '/app/qualifications': typeof AppQualificationsRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
   '/app/procedures': typeof AppProceduresRoute
   '/app/qualifications': typeof AppQualificationsRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
   '/app/procedures': typeof AppProceduresRoute
   '/app/qualifications': typeof AppQualificationsRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
+    | '/app/equipment'
     | '/app/inspections'
     | '/app/procedures'
     | '/app/qualifications'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/app/equipment'
     | '/app/inspections'
     | '/app/procedures'
     | '/app/qualifications'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
+    | '/app/equipment'
     | '/app/inspections'
     | '/app/procedures'
     | '/app/qualifications'
@@ -185,10 +197,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInspectionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/equipment': {
+      id: '/app/equipment'
+      path: '/equipment'
+      fullPath: '/app/equipment'
+      preLoaderRoute: typeof AppEquipmentRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppEquipmentRoute: typeof AppEquipmentRoute
   AppInspectionsRoute: typeof AppInspectionsRoute
   AppProceduresRoute: typeof AppProceduresRoute
   AppQualificationsRoute: typeof AppQualificationsRoute
@@ -197,6 +217,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppEquipmentRoute: AppEquipmentRoute,
   AppInspectionsRoute: AppInspectionsRoute,
   AppProceduresRoute: AppProceduresRoute,
   AppQualificationsRoute: AppQualificationsRoute,
