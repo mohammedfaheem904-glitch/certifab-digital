@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "@tanstack/react-router";
+import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   FileText,
@@ -12,18 +12,56 @@ import {
   Languages,
   FolderKanban,
   BarChart3,
+  LogOut,
+  Sparkles,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+import { seedDemoData } from "@/lib/seed";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export function AppLayout() {
   const { t, lang, toggle } = useI18n();
   const loc = useLocation();
+  const nav = useNavigate();
+  const { profile, user, companyName, roles, signOut } = useAuth();
+  const qc = useQueryClient();
+  const [seeding, setSeeding] = useState(false);
 
-  const nav = [
+  const initials = (profile?.display_name || user?.email || "U")
+    .split(/[ @.]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase())
+    .join("");
+
+  const handleSeed = async () => {
+    if (!profile?.company_id) return;
+    setSeeding(true);
+    const r = await seedDemoData(profile.company_id);
+    setSeeding(false);
+    if (r.skipped) toast.info("Workspace already has data.");
+    else {
+      toast.success("Demo data loaded.");
+      qc.invalidateQueries();
+    }
+  };
+
+  const nav_items = [
     { to: "/app", label: t("dashboard"), icon: LayoutDashboard, exact: true },
     { to: "/app/procedures", label: t("procedures"), icon: FileText },
     { to: "/app/qualifications", label: t("qualifications"), icon: BadgeCheck },
