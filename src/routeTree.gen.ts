@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppWeldsRouteImport } from './routes/app.welds'
+import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
 import { Route as AppProjectsRouteImport } from './routes/app.projects'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
@@ -43,6 +44,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppWeldsRoute = AppWeldsRouteImport.update({
   id: '/welds',
   path: '/welds',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AppRoute,
 } as any)
 const AppQualificationsRoute = AppQualificationsRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/app/procedures': typeof AppProceduresRoute
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/welds': typeof AppWeldsRoute
   '/app/': typeof AppIndexRoute
 }
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/app/procedures': typeof AppProceduresRoute
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/welds': typeof AppWeldsRoute
   '/app': typeof AppIndexRoute
 }
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/app/procedures': typeof AppProceduresRoute
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/welds': typeof AppWeldsRoute
   '/app/': typeof AppIndexRoute
 }
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/app/procedures'
     | '/app/projects'
     | '/app/qualifications'
+    | '/app/reports'
     | '/app/welds'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/app/procedures'
     | '/app/projects'
     | '/app/qualifications'
+    | '/app/reports'
     | '/app/welds'
     | '/app'
   id:
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/app/procedures'
     | '/app/projects'
     | '/app/qualifications'
+    | '/app/reports'
     | '/app/welds'
     | '/app/'
   fileRoutesById: FileRoutesById
@@ -188,6 +200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWeldsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/qualifications': {
       id: '/app/qualifications'
       path: '/qualifications'
@@ -232,6 +251,7 @@ interface AppRouteChildren {
   AppProceduresRoute: typeof AppProceduresRoute
   AppProjectsRoute: typeof AppProjectsRoute
   AppQualificationsRoute: typeof AppQualificationsRoute
+  AppReportsRoute: typeof AppReportsRoute
   AppWeldsRoute: typeof AppWeldsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -242,6 +262,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProceduresRoute: AppProceduresRoute,
   AppProjectsRoute: AppProjectsRoute,
   AppQualificationsRoute: AppQualificationsRoute,
+  AppReportsRoute: AppReportsRoute,
   AppWeldsRoute: AppWeldsRoute,
   AppIndexRoute: AppIndexRoute,
 }
