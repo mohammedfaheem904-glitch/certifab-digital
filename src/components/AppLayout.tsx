@@ -137,17 +137,47 @@ export function AppLayout() {
             <Bell className="size-4" />
             <span className="absolute top-1.5 end-1.5 size-2 rounded-full bg-primary" />
           </Button>
-          <div className="flex items-center gap-2 ps-2 border-s border-border">
-            <Avatar className="size-8">
-              <AvatarFallback className="bg-accent text-accent-foreground text-xs">
-                QC
-              </AvatarFallback>
-            </Avatar>
-            <div className="hidden sm:block text-xs leading-tight">
-              <div className="font-medium">QA/QC Manager</div>
-              <div className="text-muted-foreground">Aramco GOSP-7</div>
-            </div>
-          </div>
+          <Button variant="outline" size="sm" onClick={handleSeed} disabled={seeding} className="hidden md:inline-flex">
+            <Sparkles className="size-4 me-1" /> {seeding ? "Seeding…" : "Seed demo data"}
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 ps-2 border-s border-border outline-none">
+                <Avatar className="size-8">
+                  <AvatarFallback className="bg-accent text-accent-foreground text-xs">
+                    {initials || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden sm:block text-xs leading-tight text-start">
+                  <div className="font-medium">{profile?.display_name || user?.email}</div>
+                  <div className="text-muted-foreground truncate max-w-[140px]">
+                    {companyName ?? "—"}
+                  </div>
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                <div className="text-xs text-muted-foreground">Signed in as</div>
+                <div className="truncate">{user?.email}</div>
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  {roles.join(", ") || "no role"}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => nav({ to: "/app/settings" })}>
+                <Settings className="size-4 me-2" /> Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  await signOut();
+                  nav({ to: "/login" });
+                }}
+              >
+                <LogOut className="size-4 me-2" /> Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <Outlet />
