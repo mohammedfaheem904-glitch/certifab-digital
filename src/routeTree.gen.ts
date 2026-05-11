@@ -9,38 +9,188 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppWeldsRouteImport } from './routes/app.welds'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppReportsRouteImport } from './routes/app.reports'
+import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
+import { Route as AppProjectsRouteImport } from './routes/app.projects'
+import { Route as AppProceduresRouteImport } from './routes/app.procedures'
+import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
+import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWeldsRoute = AppWeldsRouteImport.update({
+  id: '/welds',
+  path: '/welds',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQualificationsRoute = AppQualificationsRouteImport.update({
+  id: '/qualifications',
+  path: '/qualifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsRoute = AppProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProceduresRoute = AppProceduresRouteImport.update({
+  id: '/procedures',
+  path: '/procedures',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInspectionsRoute = AppInspectionsRouteImport.update({
+  id: '/inspections',
+  path: '/inspections',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEquipmentRoute = AppEquipmentRouteImport.update({
+  id: '/equipment',
+  path: '/equipment',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/app/equipment': typeof AppEquipmentRoute
+  '/app/inspections': typeof AppInspectionsRoute
+  '/app/procedures': typeof AppProceduresRoute
+  '/app/projects': typeof AppProjectsRoute
+  '/app/qualifications': typeof AppQualificationsRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/welds': typeof AppWeldsRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/app/equipment': typeof AppEquipmentRoute
+  '/app/inspections': typeof AppInspectionsRoute
+  '/app/procedures': typeof AppProceduresRoute
+  '/app/projects': typeof AppProjectsRoute
+  '/app/qualifications': typeof AppQualificationsRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/welds': typeof AppWeldsRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/app/equipment': typeof AppEquipmentRoute
+  '/app/inspections': typeof AppInspectionsRoute
+  '/app/procedures': typeof AppProceduresRoute
+  '/app/projects': typeof AppProjectsRoute
+  '/app/qualifications': typeof AppQualificationsRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/welds': typeof AppWeldsRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/login'
+    | '/app/equipment'
+    | '/app/inspections'
+    | '/app/procedures'
+    | '/app/projects'
+    | '/app/qualifications'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/welds'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/app/equipment'
+    | '/app/inspections'
+    | '/app/procedures'
+    | '/app/projects'
+    | '/app/qualifications'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/welds'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/login'
+    | '/app/equipment'
+    | '/app/inspections'
+    | '/app/procedures'
+    | '/app/projects'
+    | '/app/qualifications'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/welds'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +198,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/welds': {
+      id: '/app/welds'
+      path: '/welds'
+      fullPath: '/app/welds'
+      preLoaderRoute: typeof AppWeldsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/qualifications': {
+      id: '/app/qualifications'
+      path: '/qualifications'
+      fullPath: '/app/qualifications'
+      preLoaderRoute: typeof AppQualificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/projects': {
+      id: '/app/projects'
+      path: '/projects'
+      fullPath: '/app/projects'
+      preLoaderRoute: typeof AppProjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/procedures': {
+      id: '/app/procedures'
+      path: '/procedures'
+      fullPath: '/app/procedures'
+      preLoaderRoute: typeof AppProceduresRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/inspections': {
+      id: '/app/inspections'
+      path: '/inspections'
+      fullPath: '/app/inspections'
+      preLoaderRoute: typeof AppInspectionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/equipment': {
+      id: '/app/equipment'
+      path: '/equipment'
+      fullPath: '/app/equipment'
+      preLoaderRoute: typeof AppEquipmentRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppEquipmentRoute: typeof AppEquipmentRoute
+  AppInspectionsRoute: typeof AppInspectionsRoute
+  AppProceduresRoute: typeof AppProceduresRoute
+  AppProjectsRoute: typeof AppProjectsRoute
+  AppQualificationsRoute: typeof AppQualificationsRoute
+  AppReportsRoute: typeof AppReportsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppWeldsRoute: typeof AppWeldsRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppEquipmentRoute: AppEquipmentRoute,
+  AppInspectionsRoute: AppInspectionsRoute,
+  AppProceduresRoute: AppProceduresRoute,
+  AppProjectsRoute: AppProjectsRoute,
+  AppQualificationsRoute: AppQualificationsRoute,
+  AppReportsRoute: AppReportsRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppWeldsRoute: AppWeldsRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
