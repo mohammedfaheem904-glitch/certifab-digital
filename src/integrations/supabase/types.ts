@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          after: Json | null
+          before: Json | null
+          company_id: string
+          created_at: string
+          id: string
+          record_id: string | null
+          table_name: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          company_id: string
+          created_at?: string
+          id?: string
+          record_id?: string | null
+          table_name: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          record_id?: string | null
+          table_name?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           country: string | null
@@ -81,6 +117,66 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      heat_inputs: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          current_amp: number
+          heat_input: number
+          id: string
+          notes: string | null
+          procedure_id: string | null
+          travel_speed: number
+          voltage: number
+          weld_id: string | null
+          within_limits: boolean | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          current_amp: number
+          heat_input: number
+          id?: string
+          notes?: string | null
+          procedure_id?: string | null
+          travel_speed: number
+          voltage: number
+          weld_id?: string | null
+          within_limits?: boolean | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          current_amp?: number
+          heat_input?: number
+          id?: string
+          notes?: string | null
+          procedure_id?: string | null
+          travel_speed?: number
+          voltage?: number
+          weld_id?: string | null
+          within_limits?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "heat_inputs_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heat_inputs_weld_id_fkey"
+            columns: ["weld_id"]
+            isOneToOne: false
+            referencedRelation: "welds"
             referencedColumns: ["id"]
           },
         ]
@@ -155,45 +251,240 @@ export type Database = {
           },
         ]
       }
+      procedure_approvals: {
+        Row: {
+          action: Database["public"]["Enums"]["approval_action"]
+          actor_id: string
+          actor_name: string | null
+          actor_role: string | null
+          comment: string | null
+          company_id: string
+          id: string
+          procedure_id: string
+          signed_at: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["approval_action"]
+          actor_id: string
+          actor_name?: string | null
+          actor_role?: string | null
+          comment?: string | null
+          company_id: string
+          id?: string
+          procedure_id: string
+          signed_at?: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["approval_action"]
+          actor_id?: string
+          actor_name?: string | null
+          actor_role?: string | null
+          comment?: string | null
+          company_id?: string
+          id?: string
+          procedure_id?: string
+          signed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedure_approvals_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      procedure_attachments: {
+        Row: {
+          company_id: string
+          created_at: string
+          filename: string
+          id: string
+          mime_type: string | null
+          procedure_id: string
+          size_bytes: number | null
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          filename: string
+          id?: string
+          mime_type?: string | null
+          procedure_id: string
+          size_bytes?: number | null
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          filename?: string
+          id?: string
+          mime_type?: string | null
+          procedure_id?: string
+          size_bytes?: number | null
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedure_attachments_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      procedure_revisions: {
+        Row: {
+          change_summary: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          procedure_id: string
+          revision: string
+          snapshot: Json
+        }
+        Insert: {
+          change_summary?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          procedure_id: string
+          revision: string
+          snapshot: Json
+        }
+        Update: {
+          change_summary?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          procedure_id?: string
+          revision?: string
+          snapshot?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedure_revisions_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       procedures: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          base_material: string | null
           code: string
           company_id: string
           created_at: string
+          current_max: number | null
+          current_min: number | null
+          filler_material: string | null
+          heat_input_max: number | null
+          heat_input_min: number | null
           id: string
+          interpass_temp: string | null
+          joint_type: string | null
           notes: string | null
+          position: string | null
+          preheat_temp: string | null
           process: string
+          pwht: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           revision: string
+          shielding_gas: string | null
           standard: string
           status: Database["public"]["Enums"]["procedure_status"]
+          submitted_by: string | null
+          submitted_for_review_at: string | null
           thickness_range: string | null
+          travel_speed_max: number | null
+          travel_speed_min: number | null
           updated_at: string
+          voltage_max: number | null
+          voltage_min: number | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          base_material?: string | null
           code: string
           company_id: string
           created_at?: string
+          current_max?: number | null
+          current_min?: number | null
+          filler_material?: string | null
+          heat_input_max?: number | null
+          heat_input_min?: number | null
           id?: string
+          interpass_temp?: string | null
+          joint_type?: string | null
           notes?: string | null
+          position?: string | null
+          preheat_temp?: string | null
           process: string
+          pwht?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           revision?: string
+          shielding_gas?: string | null
           standard: string
           status?: Database["public"]["Enums"]["procedure_status"]
+          submitted_by?: string | null
+          submitted_for_review_at?: string | null
           thickness_range?: string | null
+          travel_speed_max?: number | null
+          travel_speed_min?: number | null
           updated_at?: string
+          voltage_max?: number | null
+          voltage_min?: number | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          base_material?: string | null
           code?: string
           company_id?: string
           created_at?: string
+          current_max?: number | null
+          current_min?: number | null
+          filler_material?: string | null
+          heat_input_max?: number | null
+          heat_input_min?: number | null
           id?: string
+          interpass_temp?: string | null
+          joint_type?: string | null
           notes?: string | null
+          position?: string | null
+          preheat_temp?: string | null
           process?: string
+          pwht?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           revision?: string
+          shielding_gas?: string | null
           standard?: string
           status?: Database["public"]["Enums"]["procedure_status"]
+          submitted_by?: string | null
+          submitted_for_review_at?: string | null
           thickness_range?: string | null
+          travel_speed_max?: number | null
+          travel_speed_min?: number | null
           updated_at?: string
+          voltage_max?: number | null
+          voltage_min?: number | null
         }
         Relationships: [
           {
@@ -473,12 +764,23 @@ export type Database = {
         | "inspector"
         | "welder"
         | "client_viewer"
+      approval_action:
+        | "submitted"
+        | "reviewed"
+        | "approved"
+        | "rejected"
+        | "revoked"
       equipment_status:
         | "Operational"
         | "Maintenance"
         | "Calibration Due"
         | "Out of Service"
-      procedure_status: "Draft" | "Review" | "Approved" | "Archived"
+      procedure_status:
+        | "Draft"
+        | "Review"
+        | "Approved"
+        | "Archived"
+        | "Rejected"
       project_status:
         | "Planning"
         | "Active"
@@ -623,13 +925,20 @@ export const Constants = {
         "welder",
         "client_viewer",
       ],
+      approval_action: [
+        "submitted",
+        "reviewed",
+        "approved",
+        "rejected",
+        "revoked",
+      ],
       equipment_status: [
         "Operational",
         "Maintenance",
         "Calibration Due",
         "Out of Service",
       ],
-      procedure_status: ["Draft", "Review", "Approved", "Archived"],
+      procedure_status: ["Draft", "Review", "Approved", "Archived", "Rejected"],
       project_status: [
         "Planning",
         "Active",
