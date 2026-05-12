@@ -75,7 +75,7 @@ function ProceduresPage() {
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
             <tr>
-              <Th>Code</Th><Th>Standard</Th><Th>Process</Th><Th>Thickness</Th><Th>Revision</Th><Th>Status</Th><Th></Th>
+              <Th>Code</Th><Th>Standard</Th><Th>Process</Th><Th>Thickness</Th><Th>Revision</Th><Th>Status</Th><Th>{" "}</Th>
             </tr>
           </thead>
           <tbody>
