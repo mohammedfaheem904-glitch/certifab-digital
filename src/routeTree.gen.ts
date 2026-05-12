@@ -22,6 +22,7 @@ import { Route as AppProjectsRouteImport } from './routes/app.projects'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
 import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
+import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -88,6 +89,12 @@ const AppEquipmentRoute = AppEquipmentRouteImport.update({
   path: '/equipment',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProceduresProcedureIdRoute =
+  AppProceduresProcedureIdRouteImport.update({
+    id: '/$procedureId',
+    path: '/$procedureId',
+    getParentRoute: () => AppProceduresRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,13 +103,14 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
-  '/app/procedures': typeof AppProceduresRoute
+  '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/welds': typeof AppWeldsRoute
   '/app/': typeof AppIndexRoute
+  '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,13 +118,14 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
-  '/app/procedures': typeof AppProceduresRoute
+  '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/welds': typeof AppWeldsRoute
   '/app': typeof AppIndexRoute
+  '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -126,13 +135,14 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
-  '/app/procedures': typeof AppProceduresRoute
+  '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/welds': typeof AppWeldsRoute
   '/app/': typeof AppIndexRoute
+  '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/welds'
     | '/app/'
+    | '/app/procedures/$procedureId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/welds'
     | '/app'
+    | '/app/procedures/$procedureId'
   id:
     | '__root__'
     | '/'
@@ -179,6 +191,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/welds'
     | '/app/'
+    | '/app/procedures/$procedureId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -281,13 +294,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEquipmentRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/procedures/$procedureId': {
+      id: '/app/procedures/$procedureId'
+      path: '/$procedureId'
+      fullPath: '/app/procedures/$procedureId'
+      preLoaderRoute: typeof AppProceduresProcedureIdRouteImport
+      parentRoute: typeof AppProceduresRoute
+    }
   }
 }
+
+interface AppProceduresRouteChildren {
+  AppProceduresProcedureIdRoute: typeof AppProceduresProcedureIdRoute
+}
+
+const AppProceduresRouteChildren: AppProceduresRouteChildren = {
+  AppProceduresProcedureIdRoute: AppProceduresProcedureIdRoute,
+}
+
+const AppProceduresRouteWithChildren = AppProceduresRoute._addFileChildren(
+  AppProceduresRouteChildren,
+)
 
 interface AppRouteChildren {
   AppEquipmentRoute: typeof AppEquipmentRoute
   AppInspectionsRoute: typeof AppInspectionsRoute
-  AppProceduresRoute: typeof AppProceduresRoute
+  AppProceduresRoute: typeof AppProceduresRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRoute
   AppQualificationsRoute: typeof AppQualificationsRoute
   AppReportsRoute: typeof AppReportsRoute
@@ -299,7 +331,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppEquipmentRoute: AppEquipmentRoute,
   AppInspectionsRoute: AppInspectionsRoute,
-  AppProceduresRoute: AppProceduresRoute,
+  AppProceduresRoute: AppProceduresRouteWithChildren,
   AppProjectsRoute: AppProjectsRoute,
   AppQualificationsRoute: AppQualificationsRoute,
   AppReportsRoute: AppReportsRoute,

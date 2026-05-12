@@ -91,7 +91,7 @@ function ProcedureDetailPage() {
     if (action === "rejected") { patch.status = "Rejected"; }
     if (action === "revoked") { patch.status = "Draft"; patch.approved_at = null; patch.approved_by = null; }
 
-    const { error: e1 } = await supabase.from("procedures").update(patch).eq("id", procedureId);
+    const { error: e1 } = await (supabase.from("procedures") as any).update(patch).eq("id", procedureId);
     if (e1) return toast.error(e1.message);
     const { error: e2 } = await supabase.from("procedure_approvals").insert({
       procedure_id: procedureId,
@@ -394,4 +394,8 @@ function incrementRev(rev?: string) {
   const m = /(\d+)\s*$/.exec(rev);
   if (!m) return `${rev}.1`;
   return rev.replace(/\d+\s*$/, String(parseInt(m[1], 10) + 1));
+}
+
+function Th({ children }: { children: React.ReactNode }) {
+  return <th className="text-start font-medium px-5 py-2.5">{children}</th>;
 }
