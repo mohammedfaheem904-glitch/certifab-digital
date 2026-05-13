@@ -137,7 +137,7 @@ export function FileUploader({
         {busy ? <Loader2 className="size-4 animate-spin" /> : "browse"}
       </Button>
       <input ref={ref} type="file" multiple accept={accept} className="hidden" onChange={(e) => onFiles(e.target.files)} />
-      <div className="text-[11px] mt-1">{hint ?? "PDF, drawings, certificates — up to 50 MB each."}</div>
+      <div className="text-[11px] mt-1">{hint ?? `PDF, drawings, certificates — up to ${maxSizeMb} MB each.`}</div>
     </div>
   );
 }
