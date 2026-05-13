@@ -1,38 +1,75 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { ModulePage } from "@/components/ModulePage";
-
-const roles = [
-  { role: "Super Admin", users: 2, scope: "Full access across all companies" },
-  { role: "QA/QC Manager", users: 5, scope: "Approve WPS, manage NCRs, sign-off inspections" },
-  { role: "Welding Engineer", users: 8, scope: "Author WPS/PQR, validate parameters" },
-  { role: "Inspector", users: 14, scope: "Log inspections, raise NCRs" },
-  { role: "Welder", users: 142, scope: "View assigned welds, scan QR for WPS" },
-  { role: "Client Viewer", users: 6, scope: "Read-only access to project KPIs" },
-];
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Users, Bell, ShieldCheck, ScrollText } from "lucide-react";
 
 export const Route = createFileRoute("/app/settings")({
-  component: () => (
-    <ModulePage title="Settings — Roles & Access">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="text-xs text-muted-foreground bg-muted/40">
-            <tr>
-              <th className="text-start font-medium px-5 py-2.5">Role</th>
-              <th className="text-start font-medium px-5 py-2.5">Users</th>
-              <th className="text-start font-medium px-5 py-2.5">Scope</th>
-            </tr>
-          </thead>
-          <tbody>
-            {roles.map((r) => (
-              <tr key={r.role} className="border-t border-border/60 hover:bg-muted/20">
-                <td className="px-5 py-3 font-medium">{r.role}</td>
-                <td className="px-5 py-3">{r.users}</td>
-                <td className="px-5 py-3 text-muted-foreground">{r.scope}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  component: SettingsPage,
+});
+
+function SettingsPage() {
+  const { profile, companyName, refresh, roles } = useAuth();
+  const isAdmin = roles.includes("super_admin");
+  const [name, setName] = useState(companyName ?? "");
+  const [logo, setLogo] = useState("");
+  const [footer, setFooter] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!profile?.company_id) return;
+    supabase.from("companies").select("name, logo_url, report_footer").eq("id", profile.company_id).maybeSingle()
+      .then(({ data }) => {
+        if (data) { setName(data.name); setLogo(data.logo_url ?? ""); setFooter(data.report_footer ?? ""); }
+      });
+  }, [profile?.company_id]);
+
+  const save = async () => {
+    if (!profile?.company_id) return;
+    setBusy(true);
+    const { error } = await supabase.from("companies").update({ name, logo_url: logo, report_footer: footer }).eq("id", profile.company_id);
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Workspace updated.");
+    refresh();
+  };
+
+  return (
+    <ModulePage title="Settings" subtitle="Workspace, branding, members and access control.">
+      <div className="p-5 grid lg:grid-cols-3 gap-3">
+        <Tile to="/app/team" icon={Users} title="Team & Roles" desc="Invite members, assign roles." />
+        <Tile to="/app/audit" icon={ScrollText} title="Audit Log" desc="Tamper-evident change history." />
+        <Tile to="/app/settings" icon={Bell} title="Notifications" desc="Reminders & alerts settings." disabled />
+      </div>
+
+      <div className="p-5 border-t border-border space-y-4 max-w-2xl">
+        <div className="flex items-center gap-2 mb-2"><ShieldCheck className="size-4 text-primary" /><h3 className="text-sm font-semibold">Workspace branding</h3></div>
+        <F label="Company name"><Input value={name} onChange={(e) => setName(e.target.value)} disabled={!isAdmin} /></F>
+        <F label="Logo URL"><Input value={logo} onChange={(e) => setLogo(e.target.value)} placeholder="https://…" disabled={!isAdmin} /></F>
+        <F label="Report footer"><Input value={footer} onChange={(e) => setFooter(e.target.value)} placeholder="Confidential — © 2026" disabled={!isAdmin} /></F>
+        {isAdmin && <Button onClick={save} disabled={busy}>{busy ? "Saving…" : "Save changes"}</Button>}
+        {!isAdmin && <p className="text-xs text-muted-foreground">Only super admins can edit workspace branding.</p>}
       </div>
     </ModulePage>
-  ),
-});
+  );
+}
+
+function Tile({ to, icon: Icon, title, desc, disabled }: any) {
+  const Body = (
+    <div className={`rounded-lg border border-border p-4 hover:bg-muted/20 transition-colors ${disabled ? "opacity-60" : ""}`}>
+      <Icon className="size-5 text-primary mb-2" />
+      <div className="font-medium">{title}</div>
+      <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
+    </div>
+  );
+  return disabled ? Body : <Link to={to}>{Body}</Link>;
+}
+
+function F({ label, children }: { label: string; children: React.ReactNode }) {
+  return <div className="space-y-1.5"><Label className="text-xs">{label}</Label>{children}</div>;
+}

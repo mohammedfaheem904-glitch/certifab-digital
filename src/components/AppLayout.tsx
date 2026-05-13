@@ -8,13 +8,16 @@ import {
   Settings,
   Wrench,
   ClipboardCheck,
-  Bell,
   Languages,
   FolderKanban,
   BarChart3,
   LogOut,
   Sparkles,
+  Gauge,
+  ScrollText,
+  Users,
 } from "lucide-react";
+import { NotificationsBell } from "@/components/NotificationsBell";
 import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -68,8 +71,11 @@ export function AppLayout() {
     { to: "/app/welds", label: t("welds"), icon: Flame },
     { to: "/app/inspections", label: t("inspections"), icon: ClipboardCheck },
     { to: "/app/equipment", label: t("equipment"), icon: Wrench },
+    { to: "/app/instruments", label: "QA/QC Instruments", icon: Gauge },
     { to: "/app/projects", label: t("projects"), icon: FolderKanban },
     { to: "/app/reports", label: t("reports"), icon: BarChart3 },
+    { to: "/app/team", label: "Team & Roles", icon: Users },
+    { to: "/app/audit", label: "Audit Log", icon: ScrollText },
   ];
 
   return (
@@ -133,10 +139,7 @@ export function AppLayout() {
             <Languages className="size-4" />
             {lang === "en" ? "العربية" : "English"}
           </Button>
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="size-4" />
-            <span className="absolute top-1.5 end-1.5 size-2 rounded-full bg-primary" />
-          </Button>
+          <NotificationsBell />
           <Button variant="outline" size="sm" onClick={handleSeed} disabled={seeding} className="hidden md:inline-flex">
             <Sparkles className="size-4 me-1" /> {seeding ? "Seeding…" : "Seed demo data"}
           </Button>

@@ -54,28 +54,37 @@ export type Database = {
         Row: {
           country: string | null
           created_at: string
+          email_from_name: string | null
           id: string
           industry: string | null
+          logo_url: string | null
           name: string
           plan: string
+          report_footer: string | null
           updated_at: string
         }
         Insert: {
           country?: string | null
           created_at?: string
+          email_from_name?: string | null
           id?: string
           industry?: string | null
+          logo_url?: string | null
           name: string
           plan?: string
+          report_footer?: string | null
           updated_at?: string
         }
         Update: {
           country?: string | null
           created_at?: string
+          email_from_name?: string | null
           id?: string
           industry?: string | null
+          logo_url?: string | null
           name?: string
           plan?: string
+          report_footer?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -250,6 +259,149 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      instrument_calibrations: {
+        Row: {
+          calibrated_on: string
+          certificate_path: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          instrument_id: string
+          next_due: string | null
+          notes: string | null
+          performed_by: string | null
+        }
+        Insert: {
+          calibrated_on: string
+          certificate_path?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          instrument_id: string
+          next_due?: string | null
+          notes?: string | null
+          performed_by?: string | null
+        }
+        Update: {
+          calibrated_on?: string
+          certificate_path?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          instrument_id?: string
+          next_due?: string | null
+          notes?: string | null
+          performed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instrument_calibrations_instrument_id_fkey"
+            columns: ["instrument_id"]
+            isOneToOne: false
+            referencedRelation: "instruments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instruments: {
+        Row: {
+          asset_id: string
+          assigned_project_id: string | null
+          assigned_user_id: string | null
+          calibration_due: string | null
+          category: string
+          company_id: string
+          created_at: string
+          id: string
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          qr_token: string
+          serial_number: string | null
+          status: Database["public"]["Enums"]["instrument_status"]
+          updated_at: string
+        }
+        Insert: {
+          asset_id: string
+          assigned_project_id?: string | null
+          assigned_user_id?: string | null
+          calibration_due?: string | null
+          category?: string
+          company_id: string
+          created_at?: string
+          id?: string
+          manufacturer?: string | null
+          model?: string | null
+          name: string
+          notes?: string | null
+          qr_token?: string
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["instrument_status"]
+          updated_at?: string
+        }
+        Update: {
+          asset_id?: string
+          assigned_project_id?: string | null
+          assigned_user_id?: string | null
+          calibration_due?: string | null
+          category?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          manufacturer?: string | null
+          model?: string | null
+          name?: string
+          notes?: string | null
+          qr_token?: string
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["instrument_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          company_id: string
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          read_at: string | null
+          severity: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          link?: string | null
+          read_at?: string | null
+          severity?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          severity?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       procedure_approvals: {
         Row: {
@@ -637,6 +789,33 @@ export type Database = {
           },
         ]
       }
+      reminder_log: {
+        Row: {
+          company_id: string
+          id: string
+          kind: string
+          ref_id: string
+          sent_at: string
+          window_days: number
+        }
+        Insert: {
+          company_id: string
+          id?: string
+          kind: string
+          ref_id: string
+          sent_at?: string
+          window_days: number
+        }
+        Update: {
+          company_id?: string
+          id?: string
+          kind?: string
+          ref_id?: string
+          sent_at?: string
+          window_days?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           company_id: string | null
@@ -775,6 +954,7 @@ export type Database = {
         | "Maintenance"
         | "Calibration Due"
         | "Out of Service"
+      instrument_status: "Active" | "Calibration Due" | "Out of Service"
       procedure_status:
         | "Draft"
         | "Review"
@@ -938,6 +1118,7 @@ export const Constants = {
         "Calibration Due",
         "Out of Service",
       ],
+      instrument_status: ["Active", "Calibration Due", "Out of Service"],
       procedure_status: ["Draft", "Review", "Approved", "Archived", "Rejected"],
       project_status: [
         "Planning",
