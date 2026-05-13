@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Flame, ArrowRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +11,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 
+const search = z.object({ next: z.string().max(256).optional() });
+
 export const Route = createFileRoute("/login")({
+  validateSearch: (s) => search.parse(s),
   head: () => ({
     meta: [
       { title: "Sign in — Weld Yard" },
@@ -23,14 +27,16 @@ export const Route = createFileRoute("/login")({
 function Login() {
   const { t } = useI18n();
   const nav = useNavigate();
+  const { next } = Route.useSearch();
+  const dest = next && next.startsWith("/") ? next : "/app";
   const { session, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) nav({ to: "/app" });
-  }, [loading, session, nav]);
+    if (!loading && session) window.location.assign(dest);
+  }, [loading, session, dest]);
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,20 +47,20 @@ function Login() {
       toast.error(error.message);
       return;
     }
-    nav({ to: "/app" });
+    window.location.assign(dest);
   };
 
   const handleGoogle = async () => {
     setBusy(true);
     const r = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/app",
+      redirect_uri: window.location.origin + dest,
     });
     if (r.error) {
       toast.error(r.error.message ?? "Google sign-in failed");
       setBusy(false);
       return;
     }
-    if (!r.redirected) nav({ to: "/app" });
+    if (!r.redirected) window.location.assign(dest);
   };
 
   return (
