@@ -70,6 +70,7 @@ export function AppLayout() {
     { to: "/app/qualifications", label: t("qualifications"), icon: BadgeCheck },
     { to: "/app/welds", label: t("welds"), icon: Flame },
     { to: "/app/inspections", label: t("inspections"), icon: ClipboardCheck },
+    { to: "/app/ncrs", label: "NCRs", icon: ScrollText },
     { to: "/app/equipment", label: t("equipment"), icon: Wrench },
     { to: "/app/instruments", label: "QA/QC Instruments", icon: Gauge },
     { to: "/app/projects", label: t("projects"), icon: FolderKanban },

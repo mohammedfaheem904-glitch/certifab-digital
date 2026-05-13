@@ -307,6 +307,39 @@ export type Database = {
           },
         ]
       }
+      instrument_events: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          company_id: string
+          created_at: string
+          id: string
+          instrument_id: string
+          kind: string
+          payload: Json | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          instrument_id: string
+          kind: string
+          payload?: Json | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          instrument_id?: string
+          kind?: string
+          payload?: Json | null
+        }
+        Relationships: []
+      }
       instruments: {
         Row: {
           asset_id: string
@@ -361,6 +394,153 @@ export type Database = {
           serial_number?: string | null
           status?: Database["public"]["Enums"]["instrument_status"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      ncr_attachments: {
+        Row: {
+          company_id: string
+          created_at: string
+          filename: string
+          id: string
+          mime_type: string | null
+          ncr_id: string
+          size_bytes: number | null
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          filename: string
+          id?: string
+          mime_type?: string | null
+          ncr_id: string
+          size_bytes?: number | null
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          filename?: string
+          id?: string
+          mime_type?: string | null
+          ncr_id?: string
+          size_bytes?: number | null
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      ncr_events: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          comment: string | null
+          company_id: string
+          created_at: string
+          id: string
+          kind: string
+          ncr_id: string
+          payload: Json | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          comment?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          ncr_id: string
+          payload?: Json | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          comment?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          ncr_id?: string
+          payload?: Json | null
+        }
+        Relationships: []
+      }
+      ncrs: {
+        Row: {
+          assigned_to: string | null
+          assigned_to_name: string | null
+          closed_at: string | null
+          closed_by: string | null
+          company_id: string
+          corrective_action: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          inspection_id: string | null
+          ncr_no: string
+          preventive_action: string | null
+          project_id: string | null
+          raised_by: string | null
+          raised_by_name: string | null
+          root_cause: string | null
+          severity: Database["public"]["Enums"]["severity_level"] | null
+          status: Database["public"]["Enums"]["ncr_status"]
+          title: string
+          updated_at: string
+          weld_id: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          company_id: string
+          corrective_action?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          inspection_id?: string | null
+          ncr_no: string
+          preventive_action?: string | null
+          project_id?: string | null
+          raised_by?: string | null
+          raised_by_name?: string | null
+          root_cause?: string | null
+          severity?: Database["public"]["Enums"]["severity_level"] | null
+          status?: Database["public"]["Enums"]["ncr_status"]
+          title: string
+          updated_at?: string
+          weld_id?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          company_id?: string
+          corrective_action?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          inspection_id?: string | null
+          ncr_no?: string
+          preventive_action?: string | null
+          project_id?: string | null
+          raised_by?: string | null
+          raised_by_name?: string | null
+          root_cause?: string | null
+          severity?: Database["public"]["Enums"]["severity_level"] | null
+          status?: Database["public"]["Enums"]["ncr_status"]
+          title?: string
+          updated_at?: string
+          weld_id?: string | null
         }
         Relationships: []
       }
@@ -848,14 +1028,93 @@ export type Database = {
           },
         ]
       }
-      welds: {
+      weld_attachments: {
         Row: {
           company_id: string
           created_at: string
-          heat_input: string | null
+          filename: string
           id: string
+          mime_type: string | null
+          size_bytes: number | null
+          storage_path: string
+          uploaded_by: string | null
+          weld_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          filename: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path: string
+          uploaded_by?: string | null
+          weld_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          filename?: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path?: string
+          uploaded_by?: string | null
+          weld_id?: string
+        }
+        Relationships: []
+      }
+      weld_events: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          company_id: string
+          created_at: string
+          id: string
+          kind: string
+          payload: Json | null
+          weld_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          payload?: Json | null
+          weld_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          payload?: Json | null
+          weld_id?: string
+        }
+        Relationships: []
+      }
+      welds: {
+        Row: {
+          base_material: string | null
+          company_id: string
+          created_at: string
+          drawing_ref: string | null
+          filler_metal: string | null
+          heat_input: string | null
+          heat_number: string | null
+          id: string
+          inspection_status: string | null
+          joint_no: string | null
+          joint_type: string | null
+          line_no: string | null
           procedure_id: string | null
           project_id: string | null
+          qr_token: string | null
+          spool_no: string | null
           status: Database["public"]["Enums"]["weld_status"]
           updated_at: string
           weld_date: string
@@ -863,12 +1122,22 @@ export type Database = {
           welder_name: string | null
         }
         Insert: {
+          base_material?: string | null
           company_id: string
           created_at?: string
+          drawing_ref?: string | null
+          filler_metal?: string | null
           heat_input?: string | null
+          heat_number?: string | null
           id?: string
+          inspection_status?: string | null
+          joint_no?: string | null
+          joint_type?: string | null
+          line_no?: string | null
           procedure_id?: string | null
           project_id?: string | null
+          qr_token?: string | null
+          spool_no?: string | null
           status?: Database["public"]["Enums"]["weld_status"]
           updated_at?: string
           weld_date?: string
@@ -876,12 +1145,22 @@ export type Database = {
           welder_name?: string | null
         }
         Update: {
+          base_material?: string | null
           company_id?: string
           created_at?: string
+          drawing_ref?: string | null
+          filler_metal?: string | null
           heat_input?: string | null
+          heat_number?: string | null
           id?: string
+          inspection_status?: string | null
+          joint_no?: string | null
+          joint_type?: string | null
+          line_no?: string | null
           procedure_id?: string | null
           project_id?: string | null
+          qr_token?: string | null
+          spool_no?: string | null
           status?: Database["public"]["Enums"]["weld_status"]
           updated_at?: string
           weld_date?: string
@@ -955,6 +1234,14 @@ export type Database = {
         | "Calibration Due"
         | "Out of Service"
       instrument_status: "Active" | "Calibration Due" | "Out of Service"
+      ncr_status:
+        | "Draft"
+        | "Open"
+        | "Root Cause"
+        | "CA Pending"
+        | "In Review"
+        | "Closed"
+        | "Rejected"
       procedure_status:
         | "Draft"
         | "Review"
@@ -1119,6 +1406,15 @@ export const Constants = {
         "Out of Service",
       ],
       instrument_status: ["Active", "Calibration Due", "Out of Service"],
+      ncr_status: [
+        "Draft",
+        "Open",
+        "Root Cause",
+        "CA Pending",
+        "In Review",
+        "Closed",
+        "Rejected",
+      ],
       procedure_status: ["Draft", "Review", "Approved", "Archived", "Rejected"],
       project_status: [
         "Planning",
