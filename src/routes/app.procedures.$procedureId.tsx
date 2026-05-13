@@ -342,34 +342,94 @@ function ProcedureDetailPage() {
 }
 
 function WpsSheet({ proc }: { proc: any }) {
-  const rows: [string, any][] = [
-    ["Code", proc.code], ["Standard", proc.standard], ["Process", proc.process],
-    ["Revision", proc.revision], ["Status", proc.status],
-    ["Joint type", proc.joint_type], ["Position", proc.position],
-    ["Thickness range", proc.thickness_range],
-    ["Base material", proc.base_material], ["Filler material", proc.filler_material],
-    ["Shielding gas", proc.shielding_gas],
-    ["Preheat", proc.preheat_temp], ["Interpass", proc.interpass_temp], ["PWHT", proc.pwht],
-    ["Voltage", range(proc.voltage_min, proc.voltage_max, "V")],
-    ["Current", range(proc.current_min, proc.current_max, "A")],
-    ["Travel speed", range(proc.travel_speed_min, proc.travel_speed_max, "mm/min")],
-    ["Heat input", range(proc.heat_input_min, proc.heat_input_max, "kJ/mm")],
+  const groups: { title: string; rows: [string, any][] }[] = [
+    {
+      title: "1. Identification",
+      rows: [
+        ["WPS Code", proc.code], ["Standard / Code", proc.standard],
+        ["Welding process", proc.process], ["Revision", proc.revision],
+        ["Status", proc.status],
+      ],
+    },
+    {
+      title: "2. Joint design",
+      rows: [
+        ["Joint type", proc.joint_type], ["Welding position", proc.position],
+        ["Thickness range", proc.thickness_range],
+      ],
+    },
+    {
+      title: "3. Materials",
+      rows: [
+        ["Base material", proc.base_material],
+        ["Filler material", proc.filler_material],
+        ["Shielding gas", proc.shielding_gas],
+      ],
+    },
+    {
+      title: "4. Thermal treatment",
+      rows: [
+        ["Preheat temperature", proc.preheat_temp],
+        ["Interpass temperature", proc.interpass_temp],
+        ["PWHT", proc.pwht],
+      ],
+    },
+    {
+      title: "5. Electrical & mechanical parameters",
+      rows: [
+        ["Voltage", range(proc.voltage_min, proc.voltage_max, "V")],
+        ["Current", range(proc.current_min, proc.current_max, "A")],
+        ["Travel speed", range(proc.travel_speed_min, proc.travel_speed_max, "mm/min")],
+        ["Heat input", range(proc.heat_input_min, proc.heat_input_max, "kJ/mm")],
+      ],
+    },
   ];
   return (
-    <div className="rounded-xl border border-border bg-card p-6 print:border-0 print:p-0">
-      <div className="hidden print:block mb-6">
-        <div className="text-2xl font-bold">Welding Procedure Specification</div>
-        <div className="text-sm">{proc.code} — {proc.standard} — {proc.revision}</div>
-        <hr className="my-3" />
-      </div>
-      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
-        {rows.map(([k, v]) => (
-          <div key={k} className="flex justify-between gap-4 border-b border-border/50 pb-1.5">
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">{k}</dt>
-            <dd className="text-sm font-medium text-end">{v ?? <span className="text-muted-foreground">—</span>}</dd>
-          </div>
+    <div className="doc-sheet print:!shadow-none print:!border-0 print:!p-0 print:!max-w-none">
+      <header className="border-b-2 border-foreground pb-3 mb-4 flex items-start justify-between gap-4">
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Welding Procedure Specification</div>
+          <div className="text-lg font-bold">{proc.code}</div>
+          <div className="text-xs text-muted-foreground">{proc.standard} · {proc.process}</div>
+        </div>
+        <table className="text-[10px]">
+          <tbody>
+            <tr><td className="pe-3 uppercase text-muted-foreground">Revision</td><td className="font-medium">{proc.revision}</td></tr>
+            <tr><td className="pe-3 uppercase text-muted-foreground">Status</td><td className="font-medium">{proc.status}</td></tr>
+            <tr><td className="pe-3 uppercase text-muted-foreground">Issued</td><td className="font-medium">{new Date().toLocaleDateString()}</td></tr>
+          </tbody>
+        </table>
+      </header>
+
+      <div className="space-y-4">
+        {groups.map((g) => (
+          <section key={g.title} className="avoid-break">
+            <div className="text-[11px] font-semibold uppercase tracking-wider mb-1.5 bg-muted px-2 py-1 border border-foreground/40">{g.title}</div>
+            <table className="w-full">
+              <tbody>
+                {g.rows.map(([k, v]) => (
+                  <tr key={k}>
+                    <th style={{ width: "32%" }}>{k}</th>
+                    <td>{v ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
         ))}
-      </dl>
+      </div>
+
+      <section className="mt-8 avoid-break">
+        <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Approvals</div>
+        <table className="w-full">
+          <thead><tr><th>Welding Engineer</th><th>QA/QC Manager</th><th>Client / Inspector</th></tr></thead>
+          <tbody><tr>
+            <td style={{ height: 70 }}><div className="text-[10px] text-muted-foreground">Signature & date</div></td>
+            <td><div className="text-[10px] text-muted-foreground">Signature & date</div></td>
+            <td><div className="text-[10px] text-muted-foreground">Signature & date</div></td>
+          </tr></tbody>
+        </table>
+      </section>
     </div>
   );
 }
