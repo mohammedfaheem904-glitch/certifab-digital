@@ -134,3 +134,24 @@
   }
 }
 
+
+/* Marketing site: light section scope. Overrides design tokens locally so
+   shadcn primitives (cards, buttons) automatically render in light mode. */
+.marketing-light {
+  --background: oklch(0.99 0.003 250);
+  --foreground: oklch(0.18 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 250);
+  --secondary: oklch(0.96 0.005 250);
+  --secondary-foreground: oklch(0.22 0.02 250);
+  --muted: oklch(0.96 0.005 250);
+  --muted-foreground: oklch(0.45 0.015 250);
+  --accent: oklch(0.94 0.01 250);
+  --accent-foreground: oklch(0.22 0.02 250);
+  --border: oklch(0.91 0.005 250);
+  --input: oklch(0.93 0.005 250);
+  background-color: var(--background);
+  color: var(--foreground);
+}
