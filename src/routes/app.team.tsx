@@ -53,7 +53,7 @@ function TeamPage() {
       const { data: profs } = await supabase
         .from("profiles")
         .select("id, display_name, job_title")
-        .eq("company_id", profile!.company_id);
+        .eq("company_id", profile!.company_id as string);
       const ids = (profs ?? []).map((p) => p.id);
       const { data: roleRows } = await supabase
         .from("user_roles")

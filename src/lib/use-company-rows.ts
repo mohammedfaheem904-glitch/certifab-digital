@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
-type Tbl = "projects" | "procedures" | "qualifications" | "welds" | "inspections" | "equipment";
+type Tbl = "projects" | "procedures" | "qualifications" | "welds" | "inspections" | "equipment" | "instruments" | "instrument_calibrations";
 
 export function useCompanyRows<T = any>(table: Tbl, opts?: { select?: string; order?: { column: string; ascending?: boolean } }) {
   const { profile } = useAuth();
