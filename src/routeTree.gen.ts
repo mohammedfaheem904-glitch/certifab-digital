@@ -18,6 +18,7 @@ import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
@@ -84,6 +85,11 @@ const ContactRoute = ContactRouteImport.update({
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcceptInviteRoute = AcceptInviteRouteImport.update({
+  id: '/accept-invite',
+  path: '/accept-invite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -202,6 +208,7 @@ const AppInstrumentsInstrumentIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/app': typeof AppRouteWithChildren
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
@@ -235,6 +242,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/app': typeof AppRouteWithChildren
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/accept-invite'
     | '/app'
     | '/contact'
     | '/demo'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/accept-invite'
     | '/contact'
     | '/demo'
     | '/features'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/accept-invite'
     | '/app'
     | '/contact'
     | '/demo'
@@ -402,6 +414,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AcceptInviteRoute: typeof AcceptInviteRoute
   AppRoute: typeof AppRouteWithChildren
   ContactRoute: typeof ContactRoute
   DemoRoute: typeof DemoRoute
@@ -478,6 +491,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accept-invite': {
+      id: '/accept-invite'
+      path: '/accept-invite'
+      fullPath: '/accept-invite'
+      preLoaderRoute: typeof AcceptInviteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -733,6 +753,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AcceptInviteRoute: AcceptInviteRoute,
   AppRoute: AppRouteWithChildren,
   ContactRoute: ContactRoute,
   DemoRoute: DemoRoute,

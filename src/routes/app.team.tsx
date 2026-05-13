@@ -5,8 +5,9 @@ import { useAuth, type AppRole } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Loader2, ShieldCheck, Copy, X, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
@@ -140,6 +141,8 @@ function TeamPage() {
         </table>
       </div>
 
+      {isAdmin && <PendingInvites companyId={profile!.company_id!} />}
+
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="flex items-center gap-2 mb-4">
           <ShieldCheck className="size-4 text-primary" />
@@ -158,51 +161,180 @@ function TeamPage() {
   );
 }
 
+type Invitation = {
+  id: string;
+  email: string;
+  token: string;
+  role: AppRole;
+  expires_at: string;
+  accepted_at: string | null;
+  created_at: string;
+};
+
+function PendingInvites({ companyId }: { companyId: string }) {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery<Invitation[]>({
+    queryKey: ["invitations", companyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("invitations")
+        .select("id, email, token, role, expires_at, accepted_at, created_at")
+        .eq("company_id", companyId)
+        .is("accepted_at", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Invitation[];
+    },
+  });
+
+  const inviteUrl = (token: string) => `${window.location.origin}/accept-invite?token=${token}`;
+
+  const copy = async (token: string) => {
+    await navigator.clipboard.writeText(inviteUrl(token));
+    toast.success("Invitation link copied");
+  };
+
+  const revoke = async (id: string) => {
+    const { error } = await supabase.from("invitations").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Invitation revoked");
+    qc.invalidateQueries({ queryKey: ["invitations", companyId] });
+  };
+
+  if (isLoading) return null;
+  if (!data || data.length === 0) return null;
+
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="px-5 py-3 border-b border-border flex items-center gap-2">
+        <Mail className="size-4 text-primary" />
+        <h3 className="text-sm font-semibold">Pending invitations</h3>
+        <span className="text-xs text-muted-foreground ms-1">{data.length}</span>
+      </div>
+      <table className="w-full text-sm">
+        <thead className="text-xs text-muted-foreground bg-muted/40">
+          <tr>
+            <th className="text-start font-medium px-5 py-2.5">Email</th>
+            <th className="text-start font-medium px-5 py-2.5">Role</th>
+            <th className="text-start font-medium px-5 py-2.5">Expires</th>
+            <th className="text-end font-medium px-5 py-2.5">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((inv) => {
+            const expired = new Date(inv.expires_at) < new Date();
+            return (
+              <tr key={inv.id} className="border-t border-border/60">
+                <td className="px-5 py-2.5 font-mono text-xs">{inv.email}</td>
+                <td className="px-5 py-2.5">
+                  <Badge variant="outline" className="text-[10px]">{ROLE_LABEL[inv.role]}</Badge>
+                </td>
+                <td className="px-5 py-2.5 text-xs text-muted-foreground">
+                  {expired ? <span className="text-destructive">Expired</span> : `in ${formatDistanceToNow(new Date(inv.expires_at))}`}
+                </td>
+                <td className="px-5 py-2.5">
+                  <div className="flex justify-end gap-1">
+                    <Button size="sm" variant="ghost" onClick={() => copy(inv.token)} disabled={expired}>
+                      <Copy className="size-3.5 me-1" /> Copy link
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => revoke(inv.id)}>
+                      <X className="size-3.5" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function InviteDialog() {
+  const { profile, user } = useAuth();
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<AppRole>("inspector");
+  const [busy, setBusy] = useState(false);
+  const [link, setLink] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Magic-link self-signup style invite. Real provisioning would use service role; this surfaces an actionable signup link.
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/login` },
-    });
+    if (!profile?.company_id) return;
+    setBusy(true);
+    const { data, error } = await supabase
+      .from("invitations")
+      .insert({
+        company_id: profile.company_id,
+        email: email.trim().toLowerCase(),
+        role,
+        invited_by: user?.id,
+        invited_by_name: profile.display_name ?? user?.email ?? null,
+      })
+      .select("token")
+      .single();
+    setBusy(false);
     if (error) return toast.error(error.message);
-    toast.success(`Invitation email sent to ${email}. Assign their role here once they sign in.`);
+    const url = `${window.location.origin}/accept-invite?token=${data.token}`;
+    setLink(url);
+    qc.invalidateQueries({ queryKey: ["invitations", profile.company_id] });
+    toast.success("Invitation created — share the link below.");
+  };
+
+  const close = () => {
     setOpen(false);
     setEmail("");
+    setRole("inspector");
+    setLink(null);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : close())}>
       <DialogTrigger asChild>
         <Button>Invite member</Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={submit}>
-          <DialogHeader><DialogTitle>Invite member</DialogTitle></DialogHeader>
-          <div className="space-y-3 py-4">
-            <div><Label className="text-xs">Email</Label><Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" /></div>
-            <div><Label className="text-xs">Initial role</Label>
-              <Select value={role} onValueChange={(v) => setRole(v as AppRole)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {ROLES.map((r) => <SelectItem key={r} value={r}>{ROLE_LABEL[r]}</SelectItem>)}
-                </SelectContent>
-              </Select>
+        {!link ? (
+          <form onSubmit={submit}>
+            <DialogHeader><DialogTitle>Invite member</DialogTitle></DialogHeader>
+            <div className="space-y-3 py-4">
+              <div><Label className="text-xs">Email</Label><Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" /></div>
+              <div><Label className="text-xs">Initial role</Label>
+                <Select value={role} onValueChange={(v) => setRole(v as AppRole)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map((r) => <SelectItem key={r} value={r}>{ROLE_LABEL[r]}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                We'll generate a one-time invitation link valid for 14 days. Send it to your teammate over email or chat.
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              We'll email a magic-link sign-in. After they accept, assign roles from the table.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit">Send invite</Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={close}>Cancel</Button>
+              <Button type="submit" disabled={busy}>{busy ? "Creating…" : "Create invitation"}</Button>
+            </DialogFooter>
+          </form>
+        ) : (
+          <>
+            <DialogHeader><DialogTitle>Invitation ready</DialogTitle></DialogHeader>
+            <div className="space-y-3 py-4">
+              <p className="text-sm text-muted-foreground">Share this link with <b>{email}</b>. It expires in 14 days and can only be used once.</p>
+              <div className="flex gap-2">
+                <Input readOnly value={link} className="font-mono text-xs" onFocus={(e) => e.currentTarget.select()} />
+                <Button type="button" onClick={() => { navigator.clipboard.writeText(link); toast.success("Copied"); }}>
+                  <Copy className="size-4" />
+                </Button>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={close}>Done</Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
