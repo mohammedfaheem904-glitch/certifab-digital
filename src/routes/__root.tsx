@@ -12,6 +12,7 @@ import appCss from "../styles.css?url";
 import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 function NotFoundComponent() {
   return (
@@ -119,7 +120,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <I18nProvider>
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
           <Toaster richColors position="top-right" />
         </I18nProvider>
       </AuthProvider>
