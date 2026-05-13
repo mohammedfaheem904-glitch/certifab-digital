@@ -59,7 +59,17 @@ export async function seedDemoData(companyId: string) {
     { asset_id: "SAW-012", model: "Lincoln Idealarc DC-1000", status: "Operational" as const, calibration_due: "2026-07-30" },
     { asset_id: "TIG-145", model: "Fronius MagicWave 4000", status: "Calibration Due" as const, calibration_due: "2026-05-08" },
   ].map((e) => ({ ...e, company_id: companyId }));
-  await supabase.from("equipment").insert(equipment);
+  const instruments = [
+    { asset_id: "UT-014", name: "Olympus EPOCH 650", category: "UT", model: "EPOCH 650", serial_number: "E650-22841", manufacturer: "Olympus", calibration_due: "2026-07-15", status: "Active" as const },
+    { asset_id: "UT-021", name: "GE Phasor XS", category: "UT", model: "Phasor XS", serial_number: "PXS-9912", manufacturer: "GE", calibration_due: "2026-05-22", status: "Active" as const },
+    { asset_id: "RT-008", name: "Yxlon SMART EVO", category: "RT", model: "SMART EVO 200", serial_number: "YX-44218", manufacturer: "Yxlon", calibration_due: "2026-08-30", status: "Active" as const },
+    { asset_id: "WG-101", name: "Cambridge Welding Gauge", category: "Welding Gauge", model: "WG-2", serial_number: "CWG-1101", manufacturer: "GAL Gage", calibration_due: "2026-06-12", status: "Active" as const },
+    { asset_id: "WG-102", name: "Bridge Cam Gauge", category: "Welding Gauge", model: "BCG", serial_number: "BCG-2230", manufacturer: "GAL Gage", calibration_due: "2026-04-30", status: "Calibration Due" as const },
+    { asset_id: "PG-204", name: "Wika Pressure Gauge", category: "Pressure Gauge", model: "232.50.100", serial_number: "WK-77231", manufacturer: "WIKA", calibration_due: "2026-09-01", status: "Active" as const },
+    { asset_id: "TM-118", name: "Fluke Surface Thermometer", category: "Temperature", model: "62 MAX+", serial_number: "FL-66312", manufacturer: "Fluke", calibration_due: "2026-05-18", status: "Active" as const },
+    { asset_id: "CT-031", name: "Elcometer 456 Coating", category: "Coating", model: "456C-FNF", serial_number: "EL-88121", manufacturer: "Elcometer", calibration_due: "2026-07-22", status: "Active" as const },
+  ].map((i) => ({ ...i, company_id: companyId }));
+  await supabase.from("instruments").insert(instruments);
 
   return { skipped: false };
 }
