@@ -155,3 +155,138 @@
   background-color: var(--background);
   color: var(--foreground);
 }
+
+/* ============================================================
+   ENGINEERING DOCUMENT PRINT SYSTEM
+   A4 page with controlled margins, running headers/footers,
+   page-break controls, light theme, watermark, and table polish.
+   ============================================================ */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 14mm 22mm 14mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #0a0a0a !important;
+    background-image: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 10.5pt;
+    line-height: 1.35;
+  }
+
+  /* Force light theme tokens for any printed surface */
+  body, .doc-print {
+    --background: #ffffff;
+    --foreground: #0a0a0a;
+    --card: #ffffff;
+    --card-foreground: #0a0a0a;
+    --muted: #f4f5f7;
+    --muted-foreground: #4a5260;
+    --border: #c9ced6;
+    --primary: #b45309;
+    --primary-foreground: #ffffff;
+    --accent: #1e40af;
+    color: #0a0a0a;
+  }
+
+  /* Hide app chrome */
+  [data-app-chrome], aside, nav[aria-label="Primary"],
+  .print\:hidden { display: none !important; }
+
+  /* Make all cards crisp white */
+  .bg-card, .bg-background, .bg-muted\/40, .bg-muted\/20 {
+    background: #ffffff !important;
+  }
+
+  /* Engineering tables */
+  table { border-collapse: collapse !important; width: 100%; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  tr, td, th { page-break-inside: avoid; break-inside: avoid; }
+  table th {
+    background: #eef2f7 !important;
+    color: #0a0a0a !important;
+    border: 0.5pt solid #4a5260 !important;
+    padding: 4pt 6pt !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 8.5pt;
+    letter-spacing: 0.04em;
+  }
+  table td {
+    border: 0.5pt solid #c9ced6 !important;
+    padding: 3.5pt 6pt !important;
+    vertical-align: top;
+  }
+
+  /* Page-break helpers */
+  .page-break-before { page-break-before: always; break-before: page; }
+  .page-break-after  { page-break-after: always;  break-after: page; }
+  .avoid-break       { page-break-inside: avoid;  break-inside: avoid; }
+
+  h1, h2, h3, h4 { page-break-after: avoid; break-after: avoid; }
+
+  a { color: inherit !important; text-decoration: none !important; }
+
+  /* Watermark for draft / approved status */
+  .doc-watermark {
+    position: fixed;
+    top: 40%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 110pt;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: rgba(180, 83, 9, 0.07) !important;
+    transform: rotate(-28deg);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Allow content above the watermark */
+  .doc-content { position: relative; z-index: 1; }
+}
+
+/* On-screen preview of print sheets — give them an A4-ish look */
+.doc-sheet {
+  background: #ffffff;
+  color: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18mm 14mm;
+  max-width: 210mm;
+  margin: 0 auto;
+  box-shadow: 0 10px 40px -12px rgba(0,0,0,0.35);
+}
+.doc-sheet, .doc-sheet * {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --muted: #f4f5f7;
+  --muted-foreground: #4a5260;
+  --border: #c9ced6;
+}
+.doc-sheet table { border-collapse: collapse; width: 100%; }
+.doc-sheet th {
+  background: #eef2f7;
+  border: 1px solid #4a5260;
+  padding: 6px 10px;
+  text-align: start;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #0a0a0a;
+}
+.doc-sheet td {
+  border: 1px solid #c9ced6;
+  padding: 6px 10px;
+  vertical-align: top;
+  font-size: 12px;
+}

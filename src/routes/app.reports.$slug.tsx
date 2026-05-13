@@ -33,23 +33,37 @@ function ReportPage() {
   return null;
 }
 
-function Wrap({ title, rows, isLoading, columns, onExportRows }: any) {
+const DOC_TYPES: Record<string, string> = {
+  qualifications: "WQR", procedures: "WPS-REG", welds: "WTR",
+  inspections: "INS", ncrs: "NCR", calibration: "CAL",
+};
+
+function Wrap({ slug, title, rows, isLoading, columns, onExportRows }: any) {
   return (
     <ReportShell
       title={title}
       subtitle={`${rows.length} record${rows.length === 1 ? "" : "s"}`}
+      docType={DOC_TYPES[slug] ?? "RPT"}
+      revision="Rev 1"
+      status="ISSUED"
+      meta={[
+        { label: "Report type", value: title },
+        { label: "Records", value: String(rows.length) },
+        { label: "Period", value: "All time" },
+        { label: "Confidentiality", value: "Internal · Controlled" },
+      ]}
       onExportExcel={() => exportExcel(title, "Report", onExportRows ? onExportRows() : rows)}
     >
       <table className="w-full text-sm">
-        <thead className="text-xs text-muted-foreground bg-muted/40 print:bg-transparent print:text-foreground print:border-b print:border-foreground">
-          <tr>{columns.map((c: any) => <th key={c.key} className="text-start font-semibold px-4 py-2">{c.label}</th>)}</tr>
+        <thead>
+          <tr>{columns.map((c: any) => <th key={c.key}>{c.label}</th>)}</tr>
         </thead>
         <tbody>
-          {isLoading && <tr><td colSpan={columns.length} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /> Loading…</td></tr>}
-          {!isLoading && rows.length === 0 && <tr><td colSpan={columns.length} className="px-4 py-10 text-center text-muted-foreground">No records.</td></tr>}
+          {isLoading && <tr><td colSpan={columns.length} className="text-center text-muted-foreground py-6"><Loader2 className="size-4 animate-spin inline" /> Loading…</td></tr>}
+          {!isLoading && rows.length === 0 && <tr><td colSpan={columns.length} className="text-center text-muted-foreground py-6">No records.</td></tr>}
           {rows.map((r: any, i: number) => (
-            <tr key={r.id ?? i} className="border-t border-border/60 print:border-border">
-              {columns.map((c: any) => <td key={c.key} className="px-4 py-2 align-top">{c.render ? c.render(r) : (r[c.key] ?? "—")}</td>)}
+            <tr key={r.id ?? i}>
+              {columns.map((c: any) => <td key={c.key}>{c.render ? c.render(r) : (r[c.key] ?? "—")}</td>)}
             </tr>
           ))}
         </tbody>
@@ -61,7 +75,7 @@ function Wrap({ title, rows, isLoading, columns, onExportRows }: any) {
 function QualificationsReport() {
   const { data, isLoading } = useCompanyRows<any>("qualifications", { order: { column: "expiry_date", ascending: true } });
   const rows = data ?? [];
-  return <Wrap title={TITLES.qualifications} isLoading={isLoading} rows={rows}
+  return <Wrap slug="qualifications" title={TITLES.qualifications} isLoading={isLoading} rows={rows}
     columns={[
       { key: "welder_name", label: "Welder" },
       { key: "employee_id", label: "Employee ID" },
@@ -77,7 +91,7 @@ function QualificationsReport() {
 
 function ProceduresReport() {
   const { data, isLoading } = useCompanyRows<any>("procedures", { order: { column: "code", ascending: true } });
-  return <Wrap title={TITLES.procedures} isLoading={isLoading} rows={data ?? []}
+  return <Wrap slug="procedures" title={TITLES.procedures} isLoading={isLoading} rows={data ?? []}
     columns={[
       { key: "code", label: "Code" },
       { key: "standard", label: "Standard" },
@@ -90,7 +104,7 @@ function ProceduresReport() {
 
 function WeldsReport() {
   const { data, isLoading } = useCompanyRows<any>("welds", { order: { column: "weld_date", ascending: false } });
-  return <Wrap title={TITLES.welds} isLoading={isLoading} rows={data ?? []}
+  return <Wrap slug="welds" title={TITLES.welds} isLoading={isLoading} rows={data ?? []}
     columns={[
       { key: "weld_no", label: "Weld No." },
       { key: "welder_name", label: "Welder" },
@@ -102,7 +116,7 @@ function WeldsReport() {
 
 function InspectionsReport() {
   const { data, isLoading } = useCompanyRows<any>("inspections", { order: { column: "inspected_at", ascending: false } });
-  return <Wrap title={TITLES.inspections} isLoading={isLoading} rows={data ?? []}
+  return <Wrap slug="inspections" title={TITLES.inspections} isLoading={isLoading} rows={data ?? []}
     columns={[
       { key: "inspection_type", label: "Type" },
       { key: "ncr_code", label: "NCR" },
@@ -116,7 +130,7 @@ function InspectionsReport() {
 function NcrsReport() {
   const { data, isLoading } = useCompanyRows<any>("inspections", { order: { column: "inspected_at", ascending: false } });
   const rows = (data ?? []).filter((r: any) => r.ncr_code);
-  return <Wrap title={TITLES.ncrs} isLoading={isLoading} rows={rows}
+  return <Wrap slug="ncrs" title={TITLES.ncrs} isLoading={isLoading} rows={rows}
     columns={[
       { key: "ncr_code", label: "NCR" },
       { key: "inspection_type", label: "Detected via" },
@@ -133,7 +147,7 @@ function CalibrationReport() {
     ...(equipment ?? []).map((e: any) => ({ id: `e-${e.id}`, kind: "Welding machine", asset: e.asset_id, name: e.model, due: e.calibration_due, status: e.status })),
     ...(instruments ?? []).map((i: any) => ({ id: `i-${i.id}`, kind: "QA/QC instrument", asset: i.asset_id, name: i.name, due: i.calibration_due, status: i.status })),
   ];
-  return <Wrap title={TITLES.calibration} isLoading={l1 || l2} rows={rows}
+  return <Wrap slug="calibration" title={TITLES.calibration} isLoading={l1 || l2} rows={rows}
     columns={[
       { key: "kind", label: "Kind" },
       { key: "asset", label: "Asset ID" },
