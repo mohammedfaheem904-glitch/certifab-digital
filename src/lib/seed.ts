@@ -118,7 +118,7 @@ export async function seedDemoData(companyId: string) {
     title: ["Porosity cluster exceeding code", "Lack of fusion at root", "Crack indication on cap", "Excessive undercut", "Incomplete penetration", "Slag inclusion below surface", "Misalignment exceeds tolerance", "PWHT not performed"][i],
     description: "Detected during NDT inspection. Requires evaluation per project quality plan.",
     severity: (["High", "Medium", "Critical", "Low", "High", "Medium", "Low", "High"] as const)[i],
-    status: (["Open", "Root Cause", "CA/PA", "Open", "Review", "Closed", "Open", "Root Cause"] as const)[i],
+    status: (["Open", "Root Cause", "CA Pending", "Open", "In Review", "Closed", "Open", "Root Cause"] as const)[i],
     weld_id: w.id,
     project_id: w.project_id,
     raised_by_name: ["I. Khalid", "S. Ahmed", "T. Reyes"][i % 3],
