@@ -1,5 +1,6 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
+import { IdleTimeoutGuard } from "@/components/IdleTimeoutGuard";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/app")({
@@ -16,5 +17,10 @@ function AppGate() {
     );
   }
   if (!session) return <Navigate to="/login" />;
-  return <AppLayout />;
+  return (
+    <>
+      <AppLayout />
+      <IdleTimeoutGuard />
+    </>
+  );
 }
