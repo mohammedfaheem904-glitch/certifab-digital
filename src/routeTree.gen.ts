@@ -15,13 +15,18 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppWeldsRouteImport } from './routes/app.welds'
+import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
 import { Route as AppProjectsRouteImport } from './routes/app.projects'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
+import { Route as AppInstrumentsRouteImport } from './routes/app.instruments'
 import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
+import { Route as AppAuditRouteImport } from './routes/app.audit'
+import { Route as VerifyInstrumentTokenRouteImport } from './routes/verify.instrument.$token'
+import { Route as AppReportsSlugRouteImport } from './routes/app.reports.$slug'
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
 
 const SignupRoute = SignupRouteImport.update({
@@ -54,6 +59,11 @@ const AppWeldsRoute = AppWeldsRouteImport.update({
   path: '/welds',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -79,6 +89,11 @@ const AppProceduresRoute = AppProceduresRouteImport.update({
   path: '/procedures',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInstrumentsRoute = AppInstrumentsRouteImport.update({
+  id: '/instruments',
+  path: '/instruments',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInspectionsRoute = AppInspectionsRouteImport.update({
   id: '/inspections',
   path: '/inspections',
@@ -88,6 +103,21 @@ const AppEquipmentRoute = AppEquipmentRouteImport.update({
   id: '/equipment',
   path: '/equipment',
   getParentRoute: () => AppRoute,
+} as any)
+const AppAuditRoute = AppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AppRoute,
+} as any)
+const VerifyInstrumentTokenRoute = VerifyInstrumentTokenRouteImport.update({
+  id: '/verify/instrument/$token',
+  path: '/verify/instrument/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppReportsSlugRoute = AppReportsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AppReportsRoute,
 } as any)
 const AppProceduresProcedureIdRoute =
   AppProceduresProcedureIdRouteImport.update({
@@ -101,31 +131,41 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/app/audit': typeof AppAuditRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
+  '/app/instruments': typeof AppInstrumentsRoute
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
-  '/app/reports': typeof AppReportsRoute
+  '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
+  '/app/team': typeof AppTeamRoute
   '/app/welds': typeof AppWeldsRoute
   '/app/': typeof AppIndexRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/reports/$slug': typeof AppReportsSlugRoute
+  '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/app/audit': typeof AppAuditRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
+  '/app/instruments': typeof AppInstrumentsRoute
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
-  '/app/reports': typeof AppReportsRoute
+  '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
+  '/app/team': typeof AppTeamRoute
   '/app/welds': typeof AppWeldsRoute
   '/app': typeof AppIndexRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/reports/$slug': typeof AppReportsSlugRoute
+  '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -133,16 +173,21 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/app/audit': typeof AppAuditRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
+  '/app/instruments': typeof AppInstrumentsRoute
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRoute
-  '/app/reports': typeof AppReportsRoute
+  '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
+  '/app/team': typeof AppTeamRoute
   '/app/welds': typeof AppWeldsRoute
   '/app/': typeof AppIndexRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/reports/$slug': typeof AppReportsSlugRoute
+  '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,47 +196,62 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/signup'
+    | '/app/audit'
     | '/app/equipment'
     | '/app/inspections'
+    | '/app/instruments'
     | '/app/procedures'
     | '/app/projects'
     | '/app/qualifications'
     | '/app/reports'
     | '/app/settings'
+    | '/app/team'
     | '/app/welds'
     | '/app/'
     | '/app/procedures/$procedureId'
+    | '/app/reports/$slug'
+    | '/verify/instrument/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/signup'
+    | '/app/audit'
     | '/app/equipment'
     | '/app/inspections'
+    | '/app/instruments'
     | '/app/procedures'
     | '/app/projects'
     | '/app/qualifications'
     | '/app/reports'
     | '/app/settings'
+    | '/app/team'
     | '/app/welds'
     | '/app'
     | '/app/procedures/$procedureId'
+    | '/app/reports/$slug'
+    | '/verify/instrument/$token'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/login'
     | '/signup'
+    | '/app/audit'
     | '/app/equipment'
     | '/app/inspections'
+    | '/app/instruments'
     | '/app/procedures'
     | '/app/projects'
     | '/app/qualifications'
     | '/app/reports'
     | '/app/settings'
+    | '/app/team'
     | '/app/welds'
     | '/app/'
     | '/app/procedures/$procedureId'
+    | '/app/reports/$slug'
+    | '/verify/instrument/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -199,6 +259,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  VerifyInstrumentTokenRoute: typeof VerifyInstrumentTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -245,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWeldsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/team': {
+      id: '/app/team'
+      path: '/team'
+      fullPath: '/app/team'
+      preLoaderRoute: typeof AppTeamRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/settings': {
       id: '/app/settings'
       path: '/settings'
@@ -280,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProceduresRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/instruments': {
+      id: '/app/instruments'
+      path: '/instruments'
+      fullPath: '/app/instruments'
+      preLoaderRoute: typeof AppInstrumentsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/inspections': {
       id: '/app/inspections'
       path: '/inspections'
@@ -293,6 +368,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/equipment'
       preLoaderRoute: typeof AppEquipmentRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/app/audit': {
+      id: '/app/audit'
+      path: '/audit'
+      fullPath: '/app/audit'
+      preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/verify/instrument/$token': {
+      id: '/verify/instrument/$token'
+      path: '/verify/instrument/$token'
+      fullPath: '/verify/instrument/$token'
+      preLoaderRoute: typeof VerifyInstrumentTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/reports/$slug': {
+      id: '/app/reports/$slug'
+      path: '/$slug'
+      fullPath: '/app/reports/$slug'
+      preLoaderRoute: typeof AppReportsSlugRouteImport
+      parentRoute: typeof AppReportsRoute
     }
     '/app/procedures/$procedureId': {
       id: '/app/procedures/$procedureId'
@@ -316,26 +412,44 @@ const AppProceduresRouteWithChildren = AppProceduresRoute._addFileChildren(
   AppProceduresRouteChildren,
 )
 
+interface AppReportsRouteChildren {
+  AppReportsSlugRoute: typeof AppReportsSlugRoute
+}
+
+const AppReportsRouteChildren: AppReportsRouteChildren = {
+  AppReportsSlugRoute: AppReportsSlugRoute,
+}
+
+const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
+  AppReportsRouteChildren,
+)
+
 interface AppRouteChildren {
+  AppAuditRoute: typeof AppAuditRoute
   AppEquipmentRoute: typeof AppEquipmentRoute
   AppInspectionsRoute: typeof AppInspectionsRoute
+  AppInstrumentsRoute: typeof AppInstrumentsRoute
   AppProceduresRoute: typeof AppProceduresRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRoute
   AppQualificationsRoute: typeof AppQualificationsRoute
-  AppReportsRoute: typeof AppReportsRoute
+  AppReportsRoute: typeof AppReportsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
+  AppTeamRoute: typeof AppTeamRoute
   AppWeldsRoute: typeof AppWeldsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAuditRoute: AppAuditRoute,
   AppEquipmentRoute: AppEquipmentRoute,
   AppInspectionsRoute: AppInspectionsRoute,
+  AppInstrumentsRoute: AppInstrumentsRoute,
   AppProceduresRoute: AppProceduresRouteWithChildren,
   AppProjectsRoute: AppProjectsRoute,
   AppQualificationsRoute: AppQualificationsRoute,
-  AppReportsRoute: AppReportsRoute,
+  AppReportsRoute: AppReportsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
+  AppTeamRoute: AppTeamRoute,
   AppWeldsRoute: AppWeldsRoute,
   AppIndexRoute: AppIndexRoute,
 }
@@ -347,7 +461,18 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  VerifyInstrumentTokenRoute: VerifyInstrumentTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
