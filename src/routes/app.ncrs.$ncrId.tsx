@@ -183,7 +183,7 @@ function NcrDetail() {
   );
 }
 
-function Section({ title, value, field, drafts, setDrafts, onSave }: any) {
+function Section({ title, value, field, drafts, setDrafts, onSave }: { title: string; value: string | null; field: string; drafts: any; setDrafts: any; onSave: (v: string) => void }) {
   const v = drafts[field] ?? value ?? "";
   const dirty = drafts[field] !== undefined && drafts[field] !== (value ?? "");
   return (
