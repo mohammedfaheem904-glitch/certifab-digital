@@ -75,7 +75,7 @@ function Wrap({ slug, title, rows, isLoading, columns, onExportRows }: any) {
 function QualificationsReport() {
   const { data, isLoading } = useCompanyRows<any>("qualifications", { order: { column: "expiry_date", ascending: true } });
   const rows = data ?? [];
-  return <Wrap title={TITLES.qualifications} isLoading={isLoading} rows={rows}
+  return <Wrap slug="qualifications" title={TITLES.qualifications} isLoading={isLoading} rows={rows}
     columns={[
       { key: "welder_name", label: "Welder" },
       { key: "employee_id", label: "Employee ID" },
@@ -91,7 +91,7 @@ function QualificationsReport() {
 
 function ProceduresReport() {
   const { data, isLoading } = useCompanyRows<any>("procedures", { order: { column: "code", ascending: true } });
-  return <Wrap title={TITLES.procedures} isLoading={isLoading} rows={data ?? []}
+  return <Wrap slug="procedures" title={TITLES.procedures} isLoading={isLoading} rows={data ?? []}
     columns={[
       { key: "code", label: "Code" },
       { key: "standard", label: "Standard" },
@@ -104,7 +104,7 @@ function ProceduresReport() {
 
 function WeldsReport() {
   const { data, isLoading } = useCompanyRows<any>("welds", { order: { column: "weld_date", ascending: false } });
-  return <Wrap title={TITLES.welds} isLoading={isLoading} rows={data ?? []}
+  return <Wrap slug="welds" title={TITLES.welds} isLoading={isLoading} rows={data ?? []}
     columns={[
       { key: "weld_no", label: "Weld No." },
       { key: "welder_name", label: "Welder" },
@@ -116,7 +116,7 @@ function WeldsReport() {
 
 function InspectionsReport() {
   const { data, isLoading } = useCompanyRows<any>("inspections", { order: { column: "inspected_at", ascending: false } });
-  return <Wrap title={TITLES.inspections} isLoading={isLoading} rows={data ?? []}
+  return <Wrap slug="inspections" title={TITLES.inspections} isLoading={isLoading} rows={data ?? []}
     columns={[
       { key: "inspection_type", label: "Type" },
       { key: "ncr_code", label: "NCR" },
@@ -130,7 +130,7 @@ function InspectionsReport() {
 function NcrsReport() {
   const { data, isLoading } = useCompanyRows<any>("inspections", { order: { column: "inspected_at", ascending: false } });
   const rows = (data ?? []).filter((r: any) => r.ncr_code);
-  return <Wrap title={TITLES.ncrs} isLoading={isLoading} rows={rows}
+  return <Wrap slug="ncrs" title={TITLES.ncrs} isLoading={isLoading} rows={rows}
     columns={[
       { key: "ncr_code", label: "NCR" },
       { key: "inspection_type", label: "Detected via" },
@@ -147,7 +147,7 @@ function CalibrationReport() {
     ...(equipment ?? []).map((e: any) => ({ id: `e-${e.id}`, kind: "Welding machine", asset: e.asset_id, name: e.model, due: e.calibration_due, status: e.status })),
     ...(instruments ?? []).map((i: any) => ({ id: `i-${i.id}`, kind: "QA/QC instrument", asset: i.asset_id, name: i.name, due: i.calibration_due, status: i.status })),
   ];
-  return <Wrap title={TITLES.calibration} isLoading={l1 || l2} rows={rows}
+  return <Wrap slug="calibration" title={TITLES.calibration} isLoading={l1 || l2} rows={rows}
     columns={[
       { key: "kind", label: "Kind" },
       { key: "asset", label: "Asset ID" },
