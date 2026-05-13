@@ -33,23 +33,37 @@ function ReportPage() {
   return null;
 }
 
-function Wrap({ title, rows, isLoading, columns, onExportRows }: any) {
+const DOC_TYPES: Record<string, string> = {
+  qualifications: "WQR", procedures: "WPS-REG", welds: "WTR",
+  inspections: "INS", ncrs: "NCR", calibration: "CAL",
+};
+
+function Wrap({ slug, title, rows, isLoading, columns, onExportRows }: any) {
   return (
     <ReportShell
       title={title}
       subtitle={`${rows.length} record${rows.length === 1 ? "" : "s"}`}
+      docType={DOC_TYPES[slug] ?? "RPT"}
+      revision="Rev 1"
+      status="ISSUED"
+      meta={[
+        { label: "Report type", value: title },
+        { label: "Records", value: String(rows.length) },
+        { label: "Period", value: "All time" },
+        { label: "Confidentiality", value: "Internal · Controlled" },
+      ]}
       onExportExcel={() => exportExcel(title, "Report", onExportRows ? onExportRows() : rows)}
     >
       <table className="w-full text-sm">
-        <thead className="text-xs text-muted-foreground bg-muted/40 print:bg-transparent print:text-foreground print:border-b print:border-foreground">
-          <tr>{columns.map((c: any) => <th key={c.key} className="text-start font-semibold px-4 py-2">{c.label}</th>)}</tr>
+        <thead>
+          <tr>{columns.map((c: any) => <th key={c.key}>{c.label}</th>)}</tr>
         </thead>
         <tbody>
-          {isLoading && <tr><td colSpan={columns.length} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /> Loading…</td></tr>}
-          {!isLoading && rows.length === 0 && <tr><td colSpan={columns.length} className="px-4 py-10 text-center text-muted-foreground">No records.</td></tr>}
+          {isLoading && <tr><td colSpan={columns.length} className="text-center text-muted-foreground py-6"><Loader2 className="size-4 animate-spin inline" /> Loading…</td></tr>}
+          {!isLoading && rows.length === 0 && <tr><td colSpan={columns.length} className="text-center text-muted-foreground py-6">No records.</td></tr>}
           {rows.map((r: any, i: number) => (
-            <tr key={r.id ?? i} className="border-t border-border/60 print:border-border">
-              {columns.map((c: any) => <td key={c.key} className="px-4 py-2 align-top">{c.render ? c.render(r) : (r[c.key] ?? "—")}</td>)}
+            <tr key={r.id ?? i}>
+              {columns.map((c: any) => <td key={c.key}>{c.render ? c.render(r) : (r[c.key] ?? "—")}</td>)}
             </tr>
           ))}
         </tbody>
