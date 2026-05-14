@@ -25,6 +25,8 @@ type AuthState = {
   profile: Profile | null;
   roles: AppRole[];
   companyName: string | null;
+  companyLogo: string | null;
+  reportFooter: string | null;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
 };
@@ -36,6 +38,8 @@ const Ctx = createContext<AuthState>({
   profile: null,
   roles: [],
   companyName: null,
+  companyLogo: null,
+  reportFooter: null,
   signOut: async () => {},
   refresh: async () => {},
 });
