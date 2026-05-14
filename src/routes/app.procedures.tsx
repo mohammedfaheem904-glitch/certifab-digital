@@ -41,6 +41,7 @@ function ProceduresPage() {
       action={
         <NewRecordDialog
           table="procedures"
+          quota="procedures"
           title="New welding procedure"
           trigger="New WPS"
           defaults={{ revision: "Rev 0", status: "Draft" }}
