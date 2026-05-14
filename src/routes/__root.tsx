@@ -120,12 +120,14 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <I18nProvider>
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
-          <Toaster richColors position="top-right" />
-        </I18nProvider>
+        <TenantBrandingProvider>
+          <I18nProvider>
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
+            <Toaster richColors position="top-right" />
+          </I18nProvider>
+        </TenantBrandingProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
