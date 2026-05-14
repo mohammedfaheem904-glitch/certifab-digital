@@ -71,20 +71,24 @@ function Login() {
         <div className="absolute -top-32 -end-32 size-96 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute -bottom-32 -start-32 size-96 rounded-full bg-accent/10 blur-3xl" />
         <Link to="/" className="flex items-center gap-2 relative">
-          <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-            <Flame className="size-5 text-primary-foreground" />
-          </div>
+          {branding?.logo_url ? (
+            <img src={branding.logo_url} alt={branding.name} className="size-9 rounded-md object-cover bg-card border border-border" />
+          ) : (
+            <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
+              <Flame className="size-5 text-primary-foreground" />
+            </div>
+          )}
           <div>
-            <div className="font-semibold tracking-tight">{t("appName")}</div>
-            <div className="text-[11px] text-muted-foreground">{t("tagline")}</div>
+            <div className="font-semibold tracking-tight">{branding?.name ?? t("appName")}</div>
+            <div className="text-[11px] text-muted-foreground">{branding ? "Welding QA/QC workspace" : t("tagline")}</div>
           </div>
         </Link>
         <div className="relative">
           <h2 className="text-3xl font-semibold tracking-tight max-w-md">
-            One control room for every welder, weld and project.
+            {branding ? `Sign in to ${branding.name}.` : "One control room for every welder, weld and project."}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-md">
-            Trusted by EPC contractors, fabrication workshops and oil &amp; gas operators.
+            {branding ? "Your team's secure welding management portal." : "Trusted by EPC contractors, fabrication workshops and oil & gas operators."}
           </p>
         </div>
         <div className="text-xs text-muted-foreground relative">
