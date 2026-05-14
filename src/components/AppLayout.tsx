@@ -16,7 +16,10 @@ import {
   Gauge,
   ScrollText,
   Users,
+  Menu,
+  ShieldCheck,
 } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
@@ -64,6 +67,7 @@ export function AppLayout() {
     }
   };
 
+  const isSuperAdmin = roles.includes("super_admin");
   const nav_items = [
     { to: "/app", label: t("dashboard"), icon: LayoutDashboard, exact: true },
     { to: "/app/procedures", label: t("procedures"), icon: FileText },
@@ -77,7 +81,37 @@ export function AppLayout() {
     { to: "/app/reports", label: t("reports"), icon: BarChart3 },
     { to: "/app/team", label: "Team & Roles", icon: Users },
     { to: "/app/audit", label: "Audit Log", icon: ScrollText },
+    ...(isSuperAdmin
+      ? [{ to: "/app/admin", label: "Admin Console", icon: ShieldCheck }]
+      : []),
   ];
+
+  const NavList = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+      {nav_items.map((item) => {
+        const active = item.exact
+          ? loc.pathname === item.to
+          : loc.pathname.startsWith(item.to);
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+              active
+                ? "bg-sidebar-accent text-sidebar-accent-foreground border-s-2 border-primary"
+                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+            )}
+          >
+            <Icon className="size-4" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
 
   return (
     <div className="flex min-h-screen text-foreground">
@@ -92,29 +126,7 @@ export function AppLayout() {
             <div className="text-[11px] text-muted-foreground">{t("tagline")}</div>
           </div>
         </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {nav_items.map((item) => {
-            const active = item.exact
-              ? loc.pathname === item.to
-              : loc.pathname.startsWith(item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                  active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground border-s-2 border-primary"
-                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                )}
-              >
-                <Icon className="size-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        <NavList />
         <div className="p-3 border-t border-sidebar-border">
           <Link
             to="/app/settings"
@@ -128,7 +140,35 @@ export function AppLayout() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-border bg-card/60 backdrop-blur-md flex items-center gap-3 px-4 md:px-6 sticky top-0 z-10">
+        <header className="h-16 border-b border-border bg-card/60 backdrop-blur-md flex items-center gap-2 md:gap-3 px-3 md:px-6 sticky top-0 z-10">
+          {/* Mobile drawer trigger */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+                <Menu className="size-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 p-0 flex flex-col bg-sidebar">
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
+              <div className="flex items-center gap-2 px-5 h-16 border-b border-sidebar-border">
+                <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)]">
+                  <Flame className="size-5 text-primary-foreground" />
+                </div>
+                <div className="leading-tight">
+                  <div className="font-semibold tracking-tight">{t("appName")}</div>
+                  <div className="text-[11px] text-muted-foreground">{companyName ?? t("tagline")}</div>
+                </div>
+              </div>
+              <NavList />
+              <div className="p-3 border-t border-sidebar-border">
+                <Link to="/app/settings" className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent/60">
+                  <Settings className="size-4" />
+                  {t("settings")}
+                </Link>
+              </div>
+            </SheetContent>
+          </Sheet>
+
           <div className="flex-1 max-w-xl relative">
             <Search className="size-4 absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input

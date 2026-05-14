@@ -34,6 +34,7 @@ import { Route as AppInstrumentsRouteImport } from './routes/app.instruments'
 import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
+import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
 import { Route as VerifyInstrumentTokenRouteImport } from './routes/verify.instrument.$token'
 import { Route as AppWeldsWeldIdRouteImport } from './routes/app.welds.$weldId'
@@ -167,6 +168,11 @@ const AppAuditRoute = AppAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
 const VerifyWeldTokenRoute = VerifyWeldTokenRouteImport.update({
   id: '/verify/weld/$token',
   path: '/verify/weld/$token',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
@@ -286,6 +294,7 @@ export interface FileRoutesById {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
@@ -322,6 +331,7 @@ export interface FileRouteTypes {
     | '/modules'
     | '/pricing'
     | '/signup'
+    | '/app/admin'
     | '/app/audit'
     | '/app/equipment'
     | '/app/inspections'
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/modules'
     | '/pricing'
     | '/signup'
+    | '/app/admin'
     | '/app/audit'
     | '/app/equipment'
     | '/app/inspections'
@@ -389,6 +400,7 @@ export interface FileRouteTypes {
     | '/modules'
     | '/pricing'
     | '/signup'
+    | '/app/admin'
     | '/app/audit'
     | '/app/equipment'
     | '/app/inspections'
@@ -605,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/admin': {
+      id: '/app/admin'
+      path: '/admin'
+      fullPath: '/app/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/verify/weld/$token': {
       id: '/verify/weld/$token'
       path: '/verify/weld/$token'
@@ -717,6 +736,7 @@ const AppWeldsRouteWithChildren = AppWeldsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
   AppAuditRoute: typeof AppAuditRoute
   AppEquipmentRoute: typeof AppEquipmentRoute
   AppInspectionsRoute: typeof AppInspectionsRoute
@@ -733,6 +753,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
   AppAuditRoute: AppAuditRoute,
   AppEquipmentRoute: AppEquipmentRoute,
   AppInspectionsRoute: AppInspectionsRoute,
@@ -769,13 +790,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
