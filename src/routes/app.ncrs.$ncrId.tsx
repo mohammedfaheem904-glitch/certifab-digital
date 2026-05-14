@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, FileText, Loader2 } from "lucide-react";
+import { NcrReportDocument } from "@/components/reports/NcrReportDocument";
 import { daysUntil } from "@/lib/format";
 import { toast } from "sonner";
 
@@ -133,9 +134,10 @@ function NcrDetail() {
       </div>
 
       <Tabs defaultValue="workflow">
-        <TabsList>
+        <TabsList className="print:hidden">
           <TabsTrigger value="workflow">Workflow</TabsTrigger>
           <TabsTrigger value="audit">Audit trail ({events.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="report"><FileText className="size-4 me-1.5" />NCR Report</TabsTrigger>
         </TabsList>
         <TabsContent value="workflow" className="space-y-4">
           <Section title="Description" value={n.description} field="description" drafts={drafts} setDrafts={setDrafts} onSave={(v) => update({ description: v }, "description_updated")} />
@@ -177,6 +179,9 @@ function NcrDetail() {
               {(events.data?.length ?? 0) === 0 && <div className="text-sm text-muted-foreground">No events yet.</div>}
             </ol>
           </div>
+        </TabsContent>
+        <TabsContent value="report" className="mt-4">
+          <NcrReportDocument ncr={n} events={events.data ?? []} />
         </TabsContent>
       </Tabs>
     </div>

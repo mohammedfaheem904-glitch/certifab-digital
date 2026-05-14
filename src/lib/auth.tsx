@@ -25,6 +25,8 @@ type AuthState = {
   profile: Profile | null;
   roles: AppRole[];
   companyName: string | null;
+  companyLogo: string | null;
+  reportFooter: string | null;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
 };
@@ -36,6 +38,8 @@ const Ctx = createContext<AuthState>({
   profile: null,
   roles: [],
   companyName: null,
+  companyLogo: null,
+  reportFooter: null,
   signOut: async () => {},
   refresh: async () => {},
 });
@@ -46,6 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [companyName, setCompanyName] = useState<string | null>(null);
+  const [companyLogo, setCompanyLogo] = useState<string | null>(null);
+  const [reportFooter, setReportFooter] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadProfile = async (uid: string) => {
@@ -65,12 +71,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (p?.company_id) {
       const { data: c } = await supabase
         .from("companies")
-        .select("name")
+        .select("name, logo_url, report_footer")
         .eq("id", p.company_id)
         .maybeSingle();
       setCompanyName(c?.name ?? null);
+      setCompanyLogo(c?.logo_url ?? null);
+      setReportFooter(c?.report_footer ?? null);
     } else {
       setCompanyName(null);
+      setCompanyLogo(null);
+      setReportFooter(null);
     }
   };
 
@@ -79,12 +89,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        // defer to avoid deadlock inside callback
         setTimeout(() => loadProfile(s.user.id), 0);
       } else {
         setProfile(null);
         setRoles([]);
         setCompanyName(null);
+        setCompanyLogo(null);
+        setReportFooter(null);
       }
     });
 
@@ -107,6 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         roles,
         companyName,
+        companyLogo,
+        reportFooter,
         signOut: async () => {
           await supabase.auth.signOut();
         },
