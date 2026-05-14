@@ -7,7 +7,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Users, Bell, ShieldCheck, ScrollText } from "lucide-react";
+import { Users, Bell, ShieldCheck, ScrollText, Sparkles, Lock } from "lucide-react";
+import { usePlan } from "@/lib/use-plan";
+import { UsageMeter } from "@/components/UsageMeter";
+import { UpgradeBanner, UpgradeButton } from "@/components/UpgradePrompt";
+import { PlanBadge } from "@/components/PlanBadge";
 
 export const Route = createFileRoute("/app/settings")({
   component: SettingsPage,
@@ -39,20 +43,67 @@ function SettingsPage() {
     refresh();
   };
 
+  const { plan, hasFeature, percentUsed } = usePlan();
+  const brandingLocked = !hasFeature("pdf_branding");
+  const nearCap = ["users", "projects", "welds", "procedures"].some(
+    (q) => percentUsed(q as any) >= 80,
+  );
+
   return (
     <ModulePage title="Settings" subtitle="Workspace, branding, members and access control.">
+      {nearCap && (
+        <div className="p-5 pb-0">
+          <UpgradeBanner
+            title="You're approaching a plan limit"
+            message={`Your workspace is on the ${plan.name} plan. Upgrade to keep adding records without interruption.`}
+          />
+        </div>
+      )}
+
       <div className="p-5 grid lg:grid-cols-3 gap-3">
         <Tile to="/app/team" icon={Users} title="Team & Roles" desc="Invite members, assign roles." />
         <Tile to="/app/audit" icon={ScrollText} title="Audit Log" desc="Tamper-evident change history." />
-        <Tile to="/app/settings" icon={Bell} title="Notifications" desc="Reminders & alerts settings." disabled />
+        <Tile to="/app/billing" icon={Sparkles} title="Billing & Plan" desc="Subscription, usage and feature access." />
+      </div>
+
+      <div className="p-5 border-t border-border">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold">Workspace usage</h3>
+            <PlanBadge plan={plan} />
+          </div>
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/app/billing">View plan details →</Link>
+          </Button>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl">
+          <UsageMeter quota="users" />
+          <UsageMeter quota="projects" />
+          <UsageMeter quota="welds" />
+          <UsageMeter quota="procedures" />
+          <UsageMeter quota="storage_mb" />
+        </div>
       </div>
 
       <div className="p-5 border-t border-border space-y-4 max-w-2xl">
-        <div className="flex items-center gap-2 mb-2"><ShieldCheck className="size-4 text-primary" /><h3 className="text-sm font-semibold">Workspace branding</h3></div>
+        <div className="flex items-center gap-2 mb-2">
+          <ShieldCheck className="size-4 text-primary" />
+          <h3 className="text-sm font-semibold">Workspace branding</h3>
+          {brandingLocked && (
+            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground ms-1">
+              <Lock className="size-3" /> Professional plan
+            </span>
+          )}
+        </div>
         <F label="Company name"><Input value={name} onChange={(e) => setName(e.target.value)} disabled={!isAdmin} /></F>
-        <F label="Logo URL"><Input value={logo} onChange={(e) => setLogo(e.target.value)} placeholder="https://…" disabled={!isAdmin} /></F>
-        <F label="Report footer"><Input value={footer} onChange={(e) => setFooter(e.target.value)} placeholder="Confidential — © 2026" disabled={!isAdmin} /></F>
-        {isAdmin && <Button onClick={save} disabled={busy}>{busy ? "Saving…" : "Save changes"}</Button>}
+        <F label="Logo URL"><Input value={logo} onChange={(e) => setLogo(e.target.value)} placeholder="https://…" disabled={!isAdmin || brandingLocked} /></F>
+        <F label="Report footer"><Input value={footer} onChange={(e) => setFooter(e.target.value)} placeholder="Confidential — © 2026" disabled={!isAdmin || brandingLocked} /></F>
+        {isAdmin && (
+          <div className="flex flex-wrap items-center gap-2">
+            <Button onClick={save} disabled={busy}>{busy ? "Saving…" : "Save changes"}</Button>
+            {brandingLocked && <UpgradeButton size="sm">Unlock branding</UpgradeButton>}
+          </div>
+        )}
         {!isAdmin && <p className="text-xs text-muted-foreground">Only super admins can edit workspace branding.</p>}
       </div>
     </ModulePage>

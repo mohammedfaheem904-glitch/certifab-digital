@@ -33,6 +33,7 @@ import { Route as AppNcrsRouteImport } from './routes/app.ncrs'
 import { Route as AppInstrumentsRouteImport } from './routes/app.instruments'
 import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
+import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
@@ -163,6 +164,11 @@ const AppEquipmentRoute = AppEquipmentRouteImport.update({
   path: '/equipment',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBillingRoute = AppBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAuditRoute = AppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
@@ -296,6 +304,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/app/admin': typeof AppAdminRoute
   '/app/audit': typeof AppAuditRoute
+  '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
@@ -333,6 +342,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/app/admin'
     | '/app/audit'
+    | '/app/billing'
     | '/app/equipment'
     | '/app/inspections'
     | '/app/instruments'
@@ -367,6 +377,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/app/admin'
     | '/app/audit'
+    | '/app/billing'
     | '/app/equipment'
     | '/app/inspections'
     | '/app/instruments'
@@ -402,6 +413,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/app/admin'
     | '/app/audit'
+    | '/app/billing'
     | '/app/equipment'
     | '/app/inspections'
     | '/app/instruments'
@@ -610,6 +622,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEquipmentRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/billing': {
+      id: '/app/billing'
+      path: '/billing'
+      fullPath: '/app/billing'
+      preLoaderRoute: typeof AppBillingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/audit': {
       id: '/app/audit'
       path: '/audit'
@@ -738,6 +757,7 @@ const AppWeldsRouteWithChildren = AppWeldsRoute._addFileChildren(
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppAuditRoute: typeof AppAuditRoute
+  AppBillingRoute: typeof AppBillingRoute
   AppEquipmentRoute: typeof AppEquipmentRoute
   AppInspectionsRoute: typeof AppInspectionsRoute
   AppInstrumentsRoute: typeof AppInstrumentsRouteWithChildren
@@ -755,6 +775,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppAuditRoute: AppAuditRoute,
+  AppBillingRoute: AppBillingRoute,
   AppEquipmentRoute: AppEquipmentRoute,
   AppInspectionsRoute: AppInspectionsRoute,
   AppInstrumentsRoute: AppInstrumentsRouteWithChildren,

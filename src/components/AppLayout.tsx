@@ -20,6 +20,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { PlanBadge } from "@/components/PlanBadge";
+import { usePlan } from "@/lib/use-plan";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
@@ -81,6 +83,7 @@ export function AppLayout() {
     { to: "/app/reports", label: t("reports"), icon: BarChart3 },
     { to: "/app/team", label: "Team & Roles", icon: Users },
     { to: "/app/audit", label: "Audit Log", icon: ScrollText },
+    { to: "/app/billing", label: "Billing & Plan", icon: Sparkles },
     ...(isSuperAdmin
       ? [{ to: "/app/admin", label: "Admin Console", icon: ShieldCheck }]
       : []),
@@ -181,6 +184,7 @@ export function AppLayout() {
             {lang === "en" ? "العربية" : "English"}
           </Button>
           <NotificationsBell />
+          <PlanPill />
           <Button variant="outline" size="sm" onClick={handleSeed} disabled={seeding} className="hidden md:inline-flex">
             <Sparkles className="size-4 me-1" /> {seeding ? "Seeding…" : "Seed demo data"}
           </Button>
@@ -228,5 +232,18 @@ export function AppLayout() {
         </main>
       </div>
     </div>
+  );
+}
+
+function PlanPill() {
+  const { plan } = usePlan();
+  return (
+    <Link
+      to="/app/billing"
+      className="hidden sm:inline-flex"
+      title="Manage plan"
+    >
+      <PlanBadge plan={plan} />
+    </Link>
   );
 }

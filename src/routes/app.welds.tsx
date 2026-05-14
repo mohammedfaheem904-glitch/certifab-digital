@@ -60,7 +60,7 @@ function WeldsPage() {
       title="Weld Traceability Log"
       subtitle="Every weld linked to its WPS, welder, project, joint and inspection result."
       action={
-        <NewRecordDialog
+        <NewRecordDialog quota="welds"
           table="welds"
           title="Log a weld"
           trigger="Log Weld"

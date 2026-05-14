@@ -17,6 +17,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { usePlan } from "@/lib/use-plan";
+import { UpgradeButton } from "@/components/UpgradePrompt";
 
 const ROLES: AppRole[] = ["super_admin","qa_qc_manager","welding_engineer","inspector","welder","client_viewer"];
 const ROLE_LABEL: Record<AppRole, string> = {
@@ -259,10 +261,16 @@ function InviteDialog() {
   const [role, setRole] = useState<AppRole>("inspector");
   const [busy, setBusy] = useState(false);
   const [link, setLink] = useState<string | null>(null);
+  const { isOverQuota, reasonForQuota, plan, usage } = usePlan();
+  const blocked = isOverQuota("users");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile?.company_id) return;
+    if (blocked) {
+      toast.error(reasonForQuota("users"));
+      return;
+    }
     setBusy(true);
     const { data, error } = await supabase
       .from("invitations")
@@ -289,6 +297,17 @@ function InviteDialog() {
     setRole("inspector");
     setLink(null);
   };
+
+  if (blocked) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-muted-foreground">
+          {usage.users}/{plan.limits.users} seats on {plan.name}
+        </span>
+        <UpgradeButton size="sm">Upgrade to invite</UpgradeButton>
+      </div>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : close())}>
