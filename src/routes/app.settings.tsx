@@ -7,7 +7,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Users, Bell, ShieldCheck, ScrollText } from "lucide-react";
+import { Users, Bell, ShieldCheck, ScrollText, Sparkles, Lock } from "lucide-react";
+import { usePlan } from "@/lib/use-plan";
+import { UsageMeter } from "@/components/UsageMeter";
+import { UpgradeBanner, UpgradeButton } from "@/components/UpgradePrompt";
+import { PlanBadge } from "@/components/PlanBadge";
 
 export const Route = createFileRoute("/app/settings")({
   component: SettingsPage,
