@@ -72,20 +72,32 @@ function Signup() {
       <div className="hidden lg:flex flex-col justify-between p-10 bg-[image:var(--gradient-surface)] border-e border-border relative overflow-hidden">
         <div className="absolute -top-32 -end-32 size-96 rounded-full bg-primary/10 blur-3xl" />
         <Link to="/" className="flex items-center gap-2 relative">
-          <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-            <Flame className="size-5 text-primary-foreground" />
-          </div>
+          {branding?.logo_url ? (
+            <img src={branding.logo_url} alt={branding.name} className="size-9 rounded-md object-cover bg-card border border-border" />
+          ) : (
+            <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
+              <Flame className="size-5 text-primary-foreground" />
+            </div>
+          )}
           <div>
-            <div className="font-semibold tracking-tight">{t("appName")}</div>
-            <div className="text-[11px] text-muted-foreground">{t("tagline")}</div>
+            <div className="font-semibold tracking-tight">{branding?.name ?? t("appName")}</div>
+            <div className="text-[11px] text-muted-foreground">{branding ? "Welding QA/QC workspace" : t("tagline")}</div>
           </div>
         </Link>
         <div className="relative">
           <h2 className="text-3xl font-semibold tracking-tight max-w-md">
-            {isInvite ? "You've been invited to a Weld Yard workspace." : "Spin up a workspace for your fabrication yard."}
+            {branding && !isInvite
+              ? `Join ${branding.name}.`
+              : isInvite
+                ? "You've been invited to a Weld Yard workspace."
+                : "Spin up a workspace for your fabrication yard."}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-md">
-            {isInvite ? "Create your account to join the team." : "Multi-tenant by default — your data stays isolated to your company."}
+            {branding && !isInvite
+              ? "Sign up with your work email to be added to the team automatically."
+              : isInvite
+                ? "Create your account to join the team."
+                : "Multi-tenant by default — your data stays isolated to your company."}
           </p>
         </div>
         <div className="text-xs text-muted-foreground relative">14-day trial · no credit card</div>
