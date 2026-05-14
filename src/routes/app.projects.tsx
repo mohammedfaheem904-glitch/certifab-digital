@@ -20,7 +20,7 @@ function ProjectsPage() {
       title="Projects"
       subtitle="Master data for every fabrication and field-welding project."
       action={
-        <NewRecordDialog table="projects" title="New project" trigger="New Project" defaults={{ status: "Active" }}>
+        <NewRecordDialog table="projects" title="New project" trigger="New Project" quota="projects" defaults={{ status: "Active" }}>
           {({ values, set }) => (
             <>
               <F label="Code"><Input required value={values.code ?? ""} onChange={(e) => set("code", e.target.value)} placeholder="PRJ-001" /></F>
