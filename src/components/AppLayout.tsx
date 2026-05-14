@@ -16,7 +16,10 @@ import {
   Gauge,
   ScrollText,
   Users,
+  Menu,
+  ShieldCheck,
 } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
@@ -64,6 +67,7 @@ export function AppLayout() {
     }
   };
 
+  const isSuperAdmin = roles.includes("super_admin");
   const nav_items = [
     { to: "/app", label: t("dashboard"), icon: LayoutDashboard, exact: true },
     { to: "/app/procedures", label: t("procedures"), icon: FileText },
@@ -77,7 +81,37 @@ export function AppLayout() {
     { to: "/app/reports", label: t("reports"), icon: BarChart3 },
     { to: "/app/team", label: "Team & Roles", icon: Users },
     { to: "/app/audit", label: "Audit Log", icon: ScrollText },
+    ...(isSuperAdmin
+      ? [{ to: "/app/admin", label: "Admin Console", icon: ShieldCheck }]
+      : []),
   ];
+
+  const NavList = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+      {nav_items.map((item) => {
+        const active = item.exact
+          ? loc.pathname === item.to
+          : loc.pathname.startsWith(item.to);
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+              active
+                ? "bg-sidebar-accent text-sidebar-accent-foreground border-s-2 border-primary"
+                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+            )}
+          >
+            <Icon className="size-4" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
 
   return (
     <div className="flex min-h-screen text-foreground">
