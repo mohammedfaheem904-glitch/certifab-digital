@@ -168,18 +168,26 @@
     margin: 18mm 14mm 22mm 14mm;
   }
 
+  /* Hairlines + page-number counter */
+  html { counter-reset: page; }
+  .page-num::after {
+    counter-increment: page;
+    content: counter(page);
+  }
+
   html, body {
     background: #ffffff !important;
     color: #0a0a0a !important;
     background-image: none !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    font-size: 10.5pt;
-    line-height: 1.35;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.32;
   }
 
   /* Force light theme tokens for any printed surface */
-  body, .doc-print {
+  body, .doc-print, .doc-sheet, .doc-sheet * {
     --background: #ffffff;
     --foreground: #0a0a0a;
     --card: #ffffff;
@@ -197,12 +205,12 @@
   [data-app-chrome], aside, nav[aria-label="Primary"],
   .print\:hidden { display: none !important; }
 
-  /* Make all cards crisp white */
+  /* Crisp white surfaces */
   .bg-card, .bg-background, .bg-muted\/40, .bg-muted\/20 {
     background: #ffffff !important;
   }
 
-  /* Engineering tables */
+  /* Engineering tables — repeat headers across pages */
   table { border-collapse: collapse !important; width: 100%; }
   thead { display: table-header-group; }
   tfoot { display: table-footer-group; }
@@ -216,11 +224,13 @@
     text-transform: uppercase;
     font-size: 8.5pt;
     letter-spacing: 0.04em;
+    text-align: start;
   }
   table td {
     border: 0.5pt solid #c9ced6 !important;
     padding: 3.5pt 6pt !important;
     vertical-align: top;
+    font-size: 9.5pt;
   }
 
   /* Page-break helpers */
@@ -232,25 +242,33 @@
 
   a { color: inherit !important; text-decoration: none !important; }
 
-  /* Watermark for draft / approved status */
+  /* Watermark — colour driven by status text */
   .doc-watermark {
     position: fixed;
-    top: 40%;
+    top: 38%;
     left: 0;
     right: 0;
     text-align: center;
+    font-family: "Inter", Arial, sans-serif;
     font-size: 110pt;
     font-weight: 800;
-    letter-spacing: 0.15em;
-    color: rgba(180, 83, 9, 0.07) !important;
-    transform: rotate(-28deg);
+    letter-spacing: 0.18em;
+    color: rgba(180, 83, 9, 0.08) !important;
+    transform: rotate(-26deg);
     z-index: 0;
     pointer-events: none;
+  }
+  .doc-watermark:where([data-mark="REJECTED"], [data-mark="OBSOLETE"]) {
+    color: rgba(190, 18, 60, 0.10) !important;
+  }
+  .doc-watermark:where([data-mark="FOR REVIEW"]) {
+    color: rgba(30, 64, 175, 0.10) !important;
   }
 
   /* Allow content above the watermark */
   .doc-content { position: relative; z-index: 1; }
 }
+
 
 /* On-screen preview of print sheets — give them an A4-ish look */
 .doc-sheet {
