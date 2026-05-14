@@ -9,6 +9,7 @@ import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, P
 import { toast } from "sonner";
 import { HeatInputCalculator } from "@/components/HeatInputCalculator";
 import { FileUploader } from "@/components/FileUploader";
+import { WpsDocument } from "@/components/reports/WpsDocument";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
   component: ProcedureDetailPage,
