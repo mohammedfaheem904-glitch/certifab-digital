@@ -52,8 +52,10 @@ export type Database = {
       }
       companies: {
         Row: {
+          allowed_email_domains: string[]
           country: string | null
           created_at: string
+          dedicated_domain: string | null
           email_from_name: string | null
           id: string
           industry: string | null
@@ -64,8 +66,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allowed_email_domains?: string[]
           country?: string | null
           created_at?: string
+          dedicated_domain?: string | null
           email_from_name?: string | null
           id?: string
           industry?: string | null
@@ -76,8 +80,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allowed_email_domains?: string[]
           country?: string | null
           created_at?: string
+          dedicated_domain?: string | null
           email_from_name?: string | null
           id?: string
           industry?: string | null
@@ -1237,6 +1243,15 @@ export type Database = {
     Functions: {
       accept_invitation: { Args: { _token: string }; Returns: string }
       current_company_id: { Args: never; Returns: string }
+      get_company_branding_by_domain: {
+        Args: { _host: string }
+        Returns: {
+          id: string
+          logo_url: string
+          name: string
+          report_footer: string
+        }[]
+      }
       get_invitation: {
         Args: { _token: string }
         Returns: {
