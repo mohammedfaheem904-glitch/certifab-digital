@@ -18,8 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { usePlan } from "@/lib/use-plan";
-import { UsageMeter } from "@/components/UsageMeter";
-import { UpgradeButton, UpgradeBanner } from "@/components/UpgradePrompt";
+import { UpgradeButton } from "@/components/UpgradePrompt";
 
 const ROLES: AppRole[] = ["super_admin","qa_qc_manager","welding_engineer","inspector","welder","client_viewer"];
 const ROLE_LABEL: Record<AppRole, string> = {
