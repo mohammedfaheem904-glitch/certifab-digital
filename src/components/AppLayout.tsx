@@ -148,7 +148,7 @@ export function AppLayout() {
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="start" className="w-72 p-0 flex flex-col bg-sidebar">
+            <SheetContent side="left" className="w-72 p-0 flex flex-col bg-sidebar">
               <SheetTitle className="sr-only">Navigation</SheetTitle>
               <div className="flex items-center gap-2 px-5 h-16 border-b border-sidebar-border">
                 <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)]">
