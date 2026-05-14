@@ -106,13 +106,17 @@ function Signup() {
         <form onSubmit={onSubmit} className="w-full max-w-sm space-y-5">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">
-              {isInvite ? "Create your account" : "Create your workspace"}
+              {isInvite ? "Create your account" : branding ? `Join ${branding.name}` : "Create your workspace"}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              {isInvite ? "You'll join your inviter's workspace automatically." : "You'll be the workspace owner."}
+              {isInvite
+                ? "You'll join your inviter's workspace automatically."
+                : branding
+                  ? "Sign up with your work email — you'll be added to the workspace automatically."
+                  : "You'll be the workspace owner."}
             </p>
           </div>
-          {!isInvite && (
+          {!isInvite && !branding && (
             <div className="space-y-2">
               <Label>Company name</Label>
               <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Acme Welding LLC" required />
