@@ -33,6 +33,7 @@ function Signup() {
   const { invite, email: invitedEmail } = Route.useSearch();
   const isInvite = !!invite;
   const { session, loading } = useAuth();
+  const { branding } = useTenantBranding();
   const [companyName, setCompanyName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState(invitedEmail ?? "");
