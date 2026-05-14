@@ -1,10 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { ShieldAlert, Database, Users, Bell, FileWarning, HardDrive, Activity, Mail } from "lucide-react";
+import { ShieldAlert, Database, Users, Bell, FileWarning, HardDrive, Activity, Mail, Globe } from "lucide-react";
 import { formatDistanceToNow } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/admin")({
   component: AdminConsole,
@@ -180,6 +184,84 @@ function AdminConsole() {
               <li className="px-5 py-8 text-center text-sm text-muted-foreground">All qualifications are current.</li>
             )}
           </ul>
+        </div>
+      </div>
+
+      <DomainSettingsCard companyId={cid!} />
+    </div>
+  );
+}
+
+function DomainSettingsCard({ companyId }: { companyId: string }) {
+  const [domain, setDomain] = useState("");
+  const [allowedRaw, setAllowedRaw] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!companyId) return;
+    (supabase.from("companies").select("dedicated_domain, allowed_email_domains").eq("id", companyId).maybeSingle() as any)
+      .then(({ data }: any) => {
+        setDomain(data?.dedicated_domain ?? "");
+        setAllowedRaw((data?.allowed_email_domains ?? []).join(", "));
+      })
+      .finally(() => setLoading(false));
+  }, [companyId]);
+
+  const save = async () => {
+    setBusy(true);
+    const list = allowedRaw
+      .split(/[\s,;]+/)
+      .map((d) => d.trim().toLowerCase())
+      .filter(Boolean);
+    const cleanDomain = domain.trim().toLowerCase() || null;
+
+    const { error } = await (supabase.from("companies") as any)
+      .update({ dedicated_domain: cleanDomain, allowed_email_domains: list })
+      .eq("id", companyId);
+    setBusy(false);
+    if (error) {
+      toast.error(error.message.includes("duplicate") ? "That domain is already claimed by another workspace." : error.message);
+      return;
+    }
+    toast.success("Domain settings updated.");
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="flex items-center gap-2 px-5 py-3 border-b border-border text-sm font-medium">
+        <Globe className="size-4 text-primary" />
+        Domain masking & email whitelisting
+      </div>
+      <div className="p-5 grid lg:grid-cols-2 gap-4 max-w-3xl">
+        <div className="space-y-1.5">
+          <Label className="text-xs">Dedicated domain</Label>
+          <Input
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="weld.acme.com"
+            disabled={loading}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            When users open this host, the workspace branding loads automatically and signups land here.
+          </p>
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">Allowed email domains</Label>
+          <Input
+            value={allowedRaw}
+            onChange={(e) => setAllowedRaw(e.target.value)}
+            placeholder="acme.com, contractors.acme.com"
+            disabled={loading}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Comma-separated. New signups whose email matches are auto-joined as <span className="font-medium">client viewers</span>.
+          </p>
+        </div>
+        <div className="lg:col-span-2">
+          <Button onClick={save} disabled={busy || loading}>
+            {busy ? "Saving…" : "Save domain settings"}
+          </Button>
         </div>
       </div>
     </div>
