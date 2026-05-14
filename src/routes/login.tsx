@@ -31,6 +31,7 @@ function Login() {
   const { next } = Route.useSearch();
   const dest = next && next.startsWith("/") ? next : "/app";
   const { session, loading } = useAuth();
+  const { branding } = useTenantBranding();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
