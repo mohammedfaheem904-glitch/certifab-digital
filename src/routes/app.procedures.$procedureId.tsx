@@ -208,7 +208,7 @@ function ProcedureDetailPage() {
         </TabsList>
 
         <TabsContent value="details" className="mt-4">
-          <WpsSheet proc={proc} />
+          <WpsDocument proc={proc} approvals={apprQ.data ?? []} revisions={revsQ.data ?? []} />
         </TabsContent>
 
         <TabsContent value="heat" className="mt-4 space-y-4">
