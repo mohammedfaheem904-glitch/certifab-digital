@@ -85,6 +85,12 @@ function QualificationsPage() {
       subtitle="ASME Section IX WPQ certificates — issuance, expiry, continuity & verification."
       action={
         <div className="flex gap-2">
+          <Link to="/app/qualifications/dashboard">
+            <Button size="sm" variant="outline">Dashboard</Button>
+          </Link>
+          <Link to="/app/qualifications/new">
+            <Button size="sm" variant="outline">Wizard</Button>
+          </Link>
           <Button
             size="sm"
             variant="outline"
@@ -225,9 +231,17 @@ function QualificationsPage() {
             )}
             {!isLoading && filtered.length === 0 && <Empty colSpan={9}>No qualifications match.</Empty>}
             {filtered.map((q) => (
-              <tr key={q.id} className="border-t border-border/60 hover:bg-muted/20">
-                <td className="px-5 py-3 font-mono text-xs">{q.wpq_number ?? "—"}</td>
-                <td className="px-5 py-3 font-medium">{q.welder_name}</td>
+              <tr key={q.id} className="border-t border-border/60 hover:bg-muted/20 cursor-pointer">
+                <td className="px-5 py-3 font-mono text-xs">
+                  <Link to="/app/qualifications/$qualId" params={{ qualId: q.id }} className="hover:text-primary">
+                    {q.wpq_number ?? q.id.slice(0, 8)}
+                  </Link>
+                </td>
+                <td className="px-5 py-3 font-medium">
+                  <Link to="/app/qualifications/$qualId" params={{ qualId: q.id }} className="hover:text-primary">
+                    {q.welder_name}
+                  </Link>
+                </td>
                 <td className="px-5 py-3 text-muted-foreground">{q.employee_id}</td>
                 <td className="px-5 py-3">{q.process}</td>
                 <td className="px-5 py-3 text-muted-foreground">{q.code_family ?? q.standard}</td>
