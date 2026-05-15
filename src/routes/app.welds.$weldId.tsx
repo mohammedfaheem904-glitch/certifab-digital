@@ -114,14 +114,19 @@ function WeldDetail() {
         </div>
       </div>
 
-      <Tabs defaultValue="inspections">
+      <Tabs defaultValue="compliance">
         <TabsList className="print:hidden">
+          <TabsTrigger value="compliance"><ShieldCheck className="size-4 me-1.5" />Compliance</TabsTrigger>
           <TabsTrigger value="inspections">Inspections ({inspections.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="ncrs">NCRs ({ncrs.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="attachments">Attachments</TabsTrigger>
           <TabsTrigger value="certificate"><FileText className="size-4 me-1.5" />Traceability Report</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="compliance">
+          <WeldComplianceCheck weld={w} />
+        </TabsContent>
 
         <TabsContent value="inspections">
           <div className="rounded-xl border border-border bg-card overflow-hidden">
