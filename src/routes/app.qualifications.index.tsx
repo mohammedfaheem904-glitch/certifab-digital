@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { ModulePage } from "@/components/ModulePage";
 import { StatusBadge } from "@/components/StatusBadge";
 import { NewRecordDialog } from "@/components/NewRecordDialog";
@@ -8,11 +10,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Download, ShieldCheck, Clock, AlertTriangle, Users, Trash2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2, Download, ShieldCheck, Clock, AlertTriangle, Users, Trash2, Eye } from "lucide-react";
 import { deriveQualStatus, continuityBroken } from "@/lib/qualification-status";
 import { exportExcel } from "@/lib/export";
 import { fmtEngDate } from "@/lib/doc-number";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 type Row = {
   id: string;
@@ -36,6 +50,11 @@ export const Route = createFileRoute("/app/qualifications/")({
 function QualificationsPage() {
   const { roles } = useAuth();
   const isAdmin = roles.includes("super_admin");
+  const canDelete = isAdmin || roles.includes("qa_qc_manager");
+  const nav = useNavigate();
+  const qc = useQueryClient();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const { data, isLoading } = useCompanyRows<Row>("qualifications", {
     order: { column: "expiry_date", ascending: true },
   });
@@ -216,6 +235,7 @@ function QualificationsPage() {
         <Select value={codeFilter} onChange={setCodeFilter} options={["all", ...codes]} />
       </div>
 
+      <TooltipProvider delayDuration={200}>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
@@ -229,24 +249,29 @@ function QualificationsPage() {
               <Th>Expiry</Th>
               <Th>Continuity</Th>
               <Th>Status</Th>
+              <Th>Actions</Th>
             </tr>
           </thead>
           <tbody>
             {isLoading && (
-              <Empty colSpan={9}>
+              <Empty colSpan={10}>
                 <Loader2 className="size-4 animate-spin inline" /> Loading…
               </Empty>
             )}
-            {!isLoading && filtered.length === 0 && <Empty colSpan={9}>No qualifications match.</Empty>}
+            {!isLoading && filtered.length === 0 && <Empty colSpan={10}>No qualifications match.</Empty>}
             {filtered.map((q) => (
-              <tr key={q.id} className="border-t border-border/60 hover:bg-muted/20 cursor-pointer">
+              <tr
+                key={q.id}
+                className="border-t border-border/60 hover:bg-muted/20 cursor-pointer"
+                onClick={() => nav({ to: "/app/qualifications/$qualId", params: { qualId: q.id } })}
+              >
                 <td className="px-5 py-3 font-mono text-xs">
-                  <Link to="/app/qualifications/$qualId" params={{ qualId: q.id }} className="hover:text-primary">
+                  <Link to="/app/qualifications/$qualId" params={{ qualId: q.id }} className="hover:text-primary" onClick={(e) => e.stopPropagation()}>
                     {q.wpq_number ?? q.id.slice(0, 8)}
                   </Link>
                 </td>
                 <td className="px-5 py-3 font-medium">
-                  <Link to="/app/qualifications/$qualId" params={{ qualId: q.id }} className="hover:text-primary">
+                  <Link to="/app/qualifications/$qualId" params={{ qualId: q.id }} className="hover:text-primary" onClick={(e) => e.stopPropagation()}>
                     {q.welder_name}
                   </Link>
                 </td>
@@ -267,11 +292,77 @@ function QualificationsPage() {
                 <td className="px-5 py-3">
                   <StatusBadge status={q.derived} />
                 </td>
+                <td className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-1">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link to="/app/qualifications/$qualId" params={{ qualId: q.id }}>
+                          <Button size="icon" variant="ghost" className="size-8" aria-label="Open certificate">
+                            <Eye className="size-4" />
+                          </Button>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>Open certificate</TooltipContent>
+                    </Tooltip>
+                    {canDelete && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="size-8 text-destructive hover:text-destructive"
+                            aria-label="Delete certificate"
+                            onClick={() => setDeleteId(q.id)}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Move to Trash</TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      </TooltipProvider>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Move WPQ to Trash?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This certificate will be soft-deleted and hidden from standard lists and reports.
+              Super admins can restore it from Trash. The action is audit-logged.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async (e) => {
+                e.preventDefault();
+                if (!deleteId) return;
+                setDeleting(true);
+                const { error } = await (supabase.rpc as any)("soft_delete_qualification", { _id: deleteId });
+                setDeleting(false);
+                if (error) {
+                  toast.error(error.message);
+                  return;
+                }
+                toast.success("Moved to Trash.");
+                setDeleteId(null);
+                qc.invalidateQueries({ queryKey: ["qualifications"] });
+              }}
+            >
+              {deleting ? <Loader2 className="size-4 animate-spin" /> : "Move to Trash"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ModulePage>
   );
 }
