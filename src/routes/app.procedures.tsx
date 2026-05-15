@@ -1,12 +1,33 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ModulePage } from "@/components/ModulePage";
 import { StatusBadge } from "@/components/StatusBadge";
 import { NewRecordDialog } from "@/components/NewRecordDialog";
 import { useCompanyRows } from "@/lib/use-company-rows";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, ChevronRight, Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Row = {
   id: string;
@@ -26,6 +47,12 @@ function ProceduresPage() {
   const { data, isLoading } = useCompanyRows<Row>("procedures", { order: { column: "created_at" } });
   const [q, setQ] = useState("");
   const nav = useNavigate();
+  const qc = useQueryClient();
+  const { roles } = useAuth();
+  const canDelete = roles.includes("super_admin") || roles.includes("qa_qc_manager");
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const filtered = (data ?? []).filter((p) => {
     if (!q.trim()) return true;
@@ -34,7 +61,22 @@ function ProceduresPage() {
       .filter(Boolean).some((x) => String(x).toLowerCase().includes(s));
   });
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    const { error } = await supabase.rpc("soft_delete_procedure" as never, { _id: deleteId } as never);
+    setDeleting(false);
+    if (error) {
+      toast.error(error.message || "Failed to delete WPS");
+      return;
+    }
+    toast.success("WPS moved to Trash");
+    setDeleteId(null);
+    qc.invalidateQueries({ queryKey: ["company-rows", "procedures"] });
+  };
+
   return (
+    <TooltipProvider delayDuration={200}>
     <ModulePage
       title="Welding Procedures (WPS / pWPS / PQR)"
       subtitle="Create, revise and approve welding procedure specifications across ASME, EN ISO, AWS, AS/NZS and JIS."
@@ -76,7 +118,8 @@ function ProceduresPage() {
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
             <tr>
-              <Th>Code</Th><Th>Standard</Th><Th>Process</Th><Th>Thickness</Th><Th>Revision</Th><Th>Status</Th><Th>{" "}</Th>
+              <Th>Code</Th><Th>Standard</Th><Th>Process</Th><Th>Thickness</Th><Th>Revision</Th><Th>Status</Th>
+              <th className="text-end font-medium px-5 py-2.5">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -94,13 +137,71 @@ function ProceduresPage() {
                 <td className="px-5 py-3">{p.thickness_range}</td>
                 <td className="px-5 py-3 text-muted-foreground">{p.revision}</td>
                 <td className="px-5 py-3"><StatusBadge status={p.status} /></td>
-                <td className="px-5 py-3 text-end text-muted-foreground"><ChevronRight className="size-4 inline" /></td>
+                <td className="px-5 py-3 text-end">
+                  <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          onClick={() => nav({ to: "/app/procedures/$procedureId", params: { procedureId: p.id } })}
+                          aria-label="Open WPS"
+                        >
+                          <Eye className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Open WPS</TooltipContent>
+                    </Tooltip>
+                    {canDelete && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => setDeleteId(p.id)}
+                            aria-label="Delete WPS"
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Move to Trash</TooltipContent>
+                      </Tooltip>
+                    )}
+                    <ChevronRight className="size-4 ms-1 text-muted-foreground" />
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Move WPS to Trash?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This procedure will be soft-deleted. Super admins can restore it from Trash.
+              The action is recorded in the audit log.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDelete(); }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? <Loader2 className="size-4 animate-spin me-2" /> : null}
+              Move to Trash
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ModulePage>
+    </TooltipProvider>
   );
 }
 
