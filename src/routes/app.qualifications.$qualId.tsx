@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, QrCode, Save, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, QrCode, Save, FileText, Trash2, Undo2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -76,14 +76,38 @@ function QualDetail() {
     toast.success("Saved.");
   };
 
-  const remove = async () => {
-    if (!confirm("Delete this WPQ? This cannot be undone.")) return;
+  const softDelete = async () => {
+    if (!confirm("Move this WPQ to Trash? Super admins can restore it later.")) return;
+    const { error } = await (supabase.rpc as any)("soft_delete_qualification", { _id: qualId });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Moved to Trash.");
+    qc.invalidateQueries({ queryKey: ["qualifications"] });
+    nav({ to: "/app/qualifications" });
+  };
+
+  const restore = async () => {
+    const { error } = await (supabase.rpc as any)("restore_qualification", { _id: qualId });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Restored.");
+    qc.invalidateQueries({ queryKey: ["qualification", qualId] });
+    qc.invalidateQueries({ queryKey: ["qualifications"] });
+    qc.invalidateQueries({ queryKey: ["qualifications_trash"] });
+  };
+
+  const hardDelete = async () => {
+    if (!confirm("Permanently delete this WPQ and ALL related records? This cannot be undone.")) return;
     const { error } = await supabase.from("qualifications").delete().eq("id", qualId);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Deleted.");
+    toast.success("Permanently deleted.");
     nav({ to: "/app/qualifications" });
   };
 
@@ -131,13 +155,33 @@ function QualDetail() {
               <Button variant="outline" size="sm"><QrCode className="size-4 me-1" /> Verify QR</Button>
             </Link>
             {dirty && <Button size="sm" onClick={save} disabled={saving}><Save className="size-4 me-1" /> Save changes</Button>}
-            {isAdmin && (
-              <Button size="sm" variant="outline" onClick={remove} className="text-destructive">
+            {q.deleted_at ? (
+              <>
+                {isAdmin && (
+                  <Button size="sm" variant="outline" onClick={restore}>
+                    <Undo2 className="size-4 me-1" /> Restore
+                  </Button>
+                )}
+                {isAdmin && (
+                  <Button size="sm" variant="outline" onClick={hardDelete} className="text-destructive">
+                    <Trash2 className="size-4 me-1" /> Delete permanently
+                  </Button>
+                )}
+              </>
+            ) : (
+              <Button size="sm" variant="outline" onClick={softDelete} className="text-destructive">
                 <Trash2 className="size-4 me-1" /> Delete
               </Button>
             )}
           </div>
         </div>
+
+        {q.deleted_at && (
+          <div className="mt-4 flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <AlertTriangle className="size-4" />
+            This WPQ is in Trash (soft-deleted on {fmtEngDate(q.deleted_at)}). It is hidden from standard lists and reports.
+          </div>
+        )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <Field label="Qualified" value={q.qualification_date ? fmtEngDate(q.qualification_date) : "—"} />
