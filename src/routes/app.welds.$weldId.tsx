@@ -8,8 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { FileUploader } from "@/components/FileUploader";
-import { ArrowLeft, ChevronRight, QrCode, FileText } from "lucide-react";
+import { ArrowLeft, ChevronRight, QrCode, FileText, ShieldCheck } from "lucide-react";
 import { WeldTraceabilityDocument } from "@/components/reports/WeldTraceabilityDocument";
+import { WeldComplianceCheck } from "@/components/welds/WeldComplianceCheck";
 
 export const Route = createFileRoute("/app/welds/$weldId")({
   component: WeldDetail,
