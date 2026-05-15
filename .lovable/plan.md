@@ -1,133 +1,77 @@
+# Welder Qualification Certificate (WPQ) — Enterprise Upgrade
 
-# Phase 4 — Production-Ready Enterprise Polish
+This is a large, multi-part upgrade. Below is the staged plan. I'll execute it in one pass once you approve, but split into clear phases so it stays reviewable.
 
-Scope is large. I'll execute it in waves, each leaving the platform shippable. All work stays multi-tenant (`company_id` + RLS), uses existing `is_editor()` / `current_company_id()` helpers, and writes through `audit_logs` triggers.
+## Phase 1 — Database (migration)
 
----
+Extend `qualifications` and add supporting tables. All RLS = company-scoped (mirrors existing `editors` / `members` policies). All tables get `company_id`, `created_at`, `updated_at`.
 
-## Wave 1 — Schema Foundations (one migration)
+**`qualifications` (extend)** — add columns:
+- Identity: `wpq_number`, `wps_number`, `pqr_number`, `stamp_number`, `welder_photo_url`, `qr_token` (auto, unique), `revision` (default `Rev 0`), `doc_number`
+- Process: `process_type` (Manual/Semi-Auto/Mechanized/Auto), `test_coupon_type`, `welder_test_number`, `code_family` (ASME IX / AWS / EN ISO / AS-NZS / JIS)
+- Dates: `qualification_date`, `last_continuity_date`
+- Outcome: `result` (Satisfactory/Unsatisfactory), `remarks`, `rejection_reason`, `retest_of_id` (self-FK uuid)
+- Status enum extended: Active / Expired / Suspended / Expiring Soon (computed view)
 
-Extend the data model so the new pages have something real to render.
+**New table `qualification_variables`** (the QW-4xx matrix)
+- `qualification_id`, `variable_key`, `variable_label`, `qualified_with`, `qualified_for`, `code_reference` (QW-402/403/404/405/409), `sort_order`
 
-**`welds` table** — add traceability fields:
-`joint_no, spool_no, drawing_ref, line_no, base_material, heat_number, filler_metal, joint_type, inspection_status, qr_token, procedure_id` (FK already present).
+**New table `qualification_tests`**
+- `qualification_id`, `category` (`ndt` | `destructive`), `test_type` (VT/MT/PT/RT/UT/Macro/Root Bend/Face Bend/Side Bend/Fillet Break/Tensile/Nick Break/Hardness/Other), `result` (Acceptable/Not Acceptable/N/A), `report_number`, `inspector_name`, `test_date`, `notes`
 
-**`weld_events`** (new) — timeline of weld lifecycle:
-`weld_id, kind (logged|inspected|repaired|approved|rejected|note), actor_id, actor_name, payload jsonb, created_at`.
+**New table `qualification_signatures`**
+- `qualification_id`, `role` (QC Engineer/QA-QC Manager/Witness/Examiner/Client Rep), `name`, `signature_data_url` (text), `signed_at`, `actor_id`
 
-**`weld_attachments`** (new) — photos, RT films, sketches.
+**New table `qualification_continuity`**
+- `qualification_id`, `activity_date`, `process`, `project_id`, `evidence_weld_id`, `notes`
+- Trigger: insert auto-updates parent `last_continuity_date`
 
-**`ncrs`** (new, promoted from `inspections.ncr_code`) —
-`ncr_no, project_id, weld_id, raised_by, severity, status (Open|In Review|CA Pending|Closed|Rejected), title, description, root_cause, corrective_action, preventive_action, due_date, assigned_to, closed_at, closed_by`.
+**New table `qualification_attachments`**
+- `qualification_id`, `filename`, `storage_path`, `mime_type`, `size_bytes`
 
-**`ncr_events`** (new) — approval & escalation audit trail.
-**`ncr_attachments`** (new).
+**Storage bucket**: `qualification-files` (private, RLS by company prefix). Add `welder-photos` public bucket for portrait images.
 
-**`instrument_events`** (new) — maintenance/status/assignment history (kind, payload, actor).
+**Public RPC**: `get_qualification_by_qr(_token text)` — returns sanitized welder/qualification info (no PII beyond name, status, process, code, expiry).
 
-**Triggers** — attach `write_audit_log()` to all new tables; auto-emit `weld_events` rows on weld insert/status change; auto-emit `instrument_events` on assignment/status change.
+## Phase 2 — Frontend routes/components
 
-**RLS** — same pattern as existing tables (company members read, editors write).
+**Routes**
+- `/app/qualifications` — upgrade list: filters (welder, process, status, expiry, code, position, project), KPI strip, status badges, search.
+- `/app/qualifications/new` — multi-step wizard (Header → Identity → Variables matrix → Tests → Result → Signatures → Review).
+- `/app/qualifications/$id` — detail editor with all sections + attachments + continuity log + revisions.
+- `/app/qualifications/$id/certificate` — print-ready WPQ certificate (A4, company branded, QR).
+- `/verify/qualification/$token` — public verification page (mirrors existing `verify.weld.$token` and `verify.instrument.$token`).
+- `/app/qualifications/dashboard` — analytics: expiring soon, active welders, process distribution (pie), trends (bar), compliance KPIs.
 
----
+**Components**
+- `QualificationVariablesMatrix.tsx` — editable rows, add/remove, dropdown for code refs.
+- `QualificationTestsTable.tsx` — tabbed NDT vs Destructive.
+- `SignaturePad.tsx` — canvas-based signature, stored as data URL.
+- `WelderPhotoUploader.tsx` — uses existing storage helpers.
+- `QrCodeBlock.tsx` — uses `qrcode` lib (add via bun).
+- `WelderQualificationCertificate.tsx` — full A4 print layout (replaces minimal `WelderQualificationDocument.tsx`).
+- `ContinuityTimeline.tsx` — log entries with 6-month break warnings.
 
-## Wave 2 — Instrument Detail Page
+**Hooks/lib**
+- `lib/qualification-status.ts` — derive Active/Expiring Soon (≤30d)/Expired/Suspended; continuity break detection (>6mo gap).
+- `lib/use-qualification.ts` — React Query hook bundling qualification + variables + tests + signatures + continuity.
+- `lib/export-qualification-excel.ts` — uses existing `export.ts` xlsx helper.
 
-Route: `/app/instruments/$instrumentId`
+**PDF**
+- Reuse existing print flow (`window.print()` via `ReportShell`) with a tightened `@media print` stylesheet sized A4 portrait. (Avoids adding heavy PDF libs; mirrors current report pattern.)
 
-- Header: name, asset_id, QR badge (link to `/verify/instrument/$token`), status pill, calibration-due countdown.
-- Tabs: **Overview · Calibrations · Attachments · Activity · Assignment**.
-- Overview cards: model/serial/manufacturer, assigned project + user, last calibration, next due (color-coded ≤30/≤7/expired).
-- Calibrations: timeline + table, "Log calibration" dialog (date, performed_by, next_due, notes, certificate upload via existing `instrument-files` bucket), per-row certificate preview (PDF inline / image lightbox), CSV/Excel export via `exportExcel`.
-- Attachments: drag-and-drop `FileUploader` (already exists) wired to `instrument-files/{company_id}/{instrument_id}/`.
-- Activity: reads `instrument_events` + `audit_logs` filtered to this record, formatted timeline.
-- Assignment panel: super_admin/qa_qc_manager can reassign project/user (writes `instrument_events`).
+## Phase 3 — Cross-cutting
 
----
+- Audit: attach `write_audit_log` trigger to all new tables.
+- Notifications: weekly check (existing `reminder_log` pattern) for `Expiring Soon` and continuity-break.
+- Permissions: signatures restricted via `is_editor` + role-specific check; `super_admin` only for "Suspended" status changes.
+- i18n keys added under `welder_qualification.*`.
+- Mobile: list collapses to cards; matrix becomes vertical key/value on `<md`.
 
-## Wave 3 — Executive Dashboard Redesign
-
-Route: `/app/` (replace current `app.index.tsx`).
-
-- KPI grid (12 tiles, responsive 2/3/4/6 cols): Total welds · Accepted · Rejected · Repair rate · Open NCRs · Active quals · Expiring quals (≤30d) · Calibration due (≤30d) · Inspection completion % · Avg heat input · Compliance score · Welders active.
-- Charts (recharts, already a dep via shadcn chart): weld status trend (30d area), NDT type breakdown (donut), qualification expiry funnel (bar), calibration timeline (bar), per-project QA/QC stacked bar, top-5 welders by acceptance rate.
-- Skeleton loaders on every tile/chart, empty states with CTA buttons.
-- Realtime: subscribe to `welds`, `inspections`, `ncrs`, `notifications` channels — invalidate React Query keys on change.
-- Premium styling: subtle gradient surfaces via `--gradient-primary`, semantic tokens only, generous spacing, `tracking-tight` headings.
-
----
-
-## Wave 4 — Weld Traceability Module
-
-- `/app/welds` — upgraded list: sticky header, column filters (project, welder, WPS, status, date range), saved-search bar, bulk select → bulk approve/reject/export, advanced search box (joint/spool/drawing/heat#).
-- `/app/welds/$weldId` — detail page:
-  - Identity panel (weld no, joint, spool, drawing, line, QR badge).
-  - Traceability chain: Project → Drawing → Line → Spool → Joint → Weld → WPS → Welder → Base material/heat → Filler → Inspections → NCRs.
-  - Tabs: **Overview · Inspections · Repairs · Attachments · Timeline · Approvals**.
-  - Photo gallery with lightbox.
-  - Public QR route: `/verify/weld/$token` (anon read, masked PII).
-- Updated `NewRecordDialog` defaults for welds to capture new fields.
-
----
-
-## Wave 5 — NCR Management Workflow
-
-- `/app/ncrs` — list with KPI strip (open/overdue/critical), filters, bulk export.
-- `/app/ncrs/$ncrId` — workflow detail:
-  - Status stepper: Draft → Open → Root Cause → CA/PA → Review → Closed.
-  - Sections: Description · Root Cause · Corrective Action · Preventive Action · Approvals · Attachments · Audit Trail.
-  - Role-gated transitions (inspector raises, qa_qc_manager reviews, super_admin closes).
-  - Due-date tracking with overdue badge; notification on assignment + 24h-before-due (extends existing `notifications` table; no new cron — fired from triggers + existing daily job).
-- Migrate existing `inspections.ncr_code` references — link inspection rows to new `ncrs` table where present.
+## Out of scope / deferred (call out)
+- Real cryptographic signatures (HSM/PKI) — we store hashed signature image + `actor_id` + timestamp, which is the industry-standard "digital signature record" but not a CA-issued PKI signature.
+- Email delivery infra (would require enabling email connector). Notifications stored in `notifications` table only for now.
 
 ---
 
-## Wave 6 — UX & Enterprise Polish
-
-- New shared `<DataTable>` primitive: sticky header, sortable columns, row selection, bulk action toolbar, column visibility, density toggle, CSV export. Adopt across welds/ncrs/qualifications/instruments/procedures (replace current ad-hoc tables).
-- New `<FilterBar>` (search + facet chips + date range).
-- `AppLayout` polish: collapsible sidebar with module groups (Operations / Quality / Assets / Admin), breadcrumb in header, command palette (`⌘K`) routing.
-- Page transitions via `motion` (subtle 150ms fade).
-- Tighten typography scale in `styles.css` (display/h1/h2/body), add `--shadow-elegant` use on cards.
-
----
-
-## Wave 7 — Demo Seed Expansion
-
-Extend `src/lib/seed.ts`:
-- 4 fabrication/EPC projects with realistic clients, locations, line counts.
-- 80 welds across projects with full traceability fields, mixed statuses, ~12% repair rate.
-- 30 inspections (RT/UT/MT/PT/VT mix), 8 NCRs at various workflow stages (2 overdue, 1 critical-escalated).
-- 25 qualifications (3 expiring 30d, 2 expiring 7d, 1 expired).
-- 18 instruments + 40 calibration history records (5 due ≤30d).
-- Pre-populated notifications for the seeded user (3 unread).
-- Idempotent guard already in place.
-
----
-
-## Technical Notes
-
-- All routes use TanStack Start file routing (`src/routes/...`). Loaders prefetch via React Query `queryClient.ensureQueryData`.
-- Realtime via existing `supabase.channel(...)` pattern; cleanup on unmount.
-- Charts via `recharts` (already pulled in by shadcn `chart.tsx`).
-- File previews: PDF in `<iframe>` with signed URL from `instrument-files` / `weld-attachments` bucket; images in shadcn dialog lightbox.
-- New storage bucket: `weld-attachments` (private, RLS by company prefix).
-- No new env/secrets required.
-- Audit triggers cover all new tables — no app-side audit code.
-
----
-
-## Out of Scope (deferred, called out)
-
-- AI welding analytics, IoT/real-time machine telemetry, predictive QA, ERP connectors — architecture is ready (clean schema, server functions, RLS) but no implementation this phase.
-- Custom email-domain wiring for new event types — existing transactional pipeline is reused; new email templates can be added in a follow-up once the domain is verified.
-
----
-
-## Execution Order
-
-1. Migration (Wave 1) — **requires your approval before I run it**.
-2. Waves 2–6 implemented in code in a single follow-up.
-3. Wave 7 seed update + demo verification.
-
-Reply **approve** to run the migration and proceed, or tell me which waves to drop/reorder.
+Approve and I'll execute Phase 1 (migration) first, then Phase 2 + 3 in code in the same turn.

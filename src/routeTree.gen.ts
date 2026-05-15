@@ -37,6 +37,7 @@ import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
+import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qualification.$token'
 import { Route as VerifyInstrumentTokenRouteImport } from './routes/verify.instrument.$token'
 import { Route as AppWeldsWeldIdRouteImport } from './routes/app.welds.$weldId'
 import { Route as AppReportsSlugRouteImport } from './routes/app.reports.$slug'
@@ -184,6 +185,12 @@ const VerifyWeldTokenRoute = VerifyWeldTokenRouteImport.update({
   path: '/verify/weld/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyQualificationTokenRoute =
+  VerifyQualificationTokenRouteImport.update({
+    id: '/verify/qualification/$token',
+    path: '/verify/qualification/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const VerifyInstrumentTokenRoute = VerifyInstrumentTokenRouteImport.update({
   id: '/verify/instrument/$token',
   path: '/verify/instrument/$token',
@@ -251,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
+  '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
 }
 export interface FileRoutesByTo {
@@ -286,6 +294,7 @@ export interface FileRoutesByTo {
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
+  '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
 }
 export interface FileRoutesById {
@@ -323,6 +332,7 @@ export interface FileRoutesById {
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
+  '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
 }
 export interface FileRouteTypes {
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
+    | '/verify/qualification/$token'
     | '/verify/weld/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -396,6 +407,7 @@ export interface FileRouteTypes {
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
+    | '/verify/qualification/$token'
     | '/verify/weld/$token'
   id:
     | '__root__'
@@ -432,6 +444,7 @@ export interface FileRouteTypes {
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
+    | '/verify/qualification/$token'
     | '/verify/weld/$token'
   fileRoutesById: FileRoutesById
 }
@@ -449,6 +462,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   SignupRoute: typeof SignupRoute
   VerifyInstrumentTokenRoute: typeof VerifyInstrumentTokenRoute
+  VerifyQualificationTokenRoute: typeof VerifyQualificationTokenRoute
   VerifyWeldTokenRoute: typeof VerifyWeldTokenRoute
 }
 
@@ -650,6 +664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyWeldTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify/qualification/$token': {
+      id: '/verify/qualification/$token'
+      path: '/verify/qualification/$token'
+      fullPath: '/verify/qualification/$token'
+      preLoaderRoute: typeof VerifyQualificationTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verify/instrument/$token': {
       id: '/verify/instrument/$token'
       path: '/verify/instrument/$token'
@@ -806,18 +827,9 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   SignupRoute: SignupRoute,
   VerifyInstrumentTokenRoute: VerifyInstrumentTokenRoute,
+  VerifyQualificationTokenRoute: VerifyQualificationTokenRoute,
   VerifyWeldTokenRoute: VerifyWeldTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
