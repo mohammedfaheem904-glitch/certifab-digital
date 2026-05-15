@@ -1170,6 +1170,8 @@ export type Database = {
           code_family: string | null
           company_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           doc_number: string | null
           employee_id: string
           expiry_date: string
@@ -1204,6 +1206,8 @@ export type Database = {
           code_family?: string | null
           company_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           doc_number?: string | null
           employee_id: string
           expiry_date: string
@@ -1238,6 +1242,8 @@ export type Database = {
           code_family?: string | null
           company_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           doc_number?: string | null
           employee_id?: string
           expiry_date?: string
@@ -1563,6 +1569,8 @@ export type Database = {
       is_company_member: { Args: { _company_id: string }; Returns: boolean }
       is_editor: { Args: { _user_id: string }; Returns: boolean }
       is_internal_company: { Args: { _company_id: string }; Returns: boolean }
+      restore_qualification: { Args: { _id: string }; Returns: undefined }
+      soft_delete_qualification: { Args: { _id: string }; Returns: undefined }
     }
     Enums: {
       app_role:
