@@ -50,6 +50,11 @@ export const Route = createFileRoute("/app/qualifications/")({
 function QualificationsPage() {
   const { roles } = useAuth();
   const isAdmin = roles.includes("super_admin");
+  const canDelete = isAdmin || roles.includes("qa_qc_manager");
+  const nav = useNavigate();
+  const qc = useQueryClient();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const { data, isLoading } = useCompanyRows<Row>("qualifications", {
     order: { column: "expiry_date", ascending: true },
   });
