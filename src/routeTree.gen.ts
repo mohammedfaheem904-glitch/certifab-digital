@@ -42,6 +42,7 @@ import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qu
 import { Route as VerifyInstrumentTokenRouteImport } from './routes/verify.instrument.$token'
 import { Route as AppWeldsWeldIdRouteImport } from './routes/app.welds.$weldId'
 import { Route as AppReportsSlugRouteImport } from './routes/app.reports.$slug'
+import { Route as AppQualificationsTrashRouteImport } from './routes/app.qualifications.trash'
 import { Route as AppQualificationsNewRouteImport } from './routes/app.qualifications.new'
 import { Route as AppQualificationsDashboardRouteImport } from './routes/app.qualifications.dashboard'
 import { Route as AppQualificationsQualIdRouteImport } from './routes/app.qualifications.$qualId'
@@ -215,6 +216,11 @@ const AppReportsSlugRoute = AppReportsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => AppReportsRoute,
 } as any)
+const AppQualificationsTrashRoute = AppQualificationsTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AppQualificationsRoute,
+} as any)
 const AppQualificationsNewRoute = AppQualificationsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -283,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
+  '/app/qualifications/trash': typeof AppQualificationsTrashRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
@@ -322,6 +329,7 @@ export interface FileRoutesByTo {
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
+  '/app/qualifications/trash': typeof AppQualificationsTrashRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
@@ -364,6 +372,7 @@ export interface FileRoutesById {
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
+  '/app/qualifications/trash': typeof AppQualificationsTrashRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
@@ -407,6 +416,7 @@ export interface FileRouteTypes {
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
+    | '/app/qualifications/trash'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
+    | '/app/qualifications/trash'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
@@ -487,6 +498,7 @@ export interface FileRouteTypes {
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
+    | '/app/qualifications/trash'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
@@ -746,6 +758,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsSlugRouteImport
       parentRoute: typeof AppReportsRoute
     }
+    '/app/qualifications/trash': {
+      id: '/app/qualifications/trash'
+      path: '/trash'
+      fullPath: '/app/qualifications/trash'
+      preLoaderRoute: typeof AppQualificationsTrashRouteImport
+      parentRoute: typeof AppQualificationsRoute
+    }
     '/app/qualifications/new': {
       id: '/app/qualifications/new'
       path: '/new'
@@ -830,6 +849,7 @@ interface AppQualificationsRouteChildren {
   AppQualificationsQualIdRoute: typeof AppQualificationsQualIdRoute
   AppQualificationsDashboardRoute: typeof AppQualificationsDashboardRoute
   AppQualificationsNewRoute: typeof AppQualificationsNewRoute
+  AppQualificationsTrashRoute: typeof AppQualificationsTrashRoute
   AppQualificationsIndexRoute: typeof AppQualificationsIndexRoute
 }
 
@@ -837,6 +857,7 @@ const AppQualificationsRouteChildren: AppQualificationsRouteChildren = {
   AppQualificationsQualIdRoute: AppQualificationsQualIdRoute,
   AppQualificationsDashboardRoute: AppQualificationsDashboardRoute,
   AppQualificationsNewRoute: AppQualificationsNewRoute,
+  AppQualificationsTrashRoute: AppQualificationsTrashRoute,
   AppQualificationsIndexRoute: AppQualificationsIndexRoute,
 }
 
