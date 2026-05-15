@@ -195,6 +195,7 @@ function QualDetail() {
       <Tabs defaultValue="overview">
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="compliance"><ShieldCheck className="size-4 me-1" /> Compliance</TabsTrigger>
           <TabsTrigger value="variables">Variables</TabsTrigger>
           <TabsTrigger value="tests">Tests ({bundle.tests.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="continuity">Continuity ({bundle.continuity.data?.length ?? 0})</TabsTrigger>
