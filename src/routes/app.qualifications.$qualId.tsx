@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, QrCode, Save, FileText, Trash2, Undo2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, QrCode, Save, FileText, Trash2, Undo2, AlertTriangle, ShieldCheck } from "lucide-react";
+import { QualificationComplianceReport } from "@/components/qualifications/QualificationComplianceReport";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -194,6 +195,7 @@ function QualDetail() {
       <Tabs defaultValue="overview">
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="compliance"><ShieldCheck className="size-4 me-1" /> Compliance</TabsTrigger>
           <TabsTrigger value="variables">Variables</TabsTrigger>
           <TabsTrigger value="tests">Tests ({bundle.tests.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="continuity">Continuity ({bundle.continuity.data?.length ?? 0})</TabsTrigger>
@@ -232,6 +234,10 @@ function QualDetail() {
             </div>
             <div className="text-xs text-muted-foreground italic mt-3">{ranges.notes.join(" ")}</div>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="compliance">
+          <QualificationComplianceReport qualification={merged} />
         </TabsContent>
 
         <TabsContent value="variables">
