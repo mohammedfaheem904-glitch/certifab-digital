@@ -92,7 +92,7 @@ function QualificationsPage() {
             <Button size="sm" variant="outline">WPQ Dashboard</Button>
           </Link>
           <Link to="/app/qualifications/new">
-            <Button size="sm" variant="outline">Wizard</Button>
+            <Button size="sm" variant="outline">Build WPQ</Button>
           </Link>
           {isAdmin && (
             <Link to="/app/qualifications/trash">
