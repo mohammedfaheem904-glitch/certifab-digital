@@ -71,6 +71,7 @@ function SettingsPage() {
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold">Workspace usage</h3>
             <PlanBadge plan={plan} />
+            {isInternal && <PlanBadge plan={plan} internal size="xs" />}
           </div>
           <Button asChild variant="ghost" size="sm">
             <Link to="/app/billing">View plan details →</Link>
