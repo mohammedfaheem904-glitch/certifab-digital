@@ -770,6 +770,8 @@ export type Database = {
           created_at: string
           current_max: number | null
           current_min: number | null
+          deleted_at: string | null
+          deleted_by: string | null
           filler_material: string | null
           heat_input_max: number | null
           heat_input_min: number | null
@@ -805,6 +807,8 @@ export type Database = {
           created_at?: string
           current_max?: number | null
           current_min?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           filler_material?: string | null
           heat_input_max?: number | null
           heat_input_min?: number | null
@@ -840,6 +844,8 @@ export type Database = {
           created_at?: string
           current_max?: number | null
           current_min?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           filler_material?: string | null
           heat_input_max?: number | null
           heat_input_min?: number | null
@@ -1569,7 +1575,9 @@ export type Database = {
       is_company_member: { Args: { _company_id: string }; Returns: boolean }
       is_editor: { Args: { _user_id: string }; Returns: boolean }
       is_internal_company: { Args: { _company_id: string }; Returns: boolean }
+      restore_procedure: { Args: { _id: string }; Returns: undefined }
       restore_qualification: { Args: { _id: string }; Returns: undefined }
+      soft_delete_procedure: { Args: { _id: string }; Returns: undefined }
       soft_delete_qualification: { Args: { _id: string }; Returns: undefined }
     }
     Enums: {
