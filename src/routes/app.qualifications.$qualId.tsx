@@ -383,3 +383,9 @@ function Range({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+function fmtVal(v: any): string {
+  if (v == null || v === "") return "—";
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+}
