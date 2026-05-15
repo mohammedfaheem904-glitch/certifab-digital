@@ -16,6 +16,8 @@ type PlanState = {
   plan: PlanDefinition;
   usage: Usage;
   loading: boolean;
+  /** True when this workspace is a platform owner / internal account that bypasses plan enforcement. */
+  isInternal: boolean;
   /** True if the company plan unlocks this feature. */
   hasFeature: (f: FeatureKey) => boolean;
   /** Returns remaining capacity for a quota. Infinity = unlimited. */
@@ -49,7 +51,11 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     staleTime: 30_000,
     queryFn: async () => {
       const [{ data: company }, ...counts] = await Promise.all([
-        supabase.from("companies").select("plan").eq("id", cid!).maybeSingle(),
+        supabase
+          .from("companies")
+          .select("plan, is_internal")
+          .eq("id", cid!)
+          .maybeSingle(),
         countRows("profiles", cid!),
         countRows("projects", cid!),
         countRows("welds", cid!),
@@ -57,8 +63,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         sumStorageMb(cid!),
       ]);
       const [users, projects, welds, procedures, storage_mb] = counts as number[];
+      // Internal/owner workspaces always get full Enterprise access with no limits.
+      const isInternal = !!(company as any)?.is_internal;
+      const plan = isInternal ? PLANS.enterprise : resolvePlan(company?.plan);
       return {
-        plan: resolvePlan(company?.plan),
+        plan,
+        isInternal,
         usage: { users, projects, welds, procedures, storage_mb } as Usage,
       };
     },
@@ -67,16 +77,19 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   const value = useMemo<PlanState>(() => {
     const plan = data?.plan ?? PLANS.free;
     const usage = data?.usage ?? ZERO_USAGE;
-    const hasFeature = (f: FeatureKey) => !!plan.features[f];
-    const remaining = (q: QuotaKey) => Math.max(0, plan.limits[q] - usage[q]);
+    const isInternal = !!data?.isInternal;
+    const hasFeature = (f: FeatureKey) => isInternal || !!plan.features[f];
+    const remaining = (q: QuotaKey) =>
+      isInternal ? Number.POSITIVE_INFINITY : Math.max(0, plan.limits[q] - usage[q]);
     const percentUsed = (q: QuotaKey) => {
+      if (isInternal) return 0;
       const lim = plan.limits[q];
       if (!isFinite(lim)) return 0;
       return Math.min(100, Math.round(((usage[q] ?? 0) / lim) * 100));
     };
     const isOverQuota = (q: QuotaKey) =>
-      isFinite(plan.limits[q]) && (usage[q] ?? 0) >= plan.limits[q];
-    const reasonForFeature = (f: FeatureKey) =>
+      !isInternal && isFinite(plan.limits[q]) && (usage[q] ?? 0) >= plan.limits[q];
+    const reasonForFeature = (_f: FeatureKey) =>
       `Your ${plan.name} plan doesn't include this feature. Upgrade to unlock it.`;
     const reasonForQuota = (q: QuotaKey) =>
       `You've reached the ${plan.name} plan limit for ${q.replace("_", " ")}. Upgrade for higher capacity.`;
@@ -84,6 +97,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       plan,
       usage,
       loading: isLoading,
+      isInternal,
       hasFeature,
       remaining,
       percentUsed,
@@ -104,6 +118,7 @@ export function usePlan(): PlanState {
       plan: PLANS.free,
       usage: ZERO_USAGE,
       loading: true,
+      isInternal: false,
       hasFeature: () => false,
       remaining: () => 0,
       percentUsed: () => 0,

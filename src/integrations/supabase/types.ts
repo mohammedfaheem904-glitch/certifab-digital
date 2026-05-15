@@ -59,6 +59,7 @@ export type Database = {
           email_from_name: string | null
           id: string
           industry: string | null
+          is_internal: boolean
           logo_url: string | null
           name: string
           plan: string
@@ -73,6 +74,7 @@ export type Database = {
           email_from_name?: string | null
           id?: string
           industry?: string | null
+          is_internal?: boolean
           logo_url?: string | null
           name: string
           plan?: string
@@ -87,6 +89,7 @@ export type Database = {
           email_from_name?: string | null
           id?: string
           industry?: string | null
+          is_internal?: boolean
           logo_url?: string | null
           name?: string
           plan?: string
@@ -1280,6 +1283,7 @@ export type Database = {
       }
       is_company_member: { Args: { _company_id: string }; Returns: boolean }
       is_editor: { Args: { _user_id: string }; Returns: boolean }
+      is_internal_company: { Args: { _company_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:

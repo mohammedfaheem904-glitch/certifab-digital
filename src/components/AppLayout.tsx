@@ -236,14 +236,15 @@ export function AppLayout() {
 }
 
 function PlanPill() {
-  const { plan } = usePlan();
+  const { plan, isInternal } = usePlan();
   return (
     <Link
       to="/app/billing"
-      className="hidden sm:inline-flex"
-      title="Manage plan"
+      className="hidden sm:inline-flex items-center gap-1.5"
+      title={isInternal ? "Internal owner workspace" : "Manage plan"}
     >
       <PlanBadge plan={plan} />
+      {isInternal && <PlanBadge plan={plan} internal size="xs" />}
     </Link>
   );
 }
