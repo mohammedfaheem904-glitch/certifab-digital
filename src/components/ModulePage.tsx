@@ -26,9 +26,6 @@ export function ModulePage({
           {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Download className="size-4 me-1" /> Export
-          </Button>
           {action ?? (primaryAction && (
             <Button size="sm" className="bg-[image:var(--gradient-primary)] text-primary-foreground hover:opacity-90 shadow-[var(--shadow-glow)]">
               <Plus className="size-4 me-1" /> {primaryAction}
