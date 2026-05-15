@@ -1191,6 +1191,8 @@ export type Database = {
           standard: string
           status: Database["public"]["Enums"]["qualification_status"]
           test_coupon_type: string | null
+          test_diameter_mm: number | null
+          test_thickness_mm: number | null
           updated_at: string
           welder_name: string
           welder_photo_url: string | null
@@ -1223,6 +1225,8 @@ export type Database = {
           standard: string
           status?: Database["public"]["Enums"]["qualification_status"]
           test_coupon_type?: string | null
+          test_diameter_mm?: number | null
+          test_thickness_mm?: number | null
           updated_at?: string
           welder_name: string
           welder_photo_url?: string | null
@@ -1255,6 +1259,8 @@ export type Database = {
           standard?: string
           status?: Database["public"]["Enums"]["qualification_status"]
           test_coupon_type?: string | null
+          test_diameter_mm?: number | null
+          test_thickness_mm?: number | null
           updated_at?: string
           welder_name?: string
           welder_photo_url?: string | null
