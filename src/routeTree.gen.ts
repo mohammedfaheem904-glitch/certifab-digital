@@ -36,11 +36,15 @@ import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
+import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
 import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qualification.$token'
 import { Route as VerifyInstrumentTokenRouteImport } from './routes/verify.instrument.$token'
 import { Route as AppWeldsWeldIdRouteImport } from './routes/app.welds.$weldId'
 import { Route as AppReportsSlugRouteImport } from './routes/app.reports.$slug'
+import { Route as AppQualificationsNewRouteImport } from './routes/app.qualifications.new'
+import { Route as AppQualificationsDashboardRouteImport } from './routes/app.qualifications.dashboard'
+import { Route as AppQualificationsQualIdRouteImport } from './routes/app.qualifications.$qualId'
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
@@ -180,6 +184,11 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppQualificationsRoute,
+} as any)
 const VerifyWeldTokenRoute = VerifyWeldTokenRouteImport.update({
   id: '/verify/weld/$token',
   path: '/verify/weld/$token',
@@ -205,6 +214,22 @@ const AppReportsSlugRoute = AppReportsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => AppReportsRoute,
+} as any)
+const AppQualificationsNewRoute = AppQualificationsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AppQualificationsRoute,
+} as any)
+const AppQualificationsDashboardRoute =
+  AppQualificationsDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AppQualificationsRoute,
+  } as any)
+const AppQualificationsQualIdRoute = AppQualificationsQualIdRouteImport.update({
+  id: '/$qualId',
+  path: '/$qualId',
+  getParentRoute: () => AppQualificationsRoute,
 } as any)
 const AppProceduresProcedureIdRoute =
   AppProceduresProcedureIdRouteImport.update({
@@ -246,7 +271,7 @@ export interface FileRoutesByFullPath {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
-  '/app/qualifications': typeof AppQualificationsRoute
+  '/app/qualifications': typeof AppQualificationsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
@@ -255,11 +280,15 @@ export interface FileRoutesByFullPath {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
+  '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
+  '/app/qualifications/new': typeof AppQualificationsNewRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
+  '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -282,7 +311,6 @@ export interface FileRoutesByTo {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
-  '/app/qualifications': typeof AppQualificationsRoute
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
@@ -291,11 +319,15 @@ export interface FileRoutesByTo {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
+  '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
+  '/app/qualifications/new': typeof AppQualificationsNewRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
+  '/app/qualifications': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -320,7 +352,7 @@ export interface FileRoutesById {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
-  '/app/qualifications': typeof AppQualificationsRoute
+  '/app/qualifications': typeof AppQualificationsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
@@ -329,11 +361,15 @@ export interface FileRoutesById {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
+  '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
+  '/app/qualifications/new': typeof AppQualificationsNewRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
+  '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -368,11 +404,15 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
+    | '/app/qualifications/$qualId'
+    | '/app/qualifications/dashboard'
+    | '/app/qualifications/new'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
+    | '/app/qualifications/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -395,7 +435,6 @@ export interface FileRouteTypes {
     | '/app/ncrs'
     | '/app/procedures'
     | '/app/projects'
-    | '/app/qualifications'
     | '/app/reports'
     | '/app/settings'
     | '/app/team'
@@ -404,11 +443,15 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
+    | '/app/qualifications/$qualId'
+    | '/app/qualifications/dashboard'
+    | '/app/qualifications/new'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
+    | '/app/qualifications'
   id:
     | '__root__'
     | '/'
@@ -441,11 +484,15 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
+    | '/app/qualifications/$qualId'
+    | '/app/qualifications/dashboard'
+    | '/app/qualifications/new'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
+    | '/app/qualifications/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -657,6 +704,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/qualifications/': {
+      id: '/app/qualifications/'
+      path: '/'
+      fullPath: '/app/qualifications/'
+      preLoaderRoute: typeof AppQualificationsIndexRouteImport
+      parentRoute: typeof AppQualificationsRoute
+    }
     '/verify/weld/$token': {
       id: '/verify/weld/$token'
       path: '/verify/weld/$token'
@@ -691,6 +745,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/reports/$slug'
       preLoaderRoute: typeof AppReportsSlugRouteImport
       parentRoute: typeof AppReportsRoute
+    }
+    '/app/qualifications/new': {
+      id: '/app/qualifications/new'
+      path: '/new'
+      fullPath: '/app/qualifications/new'
+      preLoaderRoute: typeof AppQualificationsNewRouteImport
+      parentRoute: typeof AppQualificationsRoute
+    }
+    '/app/qualifications/dashboard': {
+      id: '/app/qualifications/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/qualifications/dashboard'
+      preLoaderRoute: typeof AppQualificationsDashboardRouteImport
+      parentRoute: typeof AppQualificationsRoute
+    }
+    '/app/qualifications/$qualId': {
+      id: '/app/qualifications/$qualId'
+      path: '/$qualId'
+      fullPath: '/app/qualifications/$qualId'
+      preLoaderRoute: typeof AppQualificationsQualIdRouteImport
+      parentRoute: typeof AppQualificationsRoute
     }
     '/app/procedures/$procedureId': {
       id: '/app/procedures/$procedureId'
@@ -751,6 +826,23 @@ const AppProceduresRouteWithChildren = AppProceduresRoute._addFileChildren(
   AppProceduresRouteChildren,
 )
 
+interface AppQualificationsRouteChildren {
+  AppQualificationsQualIdRoute: typeof AppQualificationsQualIdRoute
+  AppQualificationsDashboardRoute: typeof AppQualificationsDashboardRoute
+  AppQualificationsNewRoute: typeof AppQualificationsNewRoute
+  AppQualificationsIndexRoute: typeof AppQualificationsIndexRoute
+}
+
+const AppQualificationsRouteChildren: AppQualificationsRouteChildren = {
+  AppQualificationsQualIdRoute: AppQualificationsQualIdRoute,
+  AppQualificationsDashboardRoute: AppQualificationsDashboardRoute,
+  AppQualificationsNewRoute: AppQualificationsNewRoute,
+  AppQualificationsIndexRoute: AppQualificationsIndexRoute,
+}
+
+const AppQualificationsRouteWithChildren =
+  AppQualificationsRoute._addFileChildren(AppQualificationsRouteChildren)
+
 interface AppReportsRouteChildren {
   AppReportsSlugRoute: typeof AppReportsSlugRoute
 }
@@ -785,7 +877,7 @@ interface AppRouteChildren {
   AppNcrsRoute: typeof AppNcrsRouteWithChildren
   AppProceduresRoute: typeof AppProceduresRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRoute
-  AppQualificationsRoute: typeof AppQualificationsRoute
+  AppQualificationsRoute: typeof AppQualificationsRouteWithChildren
   AppReportsRoute: typeof AppReportsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
   AppTeamRoute: typeof AppTeamRoute
@@ -803,7 +895,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppNcrsRoute: AppNcrsRouteWithChildren,
   AppProceduresRoute: AppProceduresRouteWithChildren,
   AppProjectsRoute: AppProjectsRoute,
-  AppQualificationsRoute: AppQualificationsRoute,
+  AppQualificationsRoute: AppQualificationsRouteWithChildren,
   AppReportsRoute: AppReportsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
   AppTeamRoute: AppTeamRoute,
