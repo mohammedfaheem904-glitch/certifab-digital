@@ -86,7 +86,7 @@ function QualificationsPage() {
       action={
         <div className="flex gap-2">
           <Link to="/app/qualifications/dashboard">
-            <Button size="sm" variant="outline">Dashboard</Button>
+            <Button size="sm" variant="outline">WPQ Dashboard</Button>
           </Link>
           <Link to="/app/qualifications/new">
             <Button size="sm" variant="outline">Wizard</Button>
