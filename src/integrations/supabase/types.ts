@@ -970,42 +970,297 @@ export type Database = {
           },
         ]
       }
-      qualifications: {
+      qualification_attachments: {
         Row: {
           company_id: string
           created_at: string
-          employee_id: string
-          expiry_date: string
+          filename: string
           id: string
-          process: string
-          standard: string
-          status: Database["public"]["Enums"]["qualification_status"]
-          updated_at: string
-          welder_name: string
+          mime_type: string | null
+          qualification_id: string
+          size_bytes: number | null
+          storage_path: string
+          uploaded_by: string | null
         }
         Insert: {
           company_id: string
           created_at?: string
-          employee_id: string
-          expiry_date: string
+          filename: string
           id?: string
-          process: string
-          standard: string
-          status?: Database["public"]["Enums"]["qualification_status"]
-          updated_at?: string
-          welder_name: string
+          mime_type?: string | null
+          qualification_id: string
+          size_bytes?: number | null
+          storage_path: string
+          uploaded_by?: string | null
         }
         Update: {
           company_id?: string
           created_at?: string
+          filename?: string
+          id?: string
+          mime_type?: string | null
+          qualification_id?: string
+          size_bytes?: number | null
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      qualification_continuity: {
+        Row: {
+          activity_date: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          evidence_weld_id: string | null
+          id: string
+          notes: string | null
+          process: string | null
+          project_id: string | null
+          qualification_id: string
+        }
+        Insert: {
+          activity_date: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          evidence_weld_id?: string | null
+          id?: string
+          notes?: string | null
+          process?: string | null
+          project_id?: string | null
+          qualification_id: string
+        }
+        Update: {
+          activity_date?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          evidence_weld_id?: string | null
+          id?: string
+          notes?: string | null
+          process?: string | null
+          project_id?: string | null
+          qualification_id?: string
+        }
+        Relationships: []
+      }
+      qualification_signatures: {
+        Row: {
+          actor_id: string | null
+          company_id: string
+          id: string
+          name: string
+          qualification_id: string
+          role: string
+          signature_data_url: string | null
+          signed_at: string
+        }
+        Insert: {
+          actor_id?: string | null
+          company_id: string
+          id?: string
+          name: string
+          qualification_id: string
+          role: string
+          signature_data_url?: string | null
+          signed_at?: string
+        }
+        Update: {
+          actor_id?: string | null
+          company_id?: string
+          id?: string
+          name?: string
+          qualification_id?: string
+          role?: string
+          signature_data_url?: string | null
+          signed_at?: string
+        }
+        Relationships: []
+      }
+      qualification_tests: {
+        Row: {
+          category: string
+          company_id: string
+          created_at: string
+          id: string
+          inspector_name: string | null
+          notes: string | null
+          qualification_id: string
+          report_number: string | null
+          result: string | null
+          test_date: string | null
+          test_type: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          company_id: string
+          created_at?: string
+          id?: string
+          inspector_name?: string | null
+          notes?: string | null
+          qualification_id: string
+          report_number?: string | null
+          result?: string | null
+          test_date?: string | null
+          test_type: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          inspector_name?: string | null
+          notes?: string | null
+          qualification_id?: string
+          report_number?: string | null
+          result?: string | null
+          test_date?: string | null
+          test_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      qualification_variables: {
+        Row: {
+          code_reference: string | null
+          company_id: string
+          created_at: string
+          id: string
+          qualification_id: string
+          qualified_for: string | null
+          qualified_with: string | null
+          sort_order: number
+          updated_at: string
+          variable_key: string
+          variable_label: string
+        }
+        Insert: {
+          code_reference?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          qualification_id: string
+          qualified_for?: string | null
+          qualified_with?: string | null
+          sort_order?: number
+          updated_at?: string
+          variable_key: string
+          variable_label: string
+        }
+        Update: {
+          code_reference?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          qualification_id?: string
+          qualified_for?: string | null
+          qualified_with?: string | null
+          sort_order?: number
+          updated_at?: string
+          variable_key?: string
+          variable_label?: string
+        }
+        Relationships: []
+      }
+      qualifications: {
+        Row: {
+          code_family: string | null
+          company_id: string
+          created_at: string
+          doc_number: string | null
+          employee_id: string
+          expiry_date: string
+          id: string
+          last_continuity_date: string | null
+          position_qualified: string | null
+          pqr_number: string | null
+          process: string
+          process_type: string | null
+          project_id: string | null
+          qr_token: string
+          qualification_date: string | null
+          rejection_reason: string | null
+          remarks: string | null
+          result: string | null
+          retest_of_id: string | null
+          revision: string
+          stamp_number: string | null
+          standard: string
+          status: Database["public"]["Enums"]["qualification_status"]
+          test_coupon_type: string | null
+          updated_at: string
+          welder_name: string
+          welder_photo_url: string | null
+          welder_test_number: string | null
+          wpq_number: string | null
+          wps_number: string | null
+        }
+        Insert: {
+          code_family?: string | null
+          company_id: string
+          created_at?: string
+          doc_number?: string | null
+          employee_id: string
+          expiry_date: string
+          id?: string
+          last_continuity_date?: string | null
+          position_qualified?: string | null
+          pqr_number?: string | null
+          process: string
+          process_type?: string | null
+          project_id?: string | null
+          qr_token?: string
+          qualification_date?: string | null
+          rejection_reason?: string | null
+          remarks?: string | null
+          result?: string | null
+          retest_of_id?: string | null
+          revision?: string
+          stamp_number?: string | null
+          standard: string
+          status?: Database["public"]["Enums"]["qualification_status"]
+          test_coupon_type?: string | null
+          updated_at?: string
+          welder_name: string
+          welder_photo_url?: string | null
+          welder_test_number?: string | null
+          wpq_number?: string | null
+          wps_number?: string | null
+        }
+        Update: {
+          code_family?: string | null
+          company_id?: string
+          created_at?: string
+          doc_number?: string | null
           employee_id?: string
           expiry_date?: string
           id?: string
+          last_continuity_date?: string | null
+          position_qualified?: string | null
+          pqr_number?: string | null
           process?: string
+          process_type?: string | null
+          project_id?: string | null
+          qr_token?: string
+          qualification_date?: string | null
+          rejection_reason?: string | null
+          remarks?: string | null
+          result?: string | null
+          retest_of_id?: string | null
+          revision?: string
+          stamp_number?: string | null
           standard?: string
           status?: Database["public"]["Enums"]["qualification_status"]
+          test_coupon_type?: string | null
           updated_at?: string
           welder_name?: string
+          welder_photo_url?: string | null
+          welder_test_number?: string | null
+          wpq_number?: string | null
+          wps_number?: string | null
         }
         Relationships: [
           {
@@ -1265,6 +1520,24 @@ export type Database = {
           expires_at: string
           invited_by_name: string
           role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
+      get_qualification_by_qr: {
+        Args: { _token: string }
+        Returns: {
+          code_family: string
+          company_logo_url: string
+          company_name: string
+          employee_id: string
+          expiry_date: string
+          id: string
+          position_qualified: string
+          process: string
+          qualification_date: string
+          standard: string
+          status: string
+          welder_name: string
+          wpq_number: string
         }[]
       }
       has_any_role: {
