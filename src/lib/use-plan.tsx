@@ -77,16 +77,19 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   const value = useMemo<PlanState>(() => {
     const plan = data?.plan ?? PLANS.free;
     const usage = data?.usage ?? ZERO_USAGE;
-    const hasFeature = (f: FeatureKey) => !!plan.features[f];
-    const remaining = (q: QuotaKey) => Math.max(0, plan.limits[q] - usage[q]);
+    const isInternal = !!data?.isInternal;
+    const hasFeature = (f: FeatureKey) => isInternal || !!plan.features[f];
+    const remaining = (q: QuotaKey) =>
+      isInternal ? Number.POSITIVE_INFINITY : Math.max(0, plan.limits[q] - usage[q]);
     const percentUsed = (q: QuotaKey) => {
+      if (isInternal) return 0;
       const lim = plan.limits[q];
       if (!isFinite(lim)) return 0;
       return Math.min(100, Math.round(((usage[q] ?? 0) / lim) * 100));
     };
     const isOverQuota = (q: QuotaKey) =>
-      isFinite(plan.limits[q]) && (usage[q] ?? 0) >= plan.limits[q];
-    const reasonForFeature = (f: FeatureKey) =>
+      !isInternal && isFinite(plan.limits[q]) && (usage[q] ?? 0) >= plan.limits[q];
+    const reasonForFeature = (_f: FeatureKey) =>
       `Your ${plan.name} plan doesn't include this feature. Upgrade to unlock it.`;
     const reasonForQuota = (q: QuotaKey) =>
       `You've reached the ${plan.name} plan limit for ${q.replace("_", " ")}. Upgrade for higher capacity.`;
@@ -94,6 +97,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       plan,
       usage,
       loading: isLoading,
+      isInternal,
       hasFeature,
       remaining,
       percentUsed,
@@ -114,6 +118,7 @@ export function usePlan(): PlanState {
       plan: PLANS.free,
       usage: ZERO_USAGE,
       loading: true,
+      isInternal: false,
       hasFeature: () => false,
       remaining: () => 0,
       percentUsed: () => 0,
