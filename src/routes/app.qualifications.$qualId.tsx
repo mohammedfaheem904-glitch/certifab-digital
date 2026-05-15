@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, QrCode, Save, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, QrCode, Save, FileText, Trash2, Undo2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -76,14 +76,38 @@ function QualDetail() {
     toast.success("Saved.");
   };
 
-  const remove = async () => {
-    if (!confirm("Delete this WPQ? This cannot be undone.")) return;
+  const softDelete = async () => {
+    if (!confirm("Move this WPQ to Trash? Super admins can restore it later.")) return;
+    const { error } = await (supabase.rpc as any)("soft_delete_qualification", { _id: qualId });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Moved to Trash.");
+    qc.invalidateQueries({ queryKey: ["qualifications"] });
+    nav({ to: "/app/qualifications" });
+  };
+
+  const restore = async () => {
+    const { error } = await (supabase.rpc as any)("restore_qualification", { _id: qualId });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Restored.");
+    qc.invalidateQueries({ queryKey: ["qualification", qualId] });
+    qc.invalidateQueries({ queryKey: ["qualifications"] });
+    qc.invalidateQueries({ queryKey: ["qualifications_trash"] });
+  };
+
+  const hardDelete = async () => {
+    if (!confirm("Permanently delete this WPQ and ALL related records? This cannot be undone.")) return;
     const { error } = await supabase.from("qualifications").delete().eq("id", qualId);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Deleted.");
+    toast.success("Permanently deleted.");
     nav({ to: "/app/qualifications" });
   };
 
@@ -131,13 +155,33 @@ function QualDetail() {
               <Button variant="outline" size="sm"><QrCode className="size-4 me-1" /> Verify QR</Button>
             </Link>
             {dirty && <Button size="sm" onClick={save} disabled={saving}><Save className="size-4 me-1" /> Save changes</Button>}
-            {isAdmin && (
-              <Button size="sm" variant="outline" onClick={remove} className="text-destructive">
+            {q.deleted_at ? (
+              <>
+                {isAdmin && (
+                  <Button size="sm" variant="outline" onClick={restore}>
+                    <Undo2 className="size-4 me-1" /> Restore
+                  </Button>
+                )}
+                {isAdmin && (
+                  <Button size="sm" variant="outline" onClick={hardDelete} className="text-destructive">
+                    <Trash2 className="size-4 me-1" /> Delete permanently
+                  </Button>
+                )}
+              </>
+            ) : (
+              <Button size="sm" variant="outline" onClick={softDelete} className="text-destructive">
                 <Trash2 className="size-4 me-1" /> Delete
               </Button>
             )}
           </div>
         </div>
+
+        {q.deleted_at && (
+          <div className="mt-4 flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <AlertTriangle className="size-4" />
+            This WPQ is in Trash (soft-deleted on {fmtEngDate(q.deleted_at)}). It is hidden from standard lists and reports.
+          </div>
+        )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <Field label="Qualified" value={q.qualification_date ? fmtEngDate(q.qualification_date) : "—"} />
@@ -253,13 +297,44 @@ function QualDetail() {
 
         <TabsContent value="audit">
           <ol className="relative border-s border-border ms-2 space-y-4">
-            {(bundle.audit.data ?? []).map((e) => (
-              <li key={e.id} className="ms-4 relative">
-                <div className="absolute -start-[22px] mt-1.5 size-3 rounded-full bg-primary/70" />
-                <div className="text-sm font-medium">{e.action}</div>
-                <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</div>
-              </li>
-            ))}
+            {(bundle.audit.data ?? []).map((e) => {
+              const before = (e.before ?? {}) as Record<string, any>;
+              const after = (e.after ?? {}) as Record<string, any>;
+              const keys = Array.from(new Set([...Object.keys(before), ...Object.keys(after)]));
+              const changed = keys.filter((k) => JSON.stringify(before[k]) !== JSON.stringify(after[k]));
+              const tone =
+                e.action === "DELETE" ? "bg-destructive" :
+                e.action === "INSERT" ? "bg-emerald-500" : "bg-primary/70";
+              return (
+                <li key={e.id} className="ms-4 relative">
+                  <div className={`absolute -start-[22px] mt-1.5 size-3 rounded-full ${tone}`} />
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm font-medium">{e.action}</div>
+                    <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</div>
+                  </div>
+                  {e.action === "UPDATE" && changed.length > 0 && (
+                    <div className="mt-2 rounded border border-border bg-muted/20 text-xs divide-y divide-border">
+                      {changed.slice(0, 12).map((k) => (
+                        <div key={k} className="grid grid-cols-[140px_1fr_1fr] gap-2 px-2 py-1.5 items-start">
+                          <div className="font-mono text-muted-foreground">{k}</div>
+                          <div className="font-mono break-all text-destructive/80 line-through">
+                            {fmtVal(before[k])}
+                          </div>
+                          <div className="font-mono break-all text-emerald-600 dark:text-emerald-400">
+                            {fmtVal(after[k])}
+                          </div>
+                        </div>
+                      ))}
+                      {changed.length > 12 && (
+                        <div className="px-2 py-1.5 text-muted-foreground italic">
+                          +{changed.length - 12} more changes…
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
             {(bundle.audit.data?.length ?? 0) === 0 && (
               <div className="text-sm text-muted-foreground ms-4">No audit entries.</div>
             )}
@@ -307,4 +382,10 @@ function Range({ label, value }: { label: string; value: string }) {
       <div className="font-mono text-sm mt-0.5">{value}</div>
     </div>
   );
+}
+
+function fmtVal(v: any): string {
+  if (v == null || v === "") return "—";
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
 }

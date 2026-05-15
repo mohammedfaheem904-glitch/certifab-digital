@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Download, ShieldCheck, Clock, AlertTriangle, Users } from "lucide-react";
+import { Loader2, Download, ShieldCheck, Clock, AlertTriangle, Users, Trash2 } from "lucide-react";
 import { deriveQualStatus, continuityBroken } from "@/lib/qualification-status";
 import { exportExcel } from "@/lib/export";
 import { fmtEngDate } from "@/lib/doc-number";
+import { useAuth } from "@/lib/auth";
 
 type Row = {
   id: string;
@@ -33,6 +34,8 @@ export const Route = createFileRoute("/app/qualifications/")({
 });
 
 function QualificationsPage() {
+  const { roles } = useAuth();
+  const isAdmin = roles.includes("super_admin");
   const { data, isLoading } = useCompanyRows<Row>("qualifications", {
     order: { column: "expiry_date", ascending: true },
   });
@@ -91,6 +94,11 @@ function QualificationsPage() {
           <Link to="/app/qualifications/new">
             <Button size="sm" variant="outline">Wizard</Button>
           </Link>
+          {isAdmin && (
+            <Link to="/app/qualifications/trash">
+              <Button size="sm" variant="outline"><Trash2 className="size-4 me-1" /> Trash</Button>
+            </Link>
+          )}
           <Button
             size="sm"
             variant="outline"
