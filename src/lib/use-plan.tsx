@@ -16,6 +16,8 @@ type PlanState = {
   plan: PlanDefinition;
   usage: Usage;
   loading: boolean;
+  /** True when this workspace is a platform owner / internal account that bypasses plan enforcement. */
+  isInternal: boolean;
   /** True if the company plan unlocks this feature. */
   hasFeature: (f: FeatureKey) => boolean;
   /** Returns remaining capacity for a quota. Infinity = unlimited. */
