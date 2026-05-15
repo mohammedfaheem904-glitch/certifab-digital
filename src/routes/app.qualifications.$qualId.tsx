@@ -297,13 +297,44 @@ function QualDetail() {
 
         <TabsContent value="audit">
           <ol className="relative border-s border-border ms-2 space-y-4">
-            {(bundle.audit.data ?? []).map((e) => (
-              <li key={e.id} className="ms-4 relative">
-                <div className="absolute -start-[22px] mt-1.5 size-3 rounded-full bg-primary/70" />
-                <div className="text-sm font-medium">{e.action}</div>
-                <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</div>
-              </li>
-            ))}
+            {(bundle.audit.data ?? []).map((e) => {
+              const before = (e.before ?? {}) as Record<string, any>;
+              const after = (e.after ?? {}) as Record<string, any>;
+              const keys = Array.from(new Set([...Object.keys(before), ...Object.keys(after)]));
+              const changed = keys.filter((k) => JSON.stringify(before[k]) !== JSON.stringify(after[k]));
+              const tone =
+                e.action === "DELETE" ? "bg-destructive" :
+                e.action === "INSERT" ? "bg-emerald-500" : "bg-primary/70";
+              return (
+                <li key={e.id} className="ms-4 relative">
+                  <div className={`absolute -start-[22px] mt-1.5 size-3 rounded-full ${tone}`} />
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm font-medium">{e.action}</div>
+                    <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</div>
+                  </div>
+                  {e.action === "UPDATE" && changed.length > 0 && (
+                    <div className="mt-2 rounded border border-border bg-muted/20 text-xs divide-y divide-border">
+                      {changed.slice(0, 12).map((k) => (
+                        <div key={k} className="grid grid-cols-[140px_1fr_1fr] gap-2 px-2 py-1.5 items-start">
+                          <div className="font-mono text-muted-foreground">{k}</div>
+                          <div className="font-mono break-all text-destructive/80 line-through">
+                            {fmtVal(before[k])}
+                          </div>
+                          <div className="font-mono break-all text-emerald-600 dark:text-emerald-400">
+                            {fmtVal(after[k])}
+                          </div>
+                        </div>
+                      ))}
+                      {changed.length > 12 && (
+                        <div className="px-2 py-1.5 text-muted-foreground italic">
+                          +{changed.length - 12} more changes…
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
             {(bundle.audit.data?.length ?? 0) === 0 && (
               <div className="text-sm text-muted-foreground ms-4">No audit entries.</div>
             )}
