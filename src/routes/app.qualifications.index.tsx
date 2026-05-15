@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { ModulePage } from "@/components/ModulePage";
 import { StatusBadge } from "@/components/StatusBadge";
 import { NewRecordDialog } from "@/components/NewRecordDialog";
@@ -8,11 +10,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Download, ShieldCheck, Clock, AlertTriangle, Users, Trash2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2, Download, ShieldCheck, Clock, AlertTriangle, Users, Trash2, Eye } from "lucide-react";
 import { deriveQualStatus, continuityBroken } from "@/lib/qualification-status";
 import { exportExcel } from "@/lib/export";
 import { fmtEngDate } from "@/lib/doc-number";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 type Row = {
   id: string;
