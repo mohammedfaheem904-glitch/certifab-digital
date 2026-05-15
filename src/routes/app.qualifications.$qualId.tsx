@@ -236,6 +236,10 @@ function QualDetail() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="compliance">
+          <QualificationComplianceReport qualification={merged} />
+        </TabsContent>
+
         <TabsContent value="variables">
           <QualificationVariablesMatrix
             qualificationId={qualId}
