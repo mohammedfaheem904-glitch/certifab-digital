@@ -8,8 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { FileUploader } from "@/components/FileUploader";
-import { ArrowLeft, ChevronRight, QrCode, FileText } from "lucide-react";
+import { ArrowLeft, ChevronRight, QrCode, FileText, ShieldCheck } from "lucide-react";
 import { WeldTraceabilityDocument } from "@/components/reports/WeldTraceabilityDocument";
+import { WeldComplianceCheck } from "@/components/welds/WeldComplianceCheck";
 
 export const Route = createFileRoute("/app/welds/$weldId")({
   component: WeldDetail,
@@ -113,14 +114,19 @@ function WeldDetail() {
         </div>
       </div>
 
-      <Tabs defaultValue="inspections">
+      <Tabs defaultValue="compliance">
         <TabsList className="print:hidden">
+          <TabsTrigger value="compliance"><ShieldCheck className="size-4 me-1.5" />Compliance</TabsTrigger>
           <TabsTrigger value="inspections">Inspections ({inspections.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="ncrs">NCRs ({ncrs.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="attachments">Attachments</TabsTrigger>
           <TabsTrigger value="certificate"><FileText className="size-4 me-1.5" />Traceability Report</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="compliance">
+          <WeldComplianceCheck weld={w} />
+        </TabsContent>
 
         <TabsContent value="inspections">
           <div className="rounded-xl border border-border bg-card overflow-hidden">

@@ -33,6 +33,9 @@ export type FindingCategory =
   | "Process"
   | "Backing"
   | "Coverage"
+  | "Coverage Gap"
+  | "WPS Match"
+  | "Welder Qualification"
   | "Data Quality";
 
 export interface ComplianceFinding {
