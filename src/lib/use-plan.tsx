@@ -49,7 +49,11 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     staleTime: 30_000,
     queryFn: async () => {
       const [{ data: company }, ...counts] = await Promise.all([
-        supabase.from("companies").select("plan").eq("id", cid!).maybeSingle(),
+        supabase
+          .from("companies")
+          .select("plan, is_internal")
+          .eq("id", cid!)
+          .maybeSingle(),
         countRows("profiles", cid!),
         countRows("projects", cid!),
         countRows("welds", cid!),
@@ -57,8 +61,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         sumStorageMb(cid!),
       ]);
       const [users, projects, welds, procedures, storage_mb] = counts as number[];
+      // Internal/owner workspaces always get full Enterprise access with no limits.
+      const isInternal = !!(company as any)?.is_internal;
+      const plan = isInternal ? PLANS.enterprise : resolvePlan(company?.plan);
       return {
-        plan: resolvePlan(company?.plan),
+        plan,
+        isInternal,
         usage: { users, projects, welds, procedures, storage_mb } as Usage,
       };
     },
