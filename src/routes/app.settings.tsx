@@ -43,7 +43,7 @@ function SettingsPage() {
     refresh();
   };
 
-  const { plan, hasFeature, percentUsed } = usePlan();
+  const { plan, hasFeature, percentUsed, isInternal } = usePlan();
   const brandingLocked = !hasFeature("pdf_branding");
   const nearCap = ["users", "projects", "welds", "procedures"].some(
     (q) => percentUsed(q as any) >= 80,
