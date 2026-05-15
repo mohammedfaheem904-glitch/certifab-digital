@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { ModulePage } from "@/components/ModulePage";
 import { StatusBadge } from "@/components/StatusBadge";
 import { NewRecordDialog } from "@/components/NewRecordDialog";
@@ -141,15 +141,15 @@ function ProceduresPage() {
                   <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8"
-                          onClick={() => nav({ to: "/app/procedures/$procedureId", params: { procedureId: p.id } })}
+                        <Link
+                          to="/app/procedures/$procedureId"
+                          params={{ procedureId: p.id }}
+                          onClick={(e) => e.stopPropagation()}
                           aria-label="Open WPS"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
                         >
                           <Eye className="size-4" />
-                        </Button>
+                        </Link>
                       </TooltipTrigger>
                       <TooltipContent>Open WPS</TooltipContent>
                     </Tooltip>
