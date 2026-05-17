@@ -204,8 +204,13 @@ function ProcedureDetailPage() {
       </div>
 
       <Tabs defaultValue="details">
-        <TabsList className="print:hidden">
+        <TabsList className="print:hidden flex-wrap h-auto">
           <TabsTrigger value="details"><FileText className="size-4 me-1.5" /> Details</TabsTrigger>
+          <TabsTrigger value="joints"><Layers className="size-4 me-1.5" /> Joints</TabsTrigger>
+          <TabsTrigger value="basemetals"><Boxes className="size-4 me-1.5" /> Base metals</TabsTrigger>
+          <TabsTrigger value="fillers"><Wrench className="size-4 me-1.5" /> Fillers</TabsTrigger>
+          <TabsTrigger value="electrical"><Zap className="size-4 me-1.5" /> Electrical</TabsTrigger>
+          <TabsTrigger value="compliance"><Sparkles className="size-4 me-1.5" /> Compliance</TabsTrigger>
           <TabsTrigger value="heat"><Flame className="size-4 me-1.5" /> Heat input</TabsTrigger>
           <TabsTrigger value="revisions"><GitBranch className="size-4 me-1.5" /> Revisions ({revsQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="files"><Paperclip className="size-4 me-1.5" /> Attachments ({attsQ.data?.length ?? 0})</TabsTrigger>
