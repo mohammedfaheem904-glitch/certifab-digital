@@ -88,7 +88,7 @@ function JointCard({ joint, canEdit, onChange }: { joint: any; canEdit: boolean;
   });
 
   const update = async (patch: Record<string, any>) => {
-    const { error } = await supabase.from("wps_joint_configurations").update(patch).eq("id", joint.id);
+    const { error } = await (supabase.from("wps_joint_configurations") as any).update(patch).eq("id", joint.id);
     if (error) return toast.error(error.message);
     onChange();
   };
