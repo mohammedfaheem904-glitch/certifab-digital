@@ -78,11 +78,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Weld Yard — Digital Welding Management System" },
-      { name: "description", content: "Cloud-based welding QA/QC management platform for industrial operations." },
-      { property: "og:title", content: "Weld Yard" },
-      { property: "og:description", content: "Digital welding management for oil & gas, EPC and heavy industry." },
+      { name: "description", content: "Digital Welding Management System , Cloud-based welding QA/QC management platform for industrial operations." },
+      { property: "og:title", content: "Weld Yard — Digital Welding Management System" },
+      { property: "og:description", content: "Digital Welding Management System , Cloud-based welding QA/QC management platform for industrial operations." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Weld Yard — Digital Welding Management System" },
+      { name: "twitter:description", content: "Digital Welding Management System , Cloud-based welding QA/QC management platform for industrial operations." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c0302d4b-fcbe-488e-81d6-c0fd4de8b5b1" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c0302d4b-fcbe-488e-81d6-c0fd4de8b5b1" },
     ],
     links: [
       {
