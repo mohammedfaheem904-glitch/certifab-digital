@@ -764,7 +764,10 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          automation: string | null
+          back_gouging: string | null
           base_material: string | null
+          cleaning_method: string | null
           code: string
           company_id: string
           created_at: string
@@ -772,17 +775,31 @@ export type Database = {
           current_min: number | null
           deleted_at: string | null
           deleted_by: string | null
+          document_no: string | null
+          electrode_type: string | null
           filler_material: string | null
+          groove_type: string | null
           heat_input_max: number | null
           heat_input_min: number | null
           id: string
+          interpass_max_c: number | null
           interpass_temp: string | null
+          joint_notes: string | null
           joint_type: string | null
           notes: string | null
+          pass_type: string | null
+          peening: string | null
+          pipe_or_plate: string | null
           position: string | null
+          position_qualified: string | null
+          pqr_no: string | null
+          preheat_method: string | null
+          preheat_min_c: number | null
           preheat_temp: string | null
+          procedure_type: string | null
           process: string
           pwht: string | null
+          qr_token: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           revision: string
@@ -791,17 +808,26 @@ export type Database = {
           status: Database["public"]["Enums"]["procedure_status"]
           submitted_by: string | null
           submitted_for_review_at: string | null
+          technique_notes: string | null
+          technique_string_weave: string | null
+          thermal_notes: string | null
           thickness_range: string | null
           travel_speed_max: number | null
           travel_speed_min: number | null
           updated_at: string
           voltage_max: number | null
           voltage_min: number | null
+          welding_progression: string | null
+          wps_date: string | null
+          wps_no: string | null
         }
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          automation?: string | null
+          back_gouging?: string | null
           base_material?: string | null
+          cleaning_method?: string | null
           code: string
           company_id: string
           created_at?: string
@@ -809,17 +835,31 @@ export type Database = {
           current_min?: number | null
           deleted_at?: string | null
           deleted_by?: string | null
+          document_no?: string | null
+          electrode_type?: string | null
           filler_material?: string | null
+          groove_type?: string | null
           heat_input_max?: number | null
           heat_input_min?: number | null
           id?: string
+          interpass_max_c?: number | null
           interpass_temp?: string | null
+          joint_notes?: string | null
           joint_type?: string | null
           notes?: string | null
+          pass_type?: string | null
+          peening?: string | null
+          pipe_or_plate?: string | null
           position?: string | null
+          position_qualified?: string | null
+          pqr_no?: string | null
+          preheat_method?: string | null
+          preheat_min_c?: number | null
           preheat_temp?: string | null
+          procedure_type?: string | null
           process: string
           pwht?: string | null
+          qr_token?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           revision?: string
@@ -828,17 +868,26 @@ export type Database = {
           status?: Database["public"]["Enums"]["procedure_status"]
           submitted_by?: string | null
           submitted_for_review_at?: string | null
+          technique_notes?: string | null
+          technique_string_weave?: string | null
+          thermal_notes?: string | null
           thickness_range?: string | null
           travel_speed_max?: number | null
           travel_speed_min?: number | null
           updated_at?: string
           voltage_max?: number | null
           voltage_min?: number | null
+          welding_progression?: string | null
+          wps_date?: string | null
+          wps_no?: string | null
         }
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          automation?: string | null
+          back_gouging?: string | null
           base_material?: string | null
+          cleaning_method?: string | null
           code?: string
           company_id?: string
           created_at?: string
@@ -846,17 +895,31 @@ export type Database = {
           current_min?: number | null
           deleted_at?: string | null
           deleted_by?: string | null
+          document_no?: string | null
+          electrode_type?: string | null
           filler_material?: string | null
+          groove_type?: string | null
           heat_input_max?: number | null
           heat_input_min?: number | null
           id?: string
+          interpass_max_c?: number | null
           interpass_temp?: string | null
+          joint_notes?: string | null
           joint_type?: string | null
           notes?: string | null
+          pass_type?: string | null
+          peening?: string | null
+          pipe_or_plate?: string | null
           position?: string | null
+          position_qualified?: string | null
+          pqr_no?: string | null
+          preheat_method?: string | null
+          preheat_min_c?: number | null
           preheat_temp?: string | null
+          procedure_type?: string | null
           process?: string
           pwht?: string | null
+          qr_token?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           revision?: string
@@ -865,12 +928,18 @@ export type Database = {
           status?: Database["public"]["Enums"]["procedure_status"]
           submitted_by?: string | null
           submitted_for_review_at?: string | null
+          technique_notes?: string | null
+          technique_string_weave?: string | null
+          thermal_notes?: string | null
           thickness_range?: string | null
           travel_speed_max?: number | null
           travel_speed_min?: number | null
           updated_at?: string
           voltage_max?: number | null
           voltage_min?: number | null
+          welding_progression?: string | null
+          wps_date?: string | null
+          wps_no?: string | null
         }
         Relationships: [
           {
@@ -1512,6 +1581,331 @@ export type Database = {
           },
         ]
       }
+      wps_base_metals: {
+        Row: {
+          company_id: string
+          created_at: string
+          diameter_max_mm: number | null
+          diameter_min_mm: number | null
+          groove_applicability: string | null
+          group_no: string | null
+          id: string
+          material_spec: string | null
+          notes: string | null
+          p_no: string | null
+          pass_thickness_limit_mm: number | null
+          procedure_id: string
+          sort_order: number
+          thickness_max_mm: number | null
+          thickness_min_mm: number | null
+          to_group_no: string | null
+          to_p_no: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          diameter_max_mm?: number | null
+          diameter_min_mm?: number | null
+          groove_applicability?: string | null
+          group_no?: string | null
+          id?: string
+          material_spec?: string | null
+          notes?: string | null
+          p_no?: string | null
+          pass_thickness_limit_mm?: number | null
+          procedure_id: string
+          sort_order?: number
+          thickness_max_mm?: number | null
+          thickness_min_mm?: number | null
+          to_group_no?: string | null
+          to_p_no?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          diameter_max_mm?: number | null
+          diameter_min_mm?: number | null
+          groove_applicability?: string | null
+          group_no?: string | null
+          id?: string
+          material_spec?: string | null
+          notes?: string | null
+          p_no?: string | null
+          pass_thickness_limit_mm?: number | null
+          procedure_id?: string
+          sort_order?: number
+          thickness_max_mm?: number | null
+          thickness_min_mm?: number | null
+          to_group_no?: string | null
+          to_p_no?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wps_base_metals_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wps_electrical_characteristics: {
+        Row: {
+          amperage_max: number | null
+          amperage_min: number | null
+          company_id: string
+          created_at: string
+          electrode_diameter_mm: number | null
+          filler_class: string | null
+          heat_input_max: number | null
+          heat_input_min: number | null
+          id: string
+          notes: string | null
+          polarity: string | null
+          procedure_id: string
+          process: string | null
+          sort_order: number
+          travel_speed_max: number | null
+          travel_speed_min: number | null
+          updated_at: string
+          voltage_max: number | null
+          voltage_min: number | null
+          weld_layer: string | null
+        }
+        Insert: {
+          amperage_max?: number | null
+          amperage_min?: number | null
+          company_id: string
+          created_at?: string
+          electrode_diameter_mm?: number | null
+          filler_class?: string | null
+          heat_input_max?: number | null
+          heat_input_min?: number | null
+          id?: string
+          notes?: string | null
+          polarity?: string | null
+          procedure_id: string
+          process?: string | null
+          sort_order?: number
+          travel_speed_max?: number | null
+          travel_speed_min?: number | null
+          updated_at?: string
+          voltage_max?: number | null
+          voltage_min?: number | null
+          weld_layer?: string | null
+        }
+        Update: {
+          amperage_max?: number | null
+          amperage_min?: number | null
+          company_id?: string
+          created_at?: string
+          electrode_diameter_mm?: number | null
+          filler_class?: string | null
+          heat_input_max?: number | null
+          heat_input_min?: number | null
+          id?: string
+          notes?: string | null
+          polarity?: string | null
+          procedure_id?: string
+          process?: string | null
+          sort_order?: number
+          travel_speed_max?: number | null
+          travel_speed_min?: number | null
+          updated_at?: string
+          voltage_max?: number | null
+          voltage_min?: number | null
+          weld_layer?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wps_electrical_characteristics_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wps_filler_metals: {
+        Row: {
+          a_no: string | null
+          aws_classification: string | null
+          company_id: string
+          consumable_insert: string | null
+          created_at: string
+          electrode_brand: string | null
+          electrode_diameter_mm: number | null
+          f_no: string | null
+          filler_type: string | null
+          flux_brand: string | null
+          flux_wire_class: string | null
+          id: string
+          notes: string | null
+          procedure_id: string
+          process: string | null
+          qualified_thickness_mm: number | null
+          sfa_no: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          a_no?: string | null
+          aws_classification?: string | null
+          company_id: string
+          consumable_insert?: string | null
+          created_at?: string
+          electrode_brand?: string | null
+          electrode_diameter_mm?: number | null
+          f_no?: string | null
+          filler_type?: string | null
+          flux_brand?: string | null
+          flux_wire_class?: string | null
+          id?: string
+          notes?: string | null
+          procedure_id: string
+          process?: string | null
+          qualified_thickness_mm?: number | null
+          sfa_no?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          a_no?: string | null
+          aws_classification?: string | null
+          company_id?: string
+          consumable_insert?: string | null
+          created_at?: string
+          electrode_brand?: string | null
+          electrode_diameter_mm?: number | null
+          f_no?: string | null
+          filler_type?: string | null
+          flux_brand?: string | null
+          flux_wire_class?: string | null
+          id?: string
+          notes?: string | null
+          procedure_id?: string
+          process?: string | null
+          qualified_thickness_mm?: number | null
+          sfa_no?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wps_filler_metals_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wps_joint_configurations: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          groove_type: string | null
+          id: string
+          joint_type: string | null
+          label: string | null
+          notes: string | null
+          pipe_or_plate: string | null
+          position_qualified: string | null
+          procedure_id: string
+          sketch_path: string | null
+          sort_order: number
+          updated_at: string
+          welding_progression: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          groove_type?: string | null
+          id?: string
+          joint_type?: string | null
+          label?: string | null
+          notes?: string | null
+          pipe_or_plate?: string | null
+          position_qualified?: string | null
+          procedure_id: string
+          sketch_path?: string | null
+          sort_order?: number
+          updated_at?: string
+          welding_progression?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          groove_type?: string | null
+          id?: string
+          joint_type?: string | null
+          label?: string | null
+          notes?: string | null
+          pipe_or_plate?: string | null
+          position_qualified?: string | null
+          procedure_id?: string
+          sketch_path?: string | null
+          sort_order?: number
+          updated_at?: string
+          welding_progression?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wps_joint_configurations_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wps_signatures: {
+        Row: {
+          actor_id: string | null
+          company_id: string
+          id: string
+          name: string
+          procedure_id: string
+          role: string
+          signature_data_url: string | null
+          signed_at: string
+        }
+        Insert: {
+          actor_id?: string | null
+          company_id: string
+          id?: string
+          name: string
+          procedure_id: string
+          role: string
+          signature_data_url?: string | null
+          signed_at?: string
+        }
+        Update: {
+          actor_id?: string | null
+          company_id?: string
+          id?: string
+          name?: string
+          procedure_id?: string
+          role?: string
+          signature_data_url?: string | null
+          signed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wps_signatures_procedure_id_fkey"
+            columns: ["procedure_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1556,6 +1950,25 @@ export type Database = {
           status: string
           welder_name: string
           wpq_number: string
+        }[]
+      }
+      get_wps_by_qr: {
+        Args: { _token: string }
+        Returns: {
+          code: string
+          company_logo_url: string
+          company_name: string
+          document_no: string
+          groove_type: string
+          id: string
+          position_qualified: string
+          pqr_no: string
+          process: string
+          revision: string
+          standard: string
+          status: string
+          wps_date: string
+          wps_no: string
         }[]
       }
       has_any_role: {
