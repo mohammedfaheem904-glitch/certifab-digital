@@ -5,11 +5,16 @@ import { useAuth } from "@/lib/auth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, Printer, Trash2, Download, GitBranch } from "lucide-react";
+import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, Printer, Trash2, Download, GitBranch, Layers, Boxes, Wrench, Zap, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { HeatInputCalculator } from "@/components/HeatInputCalculator";
 import { FileUploader } from "@/components/FileUploader";
 import { WpsDocument } from "@/components/reports/WpsDocument";
+import { JointConfigList } from "@/components/procedures/JointConfigList";
+import { BaseMetalsTable } from "@/components/procedures/BaseMetalsTable";
+import { FillerMetalsTable } from "@/components/procedures/FillerMetalsTable";
+import { ElectricalCharacteristicsTable } from "@/components/procedures/ElectricalCharacteristicsTable";
+import { WpsCompliancePanel } from "@/components/procedures/WpsCompliancePanel";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
   component: ProcedureDetailPage,
@@ -199,8 +204,13 @@ function ProcedureDetailPage() {
       </div>
 
       <Tabs defaultValue="details">
-        <TabsList className="print:hidden">
+        <TabsList className="print:hidden flex-wrap h-auto">
           <TabsTrigger value="details"><FileText className="size-4 me-1.5" /> Details</TabsTrigger>
+          <TabsTrigger value="joints"><Layers className="size-4 me-1.5" /> Joints</TabsTrigger>
+          <TabsTrigger value="basemetals"><Boxes className="size-4 me-1.5" /> Base metals</TabsTrigger>
+          <TabsTrigger value="fillers"><Wrench className="size-4 me-1.5" /> Fillers</TabsTrigger>
+          <TabsTrigger value="electrical"><Zap className="size-4 me-1.5" /> Electrical</TabsTrigger>
+          <TabsTrigger value="compliance"><Sparkles className="size-4 me-1.5" /> Compliance</TabsTrigger>
           <TabsTrigger value="heat"><Flame className="size-4 me-1.5" /> Heat input</TabsTrigger>
           <TabsTrigger value="revisions"><GitBranch className="size-4 me-1.5" /> Revisions ({revsQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="files"><Paperclip className="size-4 me-1.5" /> Attachments ({attsQ.data?.length ?? 0})</TabsTrigger>
@@ -210,6 +220,26 @@ function ProcedureDetailPage() {
 
         <TabsContent value="details" className="mt-4">
           <WpsDocument proc={proc} approvals={apprQ.data ?? []} revisions={revsQ.data ?? []} />
+        </TabsContent>
+
+        <TabsContent value="joints" className="mt-4">
+          <JointConfigList procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
+        <TabsContent value="basemetals" className="mt-4">
+          <BaseMetalsTable procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
+        <TabsContent value="fillers" className="mt-4">
+          <FillerMetalsTable procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
+        <TabsContent value="electrical" className="mt-4">
+          <ElectricalCharacteristicsTable procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
+        <TabsContent value="compliance" className="mt-4">
+          <WpsCompliancePanel proc={proc} />
         </TabsContent>
 
         <TabsContent value="heat" className="mt-4 space-y-4">

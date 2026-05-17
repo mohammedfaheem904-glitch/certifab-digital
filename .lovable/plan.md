@@ -1,77 +1,88 @@
-# Welder Qualification Certificate (WPQ) — Enterprise Upgrade
 
-This is a large, multi-part upgrade. Below is the staged plan. I'll execute it in one pass once you approve, but split into clear phases so it stays reviewable.
+# Dynamic Intelligent WPS Engine — Implementation Plan
 
-## Phase 1 — Database (migration)
-
-Extend `qualifications` and add supporting tables. All RLS = company-scoped (mirrors existing `editors` / `members` policies). All tables get `company_id`, `created_at`, `updated_at`.
-
-**`qualifications` (extend)** — add columns:
-- Identity: `wpq_number`, `wps_number`, `pqr_number`, `stamp_number`, `welder_photo_url`, `qr_token` (auto, unique), `revision` (default `Rev 0`), `doc_number`
-- Process: `process_type` (Manual/Semi-Auto/Mechanized/Auto), `test_coupon_type`, `welder_test_number`, `code_family` (ASME IX / AWS / EN ISO / AS-NZS / JIS)
-- Dates: `qualification_date`, `last_continuity_date`
-- Outcome: `result` (Satisfactory/Unsatisfactory), `remarks`, `rejection_reason`, `retest_of_id` (self-FK uuid)
-- Status enum extended: Active / Expired / Suspended / Expiring Soon (computed view)
-
-**New table `qualification_variables`** (the QW-4xx matrix)
-- `qualification_id`, `variable_key`, `variable_label`, `qualified_with`, `qualified_for`, `code_reference` (QW-402/403/404/405/409), `sort_order`
-
-**New table `qualification_tests`**
-- `qualification_id`, `category` (`ndt` | `destructive`), `test_type` (VT/MT/PT/RT/UT/Macro/Root Bend/Face Bend/Side Bend/Fillet Break/Tensile/Nick Break/Hardness/Other), `result` (Acceptable/Not Acceptable/N/A), `report_number`, `inspector_name`, `test_date`, `notes`
-
-**New table `qualification_signatures`**
-- `qualification_id`, `role` (QC Engineer/QA-QC Manager/Witness/Examiner/Client Rep), `name`, `signature_data_url` (text), `signed_at`, `actor_id`
-
-**New table `qualification_continuity`**
-- `qualification_id`, `activity_date`, `process`, `project_id`, `evidence_weld_id`, `notes`
-- Trigger: insert auto-updates parent `last_continuity_date`
-
-**New table `qualification_attachments`**
-- `qualification_id`, `filename`, `storage_path`, `mime_type`, `size_bytes`
-
-**Storage bucket**: `qualification-files` (private, RLS by company prefix). Add `welder-photos` public bucket for portrait images.
-
-**Public RPC**: `get_qualification_by_qr(_token text)` — returns sanitized welder/qualification info (no PII beyond name, status, process, code, expiry).
-
-## Phase 2 — Frontend routes/components
-
-**Routes**
-- `/app/qualifications` — upgrade list: filters (welder, process, status, expiry, code, position, project), KPI strip, status badges, search.
-- `/app/qualifications/new` — multi-step wizard (Header → Identity → Variables matrix → Tests → Result → Signatures → Review).
-- `/app/qualifications/$id` — detail editor with all sections + attachments + continuity log + revisions.
-- `/app/qualifications/$id/certificate` — print-ready WPQ certificate (A4, company branded, QR).
-- `/verify/qualification/$token` — public verification page (mirrors existing `verify.weld.$token` and `verify.instrument.$token`).
-- `/app/qualifications/dashboard` — analytics: expiring soon, active welders, process distribution (pie), trends (bar), compliance KPIs.
-
-**Components**
-- `QualificationVariablesMatrix.tsx` — editable rows, add/remove, dropdown for code refs.
-- `QualificationTestsTable.tsx` — tabbed NDT vs Destructive.
-- `SignaturePad.tsx` — canvas-based signature, stored as data URL.
-- `WelderPhotoUploader.tsx` — uses existing storage helpers.
-- `QrCodeBlock.tsx` — uses `qrcode` lib (add via bun).
-- `WelderQualificationCertificate.tsx` — full A4 print layout (replaces minimal `WelderQualificationDocument.tsx`).
-- `ContinuityTimeline.tsx` — log entries with 6-month break warnings.
-
-**Hooks/lib**
-- `lib/qualification-status.ts` — derive Active/Expiring Soon (≤30d)/Expired/Suspended; continuity break detection (>6mo gap).
-- `lib/use-qualification.ts` — React Query hook bundling qualification + variables + tests + signatures + continuity.
-- `lib/export-qualification-excel.ts` — uses existing `export.ts` xlsx helper.
-
-**PDF**
-- Reuse existing print flow (`window.print()` via `ReportShell`) with a tightened `@media print` stylesheet sized A4 portrait. (Avoids adding heavy PDF libs; mirrors current report pattern.)
-
-## Phase 3 — Cross-cutting
-
-- Audit: attach `write_audit_log` trigger to all new tables.
-- Notifications: weekly check (existing `reminder_log` pattern) for `Expiring Soon` and continuity-break.
-- Permissions: signatures restricted via `is_editor` + role-specific check; `super_admin` only for "Suspended" status changes.
-- i18n keys added under `welder_qualification.*`.
-- Mobile: list collapses to cards; matrix becomes vertical key/value on `<md`.
-
-## Out of scope / deferred (call out)
-- Real cryptographic signatures (HSM/PKI) — we store hashed signature image + `actor_id` + timestamp, which is the industry-standard "digital signature record" but not a CA-issued PKI signature.
-- Email delivery infra (would require enabling email connector). Notifications stored in `notifications` table only for now.
+This is a large, multi-phase refactor. To keep quality high and avoid breaking the existing WPS workflow (which already has revisions, approvals, attachments, heat-input calc, soft-delete, audit logging), I'll deliver this in **4 staged phases**, each shippable on its own. Please confirm before I start, and tell me if you want me to ship all 4 in this turn or stop after Phase 1 for review.
 
 ---
 
-Approve and I'll execute Phase 1 (migration) first, then Phase 2 + 3 in code in the same turn.
+## Phase 1 — Relational Data Model (DB migration)
+
+Extend the existing `procedures` table (keep it as the WPS header) and add new child tables. No flat JSON blobs.
+
+**Extend `procedures`** with structured header + thermal + technique fields:
+- `wps_no`, `pqr_no`, `procedure_type`, `document_no`, `wps_date`
+- `groove_type`, `welding_progression`, `pipe_or_plate`, `position_qualified`, `joint_notes`
+- `preheat_min_c`, `interpass_max_c`, `preheat_method`, `thermal_notes`
+- `technique_string_weave`, `cleaning_method`, `back_gouging`, `peening`, `pass_type` (single/multi), `electrode_type` (single/multi), `automation` (manual/semi/auto), `technique_notes`
+- `qr_token` for verification
+
+**New child tables (all with `company_id`, RLS, audit triggers):**
+1. `wps_joint_configurations` — multiple joints per WPS, with `sketch_path` (image/SVG)
+2. `wps_base_metals` — P-No, Group, To-P-No, To-Group, spec, thickness range, diameter range, groove, pass thickness
+3. `wps_filler_metals` — process, SFA, AWS class, brand, F-No, A-No, diameter, qualified thickness, flux class, flux brand, consumable insert, notes
+4. `wps_electrical_characteristics` — pass/layer, process, filler class, diameter, polarity, amp range, volt range, travel speed, heat input
+5. `wps_signatures` — prepared/reviewed/approved by, signature_data_url, role, date (mirrors `qualification_signatures`)
+
+**Storage bucket:** `wps-sketches` (private, signed URLs) for joint sketches.
+
+**RLS pattern:** `company_id = current_company_id()` for SELECT, `is_editor()` for writes. Reuse the existing `write_audit_log` trigger pattern.
+
+**Public QR verification:** `get_wps_by_qr(_token)` security-definer function (mirrors `get_qualification_by_qr`).
+
+---
+
+## Phase 2 — Editor UI (engineering workspace)
+
+Redesign `src/routes/app.procedures.$procedureId.tsx` with new tabbed sections:
+- **Header & Status** (existing)
+- **Joint Design** — editable list of joint configs with sketch upload
+- **Base Metals** — editable relational table
+- **Filler Metals** — editable relational table
+- **Electrical Characteristics** — editable pass-by-pass table
+- **Thermal & Technique** — structured form
+- **Heat Input** (existing)
+- **Attachments** (existing)
+- **Approvals & Signatures** — extended with signature pad
+- **Audit** (existing)
+
+New components in `src/components/procedures/`:
+- `JointConfigList.tsx`, `BaseMetalsTable.tsx`, `FillerMetalsTable.tsx`, `ElectricalCharacteristicsTable.tsx`, `WpsSignatureBlock.tsx`
+
+Sticky action bar with Submit/Approve/Print, responsive layout.
+
+---
+
+## Phase 3 — Printable WPS document + QR verification page
+
+- Rebuild `src/components/reports/WpsDocument.tsx` to render the full structured WPS (header, joints, base metals, fillers, electrical table, technique, signatures) in a professional print layout.
+- New public route `src/routes/verify.wps.$token.tsx` for QR-based public verification.
+
+---
+
+## Phase 4 — Intelligence Layer foundation
+
+New service `src/lib/wps-intelligence.ts` exposing pure functions:
+- `validateWpsCompleteness(wps, children)` → ComplianceFinding[]
+- `checkWpsWpqCompatibility(wps, wpq)` → process / F-No / A-No / position / thickness / diameter range checks
+- `validateProductionWeld(weld, wps, children)` → heat input, filler, base metal, position
+- `scoreWpsCompliance(findings)` → 0–100 with severity weighting
+
+Reuses the existing `ComplianceFinding` / `QualificationValidation` patterns from `src/lib/qualification-validation.ts` for consistency. Hooked into the WPS detail page as a "Compliance" panel, and exposed for future weld-release workflows.
+
+---
+
+## Technical guardrails
+
+- **Backward compatible:** keep existing `procedures` columns (`voltage_min/max`, `current_min/max`, etc.) as deprecated fallbacks so existing rows + heat-input calc keep working. New electrical characteristics table is the source of truth going forward.
+- **All migrations forward-only**, no destructive drops.
+- **RLS + audit + tenant isolation** preserved on every new table.
+- **Types regenerate automatically** after migration; UI components type-check against fresh types.
+- **No new edge functions** — all logic in TanStack server fns or client.
+
+---
+
+## What I need from you
+
+1. Confirm to proceed with Phase 1 (DB migration) now. I'll write the migration in a single call and pause for your approval before running it.
+2. Tell me whether to continue straight into Phase 2 (UI) after the migration is approved, or stop for review.
+3. Optional: any attached WPS template image/PDF I should pull field names from verbatim — your message references one but nothing was attached this turn.
