@@ -222,6 +222,26 @@ function ProcedureDetailPage() {
           <WpsDocument proc={proc} approvals={apprQ.data ?? []} revisions={revsQ.data ?? []} />
         </TabsContent>
 
+        <TabsContent value="joints" className="mt-4">
+          <JointConfigList procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
+        <TabsContent value="basemetals" className="mt-4">
+          <BaseMetalsTable procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
+        <TabsContent value="fillers" className="mt-4">
+          <FillerMetalsTable procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
+        <TabsContent value="electrical" className="mt-4">
+          <ElectricalCharacteristicsTable procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
+        <TabsContent value="compliance" className="mt-4">
+          <WpsCompliancePanel proc={proc} />
+        </TabsContent>
+
         <TabsContent value="heat" className="mt-4 space-y-4">
           <HeatInputCalculator
             procedureId={procedureId}
