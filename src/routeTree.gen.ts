@@ -37,6 +37,7 @@ import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
+import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
 import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qualification.$token'
 import { Route as VerifyInstrumentTokenRouteImport } from './routes/verify.instrument.$token'
@@ -190,6 +191,11 @@ const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppQualificationsRoute,
 } as any)
+const VerifyWpsTokenRoute = VerifyWpsTokenRouteImport.update({
+  id: '/verify/wps/$token',
+  path: '/verify/wps/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerifyWeldTokenRoute = VerifyWeldTokenRouteImport.update({
   id: '/verify/weld/$token',
   path: '/verify/weld/$token',
@@ -295,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
+  '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -335,6 +342,7 @@ export interface FileRoutesByTo {
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
+  '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/qualifications': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesById {
@@ -378,6 +386,7 @@ export interface FileRoutesById {
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
+  '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRouteTypes {
@@ -422,6 +431,7 @@ export interface FileRouteTypes {
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
+    | '/verify/wps/$token'
     | '/app/qualifications/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -462,6 +472,7 @@ export interface FileRouteTypes {
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
+    | '/verify/wps/$token'
     | '/app/qualifications'
   id:
     | '__root__'
@@ -504,6 +515,7 @@ export interface FileRouteTypes {
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
+    | '/verify/wps/$token'
     | '/app/qualifications/'
   fileRoutesById: FileRoutesById
 }
@@ -523,6 +535,7 @@ export interface RootRouteChildren {
   VerifyInstrumentTokenRoute: typeof VerifyInstrumentTokenRoute
   VerifyQualificationTokenRoute: typeof VerifyQualificationTokenRoute
   VerifyWeldTokenRoute: typeof VerifyWeldTokenRoute
+  VerifyWpsTokenRoute: typeof VerifyWpsTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -722,6 +735,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/qualifications/'
       preLoaderRoute: typeof AppQualificationsIndexRouteImport
       parentRoute: typeof AppQualificationsRoute
+    }
+    '/verify/wps/$token': {
+      id: '/verify/wps/$token'
+      path: '/verify/wps/$token'
+      fullPath: '/verify/wps/$token'
+      preLoaderRoute: typeof VerifyWpsTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/verify/weld/$token': {
       id: '/verify/weld/$token'
@@ -942,6 +962,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyInstrumentTokenRoute: VerifyInstrumentTokenRoute,
   VerifyQualificationTokenRoute: VerifyQualificationTokenRoute,
   VerifyWeldTokenRoute: VerifyWeldTokenRoute,
+  VerifyWpsTokenRoute: VerifyWpsTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

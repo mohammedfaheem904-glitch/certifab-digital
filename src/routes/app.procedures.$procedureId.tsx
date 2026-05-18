@@ -5,8 +5,9 @@ import { useAuth } from "@/lib/auth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, Printer, Trash2, Download, GitBranch, Layers, Boxes, Wrench, Zap, Sparkles } from "lucide-react";
+import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, Printer, Trash2, Download, GitBranch, Layers, Boxes, Wrench, Zap, Sparkles, PenLine, GitCompare } from "lucide-react";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { HeatInputCalculator } from "@/components/HeatInputCalculator";
 import { FileUploader } from "@/components/FileUploader";
 import { WpsDocument } from "@/components/reports/WpsDocument";
@@ -15,6 +16,8 @@ import { BaseMetalsTable } from "@/components/procedures/BaseMetalsTable";
 import { FillerMetalsTable } from "@/components/procedures/FillerMetalsTable";
 import { ElectricalCharacteristicsTable } from "@/components/procedures/ElectricalCharacteristicsTable";
 import { WpsCompliancePanel } from "@/components/procedures/WpsCompliancePanel";
+import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
+import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
   component: ProcedureDetailPage,
@@ -82,6 +85,64 @@ function ProcedureDetailPage() {
       return data ?? [];
     },
   });
+
+  // Relational child queries for full printable WPS document
+  const jointsQ = useQuery({
+    queryKey: ["wps_joint_configurations", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_joint_configurations").select("*").eq("procedure_id", procedureId).order("sort_order").order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const baseMetalsQ = useQuery({
+    queryKey: ["wps_base_metals", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_base_metals").select("*").eq("procedure_id", procedureId).order("sort_order").order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const fillersQ = useQuery({
+    queryKey: ["wps_filler_metals", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_filler_metals").select("*").eq("procedure_id", procedureId).order("sort_order").order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const electricalQ = useQuery({
+    queryKey: ["wps_electrical_characteristics", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_electrical_characteristics").select("*").eq("procedure_id", procedureId).order("sort_order").order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const sigsQ = useQuery({
+    queryKey: ["wps_signatures", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_signatures").select("*").eq("procedure_id", procedureId).order("signed_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  // Resolve signed URLs for joint sketches (for printable doc)
+  const [sketchUrls, setSketchUrls] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const out: Record<string, string> = {};
+      for (const j of jointsQ.data ?? []) {
+        if (!j.sketch_path) continue;
+        const { data } = await supabase.storage.from("wps-sketches").createSignedUrl(j.sketch_path, 600);
+        if (data?.signedUrl) out[j.id] = data.signedUrl;
+      }
+      if (!cancelled) setSketchUrls(out);
+    })();
+    return () => { cancelled = true; };
+  }, [jointsQ.data]);
 
   const proc = procQ.data;
 
@@ -213,13 +274,27 @@ function ProcedureDetailPage() {
           <TabsTrigger value="compliance"><Sparkles className="size-4 me-1.5" /> Compliance</TabsTrigger>
           <TabsTrigger value="heat"><Flame className="size-4 me-1.5" /> Heat input</TabsTrigger>
           <TabsTrigger value="revisions"><GitBranch className="size-4 me-1.5" /> Revisions ({revsQ.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="compare"><GitCompare className="size-4 me-1.5" /> Compare</TabsTrigger>
           <TabsTrigger value="files"><Paperclip className="size-4 me-1.5" /> Attachments ({attsQ.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="signatures"><PenLine className="size-4 me-1.5" /> Signatures ({sigsQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="approvals"><ShieldCheck className="size-4 me-1.5" /> Approvals ({apprQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="audit"><History className="size-4 me-1.5" /> Audit log</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="mt-4">
-          <WpsDocument proc={proc} approvals={apprQ.data ?? []} revisions={revsQ.data ?? []} />
+          <WpsDocument
+            proc={proc}
+            approvals={apprQ.data ?? []}
+            revisions={revsQ.data ?? []}
+            children={{
+              joints: jointsQ.data ?? [],
+              baseMetals: baseMetalsQ.data ?? [],
+              fillers: fillersQ.data ?? [],
+              electrical: electricalQ.data ?? [],
+              signatures: sigsQ.data ?? [],
+              sketchUrls,
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="joints" className="mt-4">
@@ -295,8 +370,16 @@ function ProcedureDetailPage() {
           </div>
         </TabsContent>
 
+        <TabsContent value="compare" className="mt-4">
+          <WpsRevisionCompare
+            currentSnapshot={proc}
+            currentLabel={proc.revision}
+            revisions={(revsQ.data ?? []) as any}
+          />
+        </TabsContent>
         <TabsContent value="files" className="mt-4 space-y-4">
           {isEditor && <FileUploader procedureId={procedureId} onUploaded={() => qc.invalidateQueries({ queryKey: ["procedure_attachments", procedureId] })} />}
+
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             <table className="w-full text-sm">
               <thead className="text-xs text-muted-foreground bg-muted/40">
@@ -324,6 +407,10 @@ function ProcedureDetailPage() {
               </tbody>
             </table>
           </div>
+        </TabsContent>
+
+        <TabsContent value="signatures" className="mt-4">
+          <WpsSignatureBlock procedureId={procedureId} canEdit={isEditor} />
         </TabsContent>
 
         <TabsContent value="approvals" className="mt-4">
