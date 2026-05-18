@@ -5,8 +5,9 @@ import { useAuth } from "@/lib/auth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, Printer, Trash2, Download, GitBranch, Layers, Boxes, Wrench, Zap, Sparkles } from "lucide-react";
+import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, Printer, Trash2, Download, GitBranch, Layers, Boxes, Wrench, Zap, Sparkles, PenLine, GitCompare } from "lucide-react";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { HeatInputCalculator } from "@/components/HeatInputCalculator";
 import { FileUploader } from "@/components/FileUploader";
 import { WpsDocument } from "@/components/reports/WpsDocument";
@@ -15,6 +16,8 @@ import { BaseMetalsTable } from "@/components/procedures/BaseMetalsTable";
 import { FillerMetalsTable } from "@/components/procedures/FillerMetalsTable";
 import { ElectricalCharacteristicsTable } from "@/components/procedures/ElectricalCharacteristicsTable";
 import { WpsCompliancePanel } from "@/components/procedures/WpsCompliancePanel";
+import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
+import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
   component: ProcedureDetailPage,
