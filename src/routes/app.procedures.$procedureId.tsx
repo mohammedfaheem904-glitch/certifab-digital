@@ -370,7 +370,15 @@ function ProcedureDetailPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="files" className="mt-4 space-y-4">
+        <TabsContent value="compare" className="mt-4">
+          <WpsRevisionCompare
+            currentSnapshot={proc}
+            currentLabel={proc.revision}
+            revisions={(revsQ.data ?? []) as any}
+          />
+        </TabsContent>
+
+
           {isEditor && <FileUploader procedureId={procedureId} onUploaded={() => qc.invalidateQueries({ queryKey: ["procedure_attachments", procedureId] })} />}
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             <table className="w-full text-sm">
