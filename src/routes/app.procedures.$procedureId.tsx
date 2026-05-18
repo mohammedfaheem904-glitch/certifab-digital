@@ -274,13 +274,27 @@ function ProcedureDetailPage() {
           <TabsTrigger value="compliance"><Sparkles className="size-4 me-1.5" /> Compliance</TabsTrigger>
           <TabsTrigger value="heat"><Flame className="size-4 me-1.5" /> Heat input</TabsTrigger>
           <TabsTrigger value="revisions"><GitBranch className="size-4 me-1.5" /> Revisions ({revsQ.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="compare"><GitCompare className="size-4 me-1.5" /> Compare</TabsTrigger>
           <TabsTrigger value="files"><Paperclip className="size-4 me-1.5" /> Attachments ({attsQ.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="signatures"><PenLine className="size-4 me-1.5" /> Signatures ({sigsQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="approvals"><ShieldCheck className="size-4 me-1.5" /> Approvals ({apprQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="audit"><History className="size-4 me-1.5" /> Audit log</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="mt-4">
-          <WpsDocument proc={proc} approvals={apprQ.data ?? []} revisions={revsQ.data ?? []} />
+          <WpsDocument
+            proc={proc}
+            approvals={apprQ.data ?? []}
+            revisions={revsQ.data ?? []}
+            children={{
+              joints: jointsQ.data ?? [],
+              baseMetals: baseMetalsQ.data ?? [],
+              fillers: fillersQ.data ?? [],
+              electrical: electricalQ.data ?? [],
+              signatures: sigsQ.data ?? [],
+              sketchUrls,
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="joints" className="mt-4">
