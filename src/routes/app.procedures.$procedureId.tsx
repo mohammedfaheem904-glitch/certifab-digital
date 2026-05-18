@@ -86,6 +86,64 @@ function ProcedureDetailPage() {
     },
   });
 
+  // Relational child queries for full printable WPS document
+  const jointsQ = useQuery({
+    queryKey: ["wps_joint_configurations", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_joint_configurations").select("*").eq("procedure_id", procedureId).order("sort_order").order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const baseMetalsQ = useQuery({
+    queryKey: ["wps_base_metals", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_base_metals").select("*").eq("procedure_id", procedureId).order("sort_order").order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const fillersQ = useQuery({
+    queryKey: ["wps_filler_metals", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_filler_metals").select("*").eq("procedure_id", procedureId).order("sort_order").order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const electricalQ = useQuery({
+    queryKey: ["wps_electrical_characteristics", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_electrical_characteristics").select("*").eq("procedure_id", procedureId).order("sort_order").order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const sigsQ = useQuery({
+    queryKey: ["wps_signatures", procedureId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("wps_signatures").select("*").eq("procedure_id", procedureId).order("signed_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  // Resolve signed URLs for joint sketches (for printable doc)
+  const [sketchUrls, setSketchUrls] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const out: Record<string, string> = {};
+      for (const j of jointsQ.data ?? []) {
+        if (!j.sketch_path) continue;
+        const { data } = await supabase.storage.from("wps-sketches").createSignedUrl(j.sketch_path, 600);
+        if (data?.signedUrl) out[j.id] = data.signedUrl;
+      }
+      if (!cancelled) setSketchUrls(out);
+    })();
+    return () => { cancelled = true; };
+  }, [jointsQ.data]);
+
   const proc = procQ.data;
 
   const sign = async (action: "submitted" | "reviewed" | "approved" | "rejected" | "revoked", comment?: string) => {
