@@ -409,6 +409,10 @@ function ProcedureDetailPage() {
           </div>
         </TabsContent>
 
+        <TabsContent value="signatures" className="mt-4">
+          <WpsSignatureBlock procedureId={procedureId} canEdit={isEditor} />
+        </TabsContent>
+
         <TabsContent value="approvals" className="mt-4">
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             <table className="w-full text-sm">
