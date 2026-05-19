@@ -16,12 +16,11 @@ function VerifyInstrument() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    supabase
-      .from("instruments")
-      .select("asset_id, name, category, model, serial_number, manufacturer, calibration_due, status")
-      .eq("qr_token", token)
-      .maybeSingle()
-      .then(({ data }) => { setData(data as Row | null); setLoaded(true); });
+    (async () => {
+      const { data, error } = await (supabase as any).rpc("get_instrument_by_qr", { _token: token });
+      if (!error && data && data[0]) setData(data[0] as Row);
+      setLoaded(true);
+    })();
   }, [token]);
 
   const d = daysUntil(data?.calibration_due);
