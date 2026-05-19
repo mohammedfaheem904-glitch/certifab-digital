@@ -85,7 +85,10 @@ export function AppLayout() {
     { to: "/app/audit", label: "Audit Log", icon: ScrollText },
     { to: "/app/billing", label: "Billing & Plan", icon: Sparkles },
     ...(isSuperAdmin
-      ? [{ to: "/app/admin", label: "Admin Console", icon: ShieldCheck }]
+      ? [
+          { to: "/app/admin", label: "Admin Console", icon: ShieldCheck },
+          { to: "/app/admin/companies", label: "Companies", icon: Building2 },
+        ]
       : []),
   ];
 
