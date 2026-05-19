@@ -32,6 +32,9 @@ import { useI18n } from "@/lib/i18n";
 import { useCompanyRows } from "@/lib/use-company-rows";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/StatusBadge";
+import { OperationalAlertStrip } from "@/components/dashboard/OperationalAlertStrip";
+import { WorkflowBottlenecks } from "@/components/dashboard/WorkflowBottlenecks";
+import { RecentActivityFeed } from "@/components/dashboard/RecentActivityFeed";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
