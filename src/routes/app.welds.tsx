@@ -6,7 +6,11 @@ import { useCompanyRows } from "@/lib/use-company-rows";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DataTable } from "@/components/DataTable";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
+import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 type Row = {
@@ -15,6 +19,7 @@ type Row = {
   welder_name: string | null;
   heat_input: string | null;
   status: string;
+  workflow_status: string | null;
   weld_date: string;
   joint_no: string | null;
   spool_no: string | null;
@@ -27,6 +32,7 @@ type Row = {
   project_id: string | null;
   procedure_id: string | null;
 };
+
 
 type Project = { id: string; code: string; name: string };
 type Procedure = { id: string; code: string };
