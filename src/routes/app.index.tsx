@@ -32,6 +32,9 @@ import { useI18n } from "@/lib/i18n";
 import { useCompanyRows } from "@/lib/use-company-rows";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/StatusBadge";
+import { OperationalAlertStrip } from "@/components/dashboard/OperationalAlertStrip";
+import { WorkflowBottlenecks } from "@/components/dashboard/WorkflowBottlenecks";
+import { RecentActivityFeed } from "@/components/dashboard/RecentActivityFeed";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -139,6 +142,9 @@ function Dashboard() {
         </div>
         <ComplianceRing score={stats.compliance} />
       </div>
+
+      {/* Operational alerts — actionable, deep-linked to filtered lists */}
+      <OperationalAlertStrip />
 
       {/* KPI grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -316,6 +322,16 @@ function Dashboard() {
           </div>
         )}
       </Card>
+
+      {/* Workflow bottlenecks + cross-entity activity feed */}
+      <div className="grid lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-2" title="Workflow bottlenecks" right={<Link to="/app/welds" className="text-xs text-primary hover:underline">All welds</Link>}>
+          <WorkflowBottlenecks />
+        </Card>
+        <Card title="Recent activity" right={<Link to="/app/audit" className="text-xs text-primary hover:underline">Full audit log</Link>}>
+          <RecentActivityFeed limit={12} />
+        </Card>
+      </div>
     </div>
   );
 }
