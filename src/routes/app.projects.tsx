@@ -37,17 +37,18 @@ function ProjectsPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
-            <tr><Th>Code</Th><Th>Name</Th><Th>Client</Th><Th>Location</Th><Th>Status</Th></tr>
+            <tr><Th>Code</Th><Th>Name</Th><Th>Client</Th><Th>Location</Th><Th>Description</Th><Th>Status</Th></tr>
           </thead>
           <tbody>
-            {isLoading && <Empty colSpan={5}><Loader2 className="size-4 animate-spin inline" /> Loading…</Empty>}
-            {!isLoading && (data?.length ?? 0) === 0 && <Empty colSpan={5}>No projects yet.</Empty>}
+            {isLoading && <Empty colSpan={6}><Loader2 className="size-4 animate-spin inline" /> Loading…</Empty>}
+            {!isLoading && (data?.length ?? 0) === 0 && <Empty colSpan={6}>No projects yet.</Empty>}
             {data?.map((p) => (
               <tr key={p.id} className="border-t border-border/60 hover:bg-muted/20">
                 <td className="px-5 py-3 font-medium">{p.code}</td>
                 <td className="px-5 py-3">{p.name}</td>
                 <td className="px-5 py-3 text-muted-foreground">{p.client}</td>
                 <td className="px-5 py-3">{p.location}</td>
+                <td className="px-5 py-3 text-muted-foreground max-w-[320px] truncate" title={p.description ?? ""}>{p.description}</td>
                 <td className="px-5 py-3"><StatusBadge status={p.status} /></td>
               </tr>
             ))}
