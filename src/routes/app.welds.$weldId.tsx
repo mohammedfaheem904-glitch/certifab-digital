@@ -147,7 +147,7 @@ function WeldDetail() {
           <TabsTrigger value="compliance"><ShieldCheck className="size-4 me-1.5" />Compliance</TabsTrigger>
           <TabsTrigger value="inspections">Inspections ({inspections.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="ncrs">NCRs ({ncrs.data?.length ?? 0})</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="timeline"><History className="size-4 me-1.5" />Timeline</TabsTrigger>
           <TabsTrigger value="attachments">Attachments</TabsTrigger>
           <TabsTrigger value="certificate"><FileText className="size-4 me-1.5" />Traceability Report</TabsTrigger>
         </TabsList>
@@ -199,19 +199,7 @@ function WeldDetail() {
         </TabsContent>
 
         <TabsContent value="timeline">
-          <div className="rounded-xl border border-border bg-card p-5">
-            <ol className="relative border-s border-border ms-2 space-y-4">
-              {(events.data ?? []).map((e: any) => (
-                <li key={e.id} className="ms-4">
-                  <div className="absolute -start-1.5 mt-1.5 size-3 rounded-full bg-primary/70" />
-                  <div className="text-sm font-medium">{e.kind.replace("_", " ")}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</div>
-                  {e.payload && <pre className="mt-1 text-[11px] bg-muted/40 rounded p-2">{JSON.stringify(e.payload, null, 2)}</pre>}
-                </li>
-              ))}
-              {(events.data?.length ?? 0) === 0 && <div className="text-sm text-muted-foreground">No events.</div>}
-            </ol>
-          </div>
+          <WeldTimeline events={(events.data ?? []) as any} />
         </TabsContent>
 
         <TabsContent value="attachments">
