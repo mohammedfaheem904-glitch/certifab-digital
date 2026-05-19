@@ -28,6 +28,7 @@ function ProjectsPage() {
               <F label="Name"><Input required value={values.name ?? ""} onChange={(e) => set("name", e.target.value)} /></F>
               <F label="Client"><Input value={values.client ?? ""} onChange={(e) => set("client", e.target.value)} /></F>
               <F label="Location"><Input value={values.location ?? ""} onChange={(e) => set("location", e.target.value)} /></F>
+              <F label="Description"><Textarea rows={3} value={values.description ?? ""} onChange={(e) => set("description", e.target.value)} placeholder="Scope, deliverables, notes…" /></F>
             </>
           )}
         </NewRecordDialog>
