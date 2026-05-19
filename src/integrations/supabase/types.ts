@@ -1001,6 +1001,7 @@ export type Database = {
           code: string
           company_id: string
           created_at: string
+          description: string | null
           end_date: string | null
           id: string
           location: string | null
@@ -1014,6 +1015,7 @@ export type Database = {
           code: string
           company_id: string
           created_at?: string
+          description?: string | null
           end_date?: string | null
           id?: string
           location?: string | null
@@ -1027,6 +1029,7 @@ export type Database = {
           code?: string
           company_id?: string
           created_at?: string
+          description?: string | null
           end_date?: string | null
           id?: string
           location?: string | null
