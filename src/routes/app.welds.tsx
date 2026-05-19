@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
 import { ExternalLink } from "lucide-react";
 import { useState } from "react";
