@@ -95,7 +95,7 @@ export function OperationalAlertStrip() {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-      {items.map((it) => <Card key={it.key} {...it} />)}
+      {items.map(({ key, ...rest }) => <Card key={key} {...rest} />)}
     </div>
   );
 }
