@@ -6,7 +6,11 @@ import { useCompanyRows } from "@/lib/use-company-rows";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DataTable } from "@/components/DataTable";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
+import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 type Row = {
@@ -15,6 +19,7 @@ type Row = {
   welder_name: string | null;
   heat_input: string | null;
   status: string;
+  workflow_status: string | null;
   weld_date: string;
   joint_no: string | null;
   spool_no: string | null;
@@ -27,6 +32,7 @@ type Row = {
   project_id: string | null;
   procedure_id: string | null;
 };
+
 
 type Project = { id: string; code: string; name: string };
 type Procedure = { id: string; code: string };
@@ -51,11 +57,12 @@ function WeldsPage() {
 
   const filtered = (data ?? []).filter(
     (r) =>
-      (statusFilter === "all" || r.status === statusFilter) &&
+      (statusFilter === "all" || (r.workflow_status ?? "Draft") === statusFilter) &&
       (projectFilter === "all" || r.project_id === projectFilter),
   );
 
   return (
+    <TooltipProvider delayDuration={200}>
     <ModulePage
       title="Weld Traceability Log"
       subtitle="Every weld linked to its WPS, welder, project, joint and inspection result."
@@ -139,10 +146,14 @@ function WeldsPage() {
         filters={
           <>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-9 w-[140px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All status</SelectItem>
-                {["Pending", "Accepted", "Repair", "Rejected"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                <SelectItem value="all">All workflow stages</SelectItem>
+                {[
+                  "Draft", "Pending Validation", "Awaiting Inspection",
+                  "NCR Open", "Ready for Release", "Approved", "Released",
+                  "Rejected", "Blocked",
+                ].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={projectFilter} onValueChange={setProjectFilter}>
@@ -164,12 +175,36 @@ function WeldsPage() {
           { key: "project", header: "Project", cell: (r) => <span className="text-muted-foreground">{projectName(r.project_id)}</span> },
           { key: "joint", header: "Joint / Spool", cell: (r) => <span className="text-xs text-muted-foreground">{r.joint_no ?? "—"} / {r.spool_no ?? "—"}</span> },
           { key: "welder", header: "Welder", cell: (r) => r.welder_name ?? "—" },
-          { key: "heat", header: "Heat input", cell: (r) => <span className="text-muted-foreground">{r.heat_input ?? "—"}</span> },
           { key: "date", header: "Date", cell: (r) => <span className="text-xs">{r.weld_date}</span> },
-          { key: "status", header: "Status", cell: (r) => <StatusBadge status={r.status} /> },
+          { key: "workflow", header: "Workflow", cell: (r) => <WeldStatusBadge status={r.workflow_status ?? "Draft"} /> },
+          { key: "status", header: "Result", cell: (r) => <StatusBadge status={r.status} /> },
+          {
+            key: "actions",
+            header: "",
+            cell: (r) => (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    aria-label="Open weld"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nav({ to: "/app/welds/$weldId", params: { weldId: r.id } });
+                    }}
+                  >
+                    <ExternalLink className="size-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Open weld</TooltipContent>
+              </Tooltip>
+            ),
+          },
         ]}
       />
     </ModulePage>
+    </TooltipProvider>
   );
 }
 

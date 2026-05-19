@@ -1489,7 +1489,10 @@ export type Database = {
       }
       welds: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           base_material: string | null
+          blocked_reason: string | null
           company_id: string
           created_at: string
           drawing_ref: string | null
@@ -1504,15 +1507,25 @@ export type Database = {
           procedure_id: string | null
           project_id: string | null
           qr_token: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          released_at: string | null
+          released_by: string | null
           spool_no: string | null
           status: Database["public"]["Enums"]["weld_status"]
+          submitted_for_validation_at: string | null
           updated_at: string
           weld_date: string
           weld_no: string
           welder_name: string | null
+          workflow_status: Database["public"]["Enums"]["weld_workflow_status"]
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           base_material?: string | null
+          blocked_reason?: string | null
           company_id: string
           created_at?: string
           drawing_ref?: string | null
@@ -1527,15 +1540,25 @@ export type Database = {
           procedure_id?: string | null
           project_id?: string | null
           qr_token?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          released_at?: string | null
+          released_by?: string | null
           spool_no?: string | null
           status?: Database["public"]["Enums"]["weld_status"]
+          submitted_for_validation_at?: string | null
           updated_at?: string
           weld_date?: string
           weld_no: string
           welder_name?: string | null
+          workflow_status?: Database["public"]["Enums"]["weld_workflow_status"]
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           base_material?: string | null
+          blocked_reason?: string | null
           company_id?: string
           created_at?: string
           drawing_ref?: string | null
@@ -1550,12 +1573,19 @@ export type Database = {
           procedure_id?: string | null
           project_id?: string | null
           qr_token?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          released_at?: string | null
+          released_by?: string | null
           spool_no?: string | null
           status?: Database["public"]["Enums"]["weld_status"]
+          submitted_for_validation_at?: string | null
           updated_at?: string
           weld_date?: string
           weld_no?: string
           welder_name?: string | null
+          workflow_status?: Database["public"]["Enums"]["weld_workflow_status"]
         }
         Relationships: [
           {
@@ -2051,6 +2081,16 @@ export type Database = {
       qualification_status: "Active" | "Expiring Soon" | "Expired" | "Suspended"
       severity_level: "Low" | "Medium" | "High" | "Critical"
       weld_status: "Accepted" | "Rejected" | "Repair" | "Pending"
+      weld_workflow_status:
+        | "Draft"
+        | "Pending Validation"
+        | "Awaiting Inspection"
+        | "NCR Open"
+        | "Ready for Release"
+        | "Approved"
+        | "Released"
+        | "Rejected"
+        | "Blocked"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2220,6 +2260,17 @@ export const Constants = {
       qualification_status: ["Active", "Expiring Soon", "Expired", "Suspended"],
       severity_level: ["Low", "Medium", "High", "Critical"],
       weld_status: ["Accepted", "Rejected", "Repair", "Pending"],
+      weld_workflow_status: [
+        "Draft",
+        "Pending Validation",
+        "Awaiting Inspection",
+        "NCR Open",
+        "Ready for Release",
+        "Approved",
+        "Released",
+        "Rejected",
+        "Blocked",
+      ],
     },
   },
 } as const

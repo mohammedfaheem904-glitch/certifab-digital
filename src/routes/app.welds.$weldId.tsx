@@ -8,9 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { FileUploader } from "@/components/FileUploader";
-import { ArrowLeft, ChevronRight, QrCode, FileText, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ChevronRight, QrCode, FileText, ShieldCheck, History } from "lucide-react";
 import { WeldTraceabilityDocument } from "@/components/reports/WeldTraceabilityDocument";
 import { WeldComplianceCheck } from "@/components/welds/WeldComplianceCheck";
+import { WeldWorkflowStepper } from "@/components/welds/WeldWorkflowStepper";
+import { WeldActionBar } from "@/components/welds/WeldActionBar";
+import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
+import { WeldTimeline } from "@/components/welds/WeldTimeline";
+import type { WeldWorkflowStatus } from "@/lib/weld-workflow";
 
 export const Route = createFileRoute("/app/welds/$weldId")({
   component: WeldDetail,
@@ -19,7 +24,12 @@ export const Route = createFileRoute("/app/welds/$weldId")({
 function WeldDetail() {
   const { weldId } = Route.useParams();
   const nav = useNavigate();
-  const { profile } = useAuth();
+  const { profile, roles } = useAuth();
+
+  const canEdit = roles.some((r) =>
+    ["super_admin", "qa_qc_manager", "welding_engineer", "inspector"].includes(r),
+  );
+
 
   const weld = useQuery({
     queryKey: ["weld", weldId],
@@ -79,11 +89,21 @@ function WeldDetail() {
         <span className="text-foreground">{w.weld_no}</span>
       </div>
 
+      <WeldActionBar
+        weldId={weldId}
+        weldNo={w.weld_no}
+        status={(w.workflow_status ?? "Draft") as WeldWorkflowStatus}
+        canEdit={canEdit}
+      />
+
+      <WeldWorkflowStepper status={(w.workflow_status ?? "Draft") as WeldWorkflowStatus} />
+
       <div className="rounded-xl border border-border bg-[image:var(--gradient-surface)] p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-semibold tracking-tight">{w.weld_no}</h1>
+              <WeldStatusBadge status={w.workflow_status ?? "Draft"} />
               <StatusBadge status={w.status} />
               {w.inspection_status && <Badge variant="outline">{w.inspection_status}</Badge>}
             </div>
@@ -112,14 +132,22 @@ function WeldDetail() {
           <Field label="Heat input" value={w.heat_input ?? "—"} />
           <Field label="WPS" value={w.procedure_id ? "Linked" : "—"} />
         </div>
+
+        {(w.rejection_reason || w.blocked_reason) && (
+          <div className="mt-4 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs">
+            <span className="font-semibold text-destructive">{w.blocked_reason ? "Blocked: " : "Rejected: "}</span>
+            <span className="text-foreground/80">{w.blocked_reason ?? w.rejection_reason}</span>
+          </div>
+        )}
       </div>
+
 
       <Tabs defaultValue="compliance">
         <TabsList className="print:hidden">
           <TabsTrigger value="compliance"><ShieldCheck className="size-4 me-1.5" />Compliance</TabsTrigger>
           <TabsTrigger value="inspections">Inspections ({inspections.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="ncrs">NCRs ({ncrs.data?.length ?? 0})</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="timeline"><History className="size-4 me-1.5" />Timeline</TabsTrigger>
           <TabsTrigger value="attachments">Attachments</TabsTrigger>
           <TabsTrigger value="certificate"><FileText className="size-4 me-1.5" />Traceability Report</TabsTrigger>
         </TabsList>
@@ -171,19 +199,7 @@ function WeldDetail() {
         </TabsContent>
 
         <TabsContent value="timeline">
-          <div className="rounded-xl border border-border bg-card p-5">
-            <ol className="relative border-s border-border ms-2 space-y-4">
-              {(events.data ?? []).map((e: any) => (
-                <li key={e.id} className="ms-4">
-                  <div className="absolute -start-1.5 mt-1.5 size-3 rounded-full bg-primary/70" />
-                  <div className="text-sm font-medium">{e.kind.replace("_", " ")}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</div>
-                  {e.payload && <pre className="mt-1 text-[11px] bg-muted/40 rounded p-2">{JSON.stringify(e.payload, null, 2)}</pre>}
-                </li>
-              ))}
-              {(events.data?.length ?? 0) === 0 && <div className="text-sm text-muted-foreground">No events.</div>}
-            </ol>
-          </div>
+          <WeldTimeline events={(events.data ?? []) as any} />
         </TabsContent>
 
         <TabsContent value="attachments">
