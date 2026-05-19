@@ -204,6 +204,7 @@ function WeldsPage() {
         ]}
       />
     </ModulePage>
+    </TooltipProvider>
   );
 }
 
