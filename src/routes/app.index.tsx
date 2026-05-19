@@ -143,6 +143,9 @@ function Dashboard() {
         <ComplianceRing score={stats.compliance} />
       </div>
 
+      {/* Operational alerts — actionable, deep-linked to filtered lists */}
+      <OperationalAlertStrip />
+
       {/* KPI grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Kpi icon={Flame} label="Total welds" value={stats.total.toLocaleString()} delta={`${stats.pending} pending`} tone="primary" loading={loading} />
