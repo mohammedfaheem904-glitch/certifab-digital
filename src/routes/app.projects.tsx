@@ -5,9 +5,10 @@ import { NewRecordDialog } from "@/components/NewRecordDialog";
 import { useCompanyRows } from "@/lib/use-company-rows";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 
-type Row = { id: string; code: string; name: string; client: string | null; location: string | null; status: string };
+type Row = { id: string; code: string; name: string; client: string | null; location: string | null; status: string; description: string | null };
 
 export const Route = createFileRoute("/app/projects")({
   component: ProjectsPage,
@@ -27,6 +28,7 @@ function ProjectsPage() {
               <F label="Name"><Input required value={values.name ?? ""} onChange={(e) => set("name", e.target.value)} /></F>
               <F label="Client"><Input value={values.client ?? ""} onChange={(e) => set("client", e.target.value)} /></F>
               <F label="Location"><Input value={values.location ?? ""} onChange={(e) => set("location", e.target.value)} /></F>
+              <F label="Description"><Textarea rows={3} value={values.description ?? ""} onChange={(e) => set("description", e.target.value)} placeholder="Scope, deliverables, notes…" /></F>
             </>
           )}
         </NewRecordDialog>
@@ -35,17 +37,18 @@ function ProjectsPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
-            <tr><Th>Code</Th><Th>Name</Th><Th>Client</Th><Th>Location</Th><Th>Status</Th></tr>
+            <tr><Th>Code</Th><Th>Name</Th><Th>Client</Th><Th>Location</Th><Th>Description</Th><Th>Status</Th></tr>
           </thead>
           <tbody>
-            {isLoading && <Empty colSpan={5}><Loader2 className="size-4 animate-spin inline" /> Loading…</Empty>}
-            {!isLoading && (data?.length ?? 0) === 0 && <Empty colSpan={5}>No projects yet.</Empty>}
+            {isLoading && <Empty colSpan={6}><Loader2 className="size-4 animate-spin inline" /> Loading…</Empty>}
+            {!isLoading && (data?.length ?? 0) === 0 && <Empty colSpan={6}>No projects yet.</Empty>}
             {data?.map((p) => (
               <tr key={p.id} className="border-t border-border/60 hover:bg-muted/20">
                 <td className="px-5 py-3 font-medium">{p.code}</td>
                 <td className="px-5 py-3">{p.name}</td>
                 <td className="px-5 py-3 text-muted-foreground">{p.client}</td>
                 <td className="px-5 py-3">{p.location}</td>
+                <td className="px-5 py-3 text-muted-foreground max-w-[320px] truncate" title={p.description ?? ""}>{p.description}</td>
                 <td className="px-5 py-3"><StatusBadge status={p.status} /></td>
               </tr>
             ))}

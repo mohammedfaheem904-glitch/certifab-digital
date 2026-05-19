@@ -50,6 +50,7 @@ import { Route as AppQualificationsQualIdRouteImport } from './routes/app.qualif
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
+import { Route as AppAdminCompaniesRouteImport } from './routes/app.admin.companies'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -260,6 +261,11 @@ const AppInstrumentsInstrumentIdRoute =
     path: '/$instrumentId',
     getParentRoute: () => AppInstrumentsRoute,
   } as any)
+const AppAdminCompaniesRoute = AppAdminCompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -274,7 +280,7 @@ export interface FileRoutesByFullPath {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
-  '/app/admin': typeof AppAdminRoute
+  '/app/admin': typeof AppAdminRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/app/team': typeof AppTeamRoute
   '/app/welds': typeof AppWeldsRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
@@ -316,7 +323,7 @@ export interface FileRoutesByTo {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
-  '/app/admin': typeof AppAdminRoute
+  '/app/admin': typeof AppAdminRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/app/team': typeof AppTeamRoute
   '/app/welds': typeof AppWeldsRouteWithChildren
   '/app': typeof AppIndexRoute
+  '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
@@ -359,7 +367,7 @@ export interface FileRoutesById {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
-  '/app/admin': typeof AppAdminRoute
+  '/app/admin': typeof AppAdminRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
@@ -374,6 +382,7 @@ export interface FileRoutesById {
   '/app/team': typeof AppTeamRoute
   '/app/welds': typeof AppWeldsRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
@@ -419,6 +428,7 @@ export interface FileRouteTypes {
     | '/app/team'
     | '/app/welds'
     | '/app/'
+    | '/app/admin/companies'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
@@ -460,6 +470,7 @@ export interface FileRouteTypes {
     | '/app/team'
     | '/app/welds'
     | '/app'
+    | '/app/admin/companies'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
@@ -503,6 +514,7 @@ export interface FileRouteTypes {
     | '/app/team'
     | '/app/welds'
     | '/app/'
+    | '/app/admin/companies'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
@@ -827,8 +839,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsInstrumentIdRouteImport
       parentRoute: typeof AppInstrumentsRoute
     }
+    '/app/admin/companies': {
+      id: '/app/admin/companies'
+      path: '/companies'
+      fullPath: '/app/admin/companies'
+      preLoaderRoute: typeof AppAdminCompaniesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
   }
 }
+
+interface AppAdminRouteChildren {
+  AppAdminCompaniesRoute: typeof AppAdminCompaniesRoute
+}
+
+const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminCompaniesRoute: AppAdminCompaniesRoute,
+}
+
+const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
+  AppAdminRouteChildren,
+)
 
 interface AppInstrumentsRouteChildren {
   AppInstrumentsInstrumentIdRoute: typeof AppInstrumentsInstrumentIdRoute
@@ -909,7 +940,7 @@ const AppWeldsRouteWithChildren = AppWeldsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
-  AppAdminRoute: typeof AppAdminRoute
+  AppAdminRoute: typeof AppAdminRouteWithChildren
   AppAuditRoute: typeof AppAuditRoute
   AppBillingRoute: typeof AppBillingRoute
   AppEquipmentRoute: typeof AppEquipmentRoute
@@ -927,7 +958,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAdminRoute: AppAdminRoute,
+  AppAdminRoute: AppAdminRouteWithChildren,
   AppAuditRoute: AppAuditRoute,
   AppBillingRoute: AppBillingRoute,
   AppEquipmentRoute: AppEquipmentRoute,

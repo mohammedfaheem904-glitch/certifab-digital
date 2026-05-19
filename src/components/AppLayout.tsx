@@ -18,6 +18,7 @@ import {
   Users,
   Menu,
   ShieldCheck,
+  Building2,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { PlanBadge } from "@/components/PlanBadge";
@@ -85,7 +86,10 @@ export function AppLayout() {
     { to: "/app/audit", label: "Audit Log", icon: ScrollText },
     { to: "/app/billing", label: "Billing & Plan", icon: Sparkles },
     ...(isSuperAdmin
-      ? [{ to: "/app/admin", label: "Admin Console", icon: ShieldCheck }]
+      ? [
+          { to: "/app/admin", label: "Admin Console", icon: ShieldCheck },
+          { to: "/app/admin/companies", label: "Companies", icon: Building2 },
+        ]
       : []),
   ];
 
