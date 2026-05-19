@@ -62,6 +62,7 @@ function WeldsPage() {
   );
 
   return (
+    <TooltipProvider delayDuration={200}>
     <ModulePage
       title="Weld Traceability Log"
       subtitle="Every weld linked to its WPS, welder, project, joint and inspection result."
