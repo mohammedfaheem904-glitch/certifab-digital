@@ -89,11 +89,21 @@ function WeldDetail() {
         <span className="text-foreground">{w.weld_no}</span>
       </div>
 
+      <WeldActionBar
+        weldId={weldId}
+        weldNo={w.weld_no}
+        status={(w.workflow_status ?? "Draft") as WeldWorkflowStatus}
+        canEdit={canEdit}
+      />
+
+      <WeldWorkflowStepper status={(w.workflow_status ?? "Draft") as WeldWorkflowStatus} />
+
       <div className="rounded-xl border border-border bg-[image:var(--gradient-surface)] p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-semibold tracking-tight">{w.weld_no}</h1>
+              <WeldStatusBadge status={w.workflow_status ?? "Draft"} />
               <StatusBadge status={w.status} />
               {w.inspection_status && <Badge variant="outline">{w.inspection_status}</Badge>}
             </div>
@@ -122,7 +132,15 @@ function WeldDetail() {
           <Field label="Heat input" value={w.heat_input ?? "—"} />
           <Field label="WPS" value={w.procedure_id ? "Linked" : "—"} />
         </div>
+
+        {(w.rejection_reason || w.blocked_reason) && (
+          <div className="mt-4 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs">
+            <span className="font-semibold text-destructive">{w.blocked_reason ? "Blocked: " : "Rejected: "}</span>
+            <span className="text-foreground/80">{w.blocked_reason ?? w.rejection_reason}</span>
+          </div>
+        )}
       </div>
+
 
       <Tabs defaultValue="compliance">
         <TabsList className="print:hidden">
