@@ -1,88 +1,100 @@
+# Operational UX & End-to-End Workflow
 
-# Dynamic Intelligent WPS Engine — Implementation Plan
-
-This is a large, multi-phase refactor. To keep quality high and avoid breaking the existing WPS workflow (which already has revisions, approvals, attachments, heat-input calc, soft-delete, audit logging), I'll deliver this in **4 staged phases**, each shippable on its own. Please confirm before I start, and tell me if you want me to ship all 4 in this turn or stop after Phase 1 for review.
-
----
-
-## Phase 1 — Relational Data Model (DB migration)
-
-Extend the existing `procedures` table (keep it as the WPS header) and add new child tables. No flat JSON blobs.
-
-**Extend `procedures`** with structured header + thermal + technique fields:
-- `wps_no`, `pqr_no`, `procedure_type`, `document_no`, `wps_date`
-- `groove_type`, `welding_progression`, `pipe_or_plate`, `position_qualified`, `joint_notes`
-- `preheat_min_c`, `interpass_max_c`, `preheat_method`, `thermal_notes`
-- `technique_string_weave`, `cleaning_method`, `back_gouging`, `peening`, `pass_type` (single/multi), `electrode_type` (single/multi), `automation` (manual/semi/auto), `technique_notes`
-- `qr_token` for verification
-
-**New child tables (all with `company_id`, RLS, audit triggers):**
-1. `wps_joint_configurations` — multiple joints per WPS, with `sketch_path` (image/SVG)
-2. `wps_base_metals` — P-No, Group, To-P-No, To-Group, spec, thickness range, diameter range, groove, pass thickness
-3. `wps_filler_metals` — process, SFA, AWS class, brand, F-No, A-No, diameter, qualified thickness, flux class, flux brand, consumable insert, notes
-4. `wps_electrical_characteristics` — pass/layer, process, filler class, diameter, polarity, amp range, volt range, travel speed, heat input
-5. `wps_signatures` — prepared/reviewed/approved by, signature_data_url, role, date (mirrors `qualification_signatures`)
-
-**Storage bucket:** `wps-sketches` (private, signed URLs) for joint sketches.
-
-**RLS pattern:** `company_id = current_company_id()` for SELECT, `is_editor()` for writes. Reuse the existing `write_audit_log` trigger pattern.
-
-**Public QR verification:** `get_wps_by_qr(_token)` security-definer function (mirrors `get_qualification_by_qr`).
+Goal: shift from hidden backend intelligence to **visible, connected, operational UX**. Every change below produces something the user can see and click.
 
 ---
 
-## Phase 2 — Editor UI (engineering workspace)
+## Phase 1 — Weld Workflow Engine (status system + transitions)
 
-Redesign `src/routes/app.procedures.$procedureId.tsx` with new tabbed sections:
-- **Header & Status** (existing)
-- **Joint Design** — editable list of joint configs with sketch upload
-- **Base Metals** — editable relational table
-- **Filler Metals** — editable relational table
-- **Electrical Characteristics** — editable pass-by-pass table
-- **Thermal & Technique** — structured form
-- **Heat Input** (existing)
-- **Attachments** (existing)
-- **Approvals & Signatures** — extended with signature pad
-- **Audit** (existing)
+**Pages changed**
+- `src/routes/app.welds.tsx` (list) — new status badges, quick-action column, sticky bulk action bar.
+- `src/routes/app.welds.$weldId.tsx` (detail) — new top-of-page **Workflow Stepper** + **Action Bar**.
 
-New components in `src/components/procedures/`:
-- `JointConfigList.tsx`, `BaseMetalsTable.tsx`, `FillerMetalsTable.tsx`, `ElectricalCharacteristicsTable.tsx`, `WpsSignatureBlock.tsx`
+**New components**
+- `src/components/welds/WeldWorkflowStepper.tsx` — horizontal stepper: Draft → Pending Validation → Awaiting Inspection → NCR Open (conditional) → Ready for Release → Approved / Rejected / Blocked. Click a stage to jump; current/blocked/done states color-coded.
+- `src/components/welds/WeldStatusBadge.tsx` — semantic badge per workflow status (replaces ad-hoc badges).
+- `src/components/welds/WeldActionBar.tsx` — sticky action bar with context-aware buttons (Submit for validation, Approve, Reject, Release, Reopen) wired to allowed transitions; uses existing `WeldComplianceCheck` to gate Approve.
+- `src/components/welds/WeldTimeline.tsx` — reads `weld_events` and renders an activity timeline.
 
-Sticky action bar with Submit/Approve/Print, responsive layout.
+**Database (small, additive)**
+- Add `workflow_status` enum + column to `welds` (derived initial value from existing `status`). Add `released_at`, `released_by`, `blocked_reason`. RLS unchanged (inherits welds policies). Audit + event logging via existing `emit_weld_event` trigger.
 
----
-
-## Phase 3 — Printable WPS document + QR verification page
-
-- Rebuild `src/components/reports/WpsDocument.tsx` to render the full structured WPS (header, joints, base metals, fillers, electrical table, technique, signatures) in a professional print layout.
-- New public route `src/routes/verify.wps.$token.tsx` for QR-based public verification.
+**What the user sees immediately**
+- Each weld now has a visible workflow stage stepper and an Approve/Reject/Release action bar.
+- Timeline of every state change with actor + timestamp.
 
 ---
 
-## Phase 4 — Intelligence Layer foundation
+## Phase 2 — Interactive Compliance Center & Traceability Graph
 
-New service `src/lib/wps-intelligence.ts` exposing pure functions:
-- `validateWpsCompleteness(wps, children)` → ComplianceFinding[]
-- `checkWpsWpqCompatibility(wps, wpq)` → process / F-No / A-No / position / thickness / diameter range checks
-- `validateProductionWeld(weld, wps, children)` → heat input, filler, base metal, position
-- `scoreWpsCompliance(findings)` → 0–100 with severity weighting
+**Pages changed**
+- `src/routes/app.welds.$weldId.tsx` — new tabs: **Compliance Center**, **Traceability**.
 
-Reuses the existing `ComplianceFinding` / `QualificationValidation` patterns from `src/lib/qualification-validation.ts` for consistency. Hooked into the WPS detail page as a "Compliance" panel, and exposed for future weld-release workflows.
+**New components**
+- `src/components/welds/ComplianceCenter.tsx` — single canvas combining: WPQ status, WPS compatibility (reuse `evaluateWeldCompatibility`), inspection completion (from `inspections` rows for this weld), calibration validity of any linked instruments, open NCR impact, release-readiness verdict. Each tile shows status icon, score, and a **"Fix this"** deeplink to the source record.
+- `src/components/welds/TraceabilityGraph.tsx` — clickable relationship cards laid out as:
+  ```text
+  Weld → WPS → WPQ → Welder
+            ↘ Inspections → NCRs
+            ↘ Instruments (calibration)
+  ```
+  SVG connectors, hover highlights the path, each card navigates to the source route.
+- `src/components/welds/ReleaseReadinessGauge.tsx` — circular progress with blocking-issues list.
+
+**What the user sees immediately**
+- One screen that answers "can I release this weld?" with a colored gauge and 5–8 status tiles.
+- Visual graph of every related record, one click away.
 
 ---
 
-## Technical guardrails
+## Phase 3 — Operational Dashboard Redesign
 
-- **Backward compatible:** keep existing `procedures` columns (`voltage_min/max`, `current_min/max`, etc.) as deprecated fallbacks so existing rows + heat-input calc keep working. New electrical characteristics table is the source of truth going forward.
-- **All migrations forward-only**, no destructive drops.
-- **RLS + audit + tenant isolation** preserved on every new table.
-- **Types regenerate automatically** after migration; UI components type-check against fresh types.
-- **No new edge functions** — all logic in TanStack server fns or client.
+**Pages changed**
+- `src/routes/app.index.tsx` — full redesign.
+
+**New components**
+- `src/components/dashboard/KpiTile.tsx` — KPI tile (label, value, delta, sparkline).
+- `src/components/dashboard/ReleaseReadinessPanel.tsx` — production welds grouped by workflow stage, with counts and quick filter links.
+- `src/components/dashboard/ExpiringQualificationsPanel.tsx` — list of qualifications expiring in 30/60/90 days.
+- `src/components/dashboard/OpenNcrPanel.tsx` — open NCRs by severity, click → NCR detail.
+- `src/components/dashboard/InspectionProgressPanel.tsx` — inspection throughput chart (uses existing inspections data).
+- `src/components/dashboard/ComplianceScorecard.tsx` — overall % readiness across active projects.
+- `src/components/dashboard/OperationalAlerts.tsx` — calibration overdue, qualifications expired, NCRs past due.
+
+Mobile responsiveness: 1-col on `<md`, 2-col `md`, 3-col `xl`. All tiles use design-system tokens, semantic colors.
+
+**What the user sees immediately**
+- New executive-style dashboard with live KPIs, release-readiness, expiring items, and alerts — replaces the current minimal index.
 
 ---
 
-## What I need from you
+## Phase 4 — Faster Operational Actions & Polish
 
-1. Confirm to proceed with Phase 1 (DB migration) now. I'll write the migration in a single call and pause for your approval before running it.
-2. Tell me whether to continue straight into Phase 2 (UI) after the migration is approved, or stop for review.
-3. Optional: any attached WPS template image/PDF I should pull field names from verbatim — your message references one but nothing was attached this turn.
+**Pages changed**
+- `src/components/AppLayout.tsx` — add global search (⌘K) palette: search welds, qualifications, WPS, NCRs, projects; navigate on Enter.
+- All list routes (welds, qualifications, procedures, ncrs, instruments) — add row hover quick-action icons (Open, Edit, Status change, Delete) consistent with WPQ/WPS pattern already shipped.
+- All detail routes — adopt sticky action bar pattern from `WeldActionBar`.
+
+**New components**
+- `src/components/GlobalSearch.tsx` — `cmd+k` palette built on shadcn `Command`.
+- `src/components/QuickActionButton.tsx` — shared tooltip icon button used by every list.
+
+**What the user sees immediately**
+- `⌘K` global search anywhere.
+- Hover any row → consistent quick-action icons.
+- Every detail page has a sticky action bar at top.
+
+---
+
+## Technical notes (for review)
+
+- All new SQL is additive; existing RLS, audit triggers, tenant isolation untouched.
+- Workflow transitions enforced client-side first; a follow-up DB trigger can lock illegal transitions in a later phase.
+- Reuses `wps-intelligence.ts`, `weld-matching.ts`, `qualification-validation.ts` — no new intelligence libraries.
+- All components built on shadcn primitives + design tokens in `src/styles.css`; no hardcoded colors.
+
+## Delivery order
+
+I propose shipping in this exact phase order (1 → 4) with one user checkpoint after each phase, so you can react to the visible UX before the next phase builds on it.
+
+**Please confirm I should start with Phase 1** (Weld Workflow Engine — stepper, status system, action bar, timeline, small additive migration). After Phase 1 ships I'll pause for your review before Phase 2.
