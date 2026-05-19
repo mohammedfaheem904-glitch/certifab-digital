@@ -8,9 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { FileUploader } from "@/components/FileUploader";
-import { ArrowLeft, ChevronRight, QrCode, FileText, ShieldCheck, History } from "lucide-react";
+import { ArrowLeft, ChevronRight, QrCode, FileText, ShieldCheck, History, Network } from "lucide-react";
 import { WeldTraceabilityDocument } from "@/components/reports/WeldTraceabilityDocument";
-import { WeldComplianceCheck } from "@/components/welds/WeldComplianceCheck";
+import { ComplianceCenter } from "@/components/welds/ComplianceCenter";
+import { TraceabilityGraph } from "@/components/welds/TraceabilityGraph";
 import { WeldWorkflowStepper } from "@/components/welds/WeldWorkflowStepper";
 import { WeldActionBar } from "@/components/welds/WeldActionBar";
 import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
@@ -144,7 +145,8 @@ function WeldDetail() {
 
       <Tabs defaultValue="compliance">
         <TabsList className="print:hidden">
-          <TabsTrigger value="compliance"><ShieldCheck className="size-4 me-1.5" />Compliance</TabsTrigger>
+          <TabsTrigger value="compliance"><ShieldCheck className="size-4 me-1.5" />Compliance Center</TabsTrigger>
+          <TabsTrigger value="traceability"><Network className="size-4 me-1.5" />Traceability</TabsTrigger>
           <TabsTrigger value="inspections">Inspections ({inspections.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="ncrs">NCRs ({ncrs.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="timeline"><History className="size-4 me-1.5" />Timeline</TabsTrigger>
@@ -153,7 +155,11 @@ function WeldDetail() {
         </TabsList>
 
         <TabsContent value="compliance">
-          <WeldComplianceCheck weld={w} />
+          <ComplianceCenter weld={w} />
+        </TabsContent>
+
+        <TabsContent value="traceability">
+          <TraceabilityGraph weld={w} />
         </TabsContent>
 
         <TabsContent value="inspections">
