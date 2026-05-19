@@ -38,19 +38,29 @@ type Project = { id: string; code: string; name: string };
 type Procedure = { id: string; code: string };
 
 export const Route = createFileRoute("/app/welds")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    workflow: typeof s.workflow === "string" ? s.workflow : undefined,
+  }),
   component: WeldsPage,
 });
 
 function WeldsPage() {
   const nav = useNavigate();
+  const { workflow } = Route.useSearch();
   const { data, isLoading } = useCompanyRows<Row>("welds", {
     order: { column: "weld_date" },
     realtime: true,
   });
   const projects = useCompanyRows<Project>("projects");
   const procs = useCompanyRows<Procedure>("procedures");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>(workflow ?? "all");
   const [projectFilter, setProjectFilter] = useState<string>("all");
+
+  // Keep filter in sync when user lands here from a dashboard deep-link.
+  useEffect(() => {
+    if (workflow && workflow !== statusFilter) setStatusFilter(workflow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workflow]);
 
   const projectName = (id: string | null) =>
     projects.data?.find((p) => p.id === id)?.code ?? "—";
