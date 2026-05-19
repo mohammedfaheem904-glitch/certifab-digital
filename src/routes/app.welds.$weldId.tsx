@@ -8,9 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { FileUploader } from "@/components/FileUploader";
-import { ArrowLeft, ChevronRight, QrCode, FileText, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ChevronRight, QrCode, FileText, ShieldCheck, History } from "lucide-react";
 import { WeldTraceabilityDocument } from "@/components/reports/WeldTraceabilityDocument";
 import { WeldComplianceCheck } from "@/components/welds/WeldComplianceCheck";
+import { WeldWorkflowStepper } from "@/components/welds/WeldWorkflowStepper";
+import { WeldActionBar } from "@/components/welds/WeldActionBar";
+import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
+import { WeldTimeline } from "@/components/welds/WeldTimeline";
+import type { WeldWorkflowStatus } from "@/lib/weld-workflow";
 
 export const Route = createFileRoute("/app/welds/$weldId")({
   component: WeldDetail,
@@ -19,7 +24,12 @@ export const Route = createFileRoute("/app/welds/$weldId")({
 function WeldDetail() {
   const { weldId } = Route.useParams();
   const nav = useNavigate();
-  const { profile } = useAuth();
+  const { profile, roles } = useAuth();
+
+  const canEdit = roles.some((r) =>
+    ["super_admin", "qa_qc_manager", "welding_engineer", "inspector"].includes(r),
+  );
+
 
   const weld = useQuery({
     queryKey: ["weld", weldId],
