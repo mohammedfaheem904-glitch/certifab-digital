@@ -5,9 +5,10 @@ import { NewRecordDialog } from "@/components/NewRecordDialog";
 import { useCompanyRows } from "@/lib/use-company-rows";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 
-type Row = { id: string; code: string; name: string; client: string | null; location: string | null; status: string };
+type Row = { id: string; code: string; name: string; client: string | null; location: string | null; status: string; description: string | null };
 
 export const Route = createFileRoute("/app/projects")({
   component: ProjectsPage,
