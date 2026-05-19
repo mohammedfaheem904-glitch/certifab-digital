@@ -57,7 +57,7 @@ function WeldsPage() {
 
   const filtered = (data ?? []).filter(
     (r) =>
-      (statusFilter === "all" || r.status === statusFilter) &&
+      (statusFilter === "all" || (r.workflow_status ?? "Draft") === statusFilter) &&
       (projectFilter === "all" || r.project_id === projectFilter),
   );
 
@@ -145,10 +145,14 @@ function WeldsPage() {
         filters={
           <>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-9 w-[140px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-[180px]"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All status</SelectItem>
-                {["Pending", "Accepted", "Repair", "Rejected"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                <SelectItem value="all">All workflow stages</SelectItem>
+                {[
+                  "Draft", "Pending Validation", "Awaiting Inspection",
+                  "NCR Open", "Ready for Release", "Approved", "Released",
+                  "Rejected", "Blocked",
+                ].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={projectFilter} onValueChange={setProjectFilter}>
@@ -170,9 +174,32 @@ function WeldsPage() {
           { key: "project", header: "Project", cell: (r) => <span className="text-muted-foreground">{projectName(r.project_id)}</span> },
           { key: "joint", header: "Joint / Spool", cell: (r) => <span className="text-xs text-muted-foreground">{r.joint_no ?? "—"} / {r.spool_no ?? "—"}</span> },
           { key: "welder", header: "Welder", cell: (r) => r.welder_name ?? "—" },
-          { key: "heat", header: "Heat input", cell: (r) => <span className="text-muted-foreground">{r.heat_input ?? "—"}</span> },
           { key: "date", header: "Date", cell: (r) => <span className="text-xs">{r.weld_date}</span> },
-          { key: "status", header: "Status", cell: (r) => <StatusBadge status={r.status} /> },
+          { key: "workflow", header: "Workflow", cell: (r) => <WeldStatusBadge status={r.workflow_status ?? "Draft"} /> },
+          { key: "status", header: "Result", cell: (r) => <StatusBadge status={r.status} /> },
+          {
+            key: "actions",
+            header: "",
+            cell: (r) => (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    aria-label="Open weld"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nav({ to: "/app/welds/$weldId", params: { weldId: r.id } });
+                    }}
+                  >
+                    <ExternalLink className="size-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Open weld</TooltipContent>
+              </Tooltip>
+            ),
+          },
         ]}
       />
     </ModulePage>
