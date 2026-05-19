@@ -1922,6 +1922,21 @@ export type Database = {
           report_footer: string
         }[]
       }
+      get_instrument_by_qr: {
+        Args: { _token: string }
+        Returns: {
+          asset_id: string
+          calibration_due: string
+          category: string
+          company_logo_url: string
+          company_name: string
+          manufacturer: string
+          model: string
+          name: string
+          serial_number: string
+          status: string
+        }[]
+      }
       get_invitation: {
         Args: { _token: string }
         Returns: {
