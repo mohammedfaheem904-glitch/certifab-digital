@@ -1,92 +1,100 @@
-# Frontend Activation & Operational Exposure Phase
+# Actionable UX & Operational Guidance Phase
 
-A lot of intelligence already exists in code (`wps-intelligence.ts`, `weld-matching.ts`, `weld-readiness.ts`, `weld-workflow.ts`, `qualification-validation.ts`, `qualification-intelligence.ts`, `qualification-status.ts`, `notifications.ts`, audit logs, `procedure_revisions`, `procedure_approvals`, `weld_events`, `instrument_events`, `ncr_events`) but most of it is only wired into the Weld detail page. This phase exposes that intelligence everywhere else the user works.
+Transform the platform from "showing data" into actively telling users **what to do next, why, and with one click how**. This is a large, cross-cutting initiative — I'll ship it in vertical slices so you can review each one in the UI before the next ships.
+
+## Foundations (Slice 0 — shared engine + primitives)
+
+A single `recommendations` engine drives every module. All UI consumes the same shape so badges, banners, dashboards, and detail pages stay in lockstep.
+
+**`src/lib/recommendations.ts`** — pure functions per entity:
+- `recommendForWeld(weld, wps, wpq, inspections, ncrs, instruments, role)`
+- `recommendForQualification(q, continuity, welds, role)`
+- `recommendForWps(wps, welds, approvals, role)`
+- `recommendForNcr(ncr, weld, inspection, role)`
+- `recommendForInspection(insp, weld, ncrs, role)`
+- `recommendForInstrument(inst, calibrations, role)`
+
+Returns:
+```ts
+type Recommendation = {
+  id: string;
+  severity: "critical" | "warning" | "info" | "ok";
+  title: string;             // "Renew welder qualification"
+  why: string;               // rule + clause + measured fact
+  rule?: string;             // "ASME IX QW-452"
+  impact: string;            // operational consequence
+  remediation: string;       // narrative how-to
+  action?: {                 // one-click
+    label: string;
+    kind: "navigate" | "open-dialog" | "mutation";
+    to?: string; search?: Record<string,string>;
+    dialog?: "assign-welder"|"pick-wps"|"create-ncr"|"create-inspection"|"request-approval"|"request-calibration";
+    payload?: Record<string,unknown>;
+  };
+  roles?: string[];          // who should act
+};
+```
+
+Reuses existing intelligence (`weld-readiness.ts`, `weld-matching.ts`, `qualification-validation.ts`, `qualification-status.ts`, `wps-intelligence.ts`) — no duplicate rules, just wraps them into actionable items.
+
+**Shared UI primitives** under `src/components/common/`:
+- `<OperationalBanner verdict severity title summary action />` — the 🔴🟠🟢🔵 strip
+- `<RecommendedActionsCard recommendations role />` — grouped, prioritised, with one-click buttons
+- `<ExplainabilityRow why rule impact remediation />` — collapsible "Why this matters"
+- `<SeverityBadge level />` + `<RiskScoreRing value />`
+- `<QuickActionDialogs />` — assign welder, pick compatible WPS, create NCR/inspection, request approval/calibration
+
+## Slice 1 — Welds (most operational module)
+
+- Top of `app.welds.$weldId.tsx`: `OperationalBanner` driven by `evaluateReleaseReadiness`.
+- `RecommendedActionsCard` between banner and tabs.
+- Every finding in `ComplianceCenter` gains the explainability row + one-click remediation.
+- Welds list: severity-coloured row + "Next action" column.
+
+## Slice 2 — Qualifications
+
+- Detail banner (Active / Expiring / Expired / Continuity broken) with renew / log-continuity actions.
+- Findings panel uses explainability (currently raw text).
+- List: risk badge + next-action chip.
+
+## Slice 3 — WPS / Procedures
+
+- Detail banner (Draft / In Review / Approved / Superseded) with request-approval / sign actions.
+- Recommendations: missing essential variables, incompatible welds, expiring revision.
+- List: compliance score + next-action chip.
+
+## Slice 4 — NCRs & Inspections
+
+- NCR banner: severity + days-open + blocking-weld count + close/assign actions.
+- Inspection banner: failed → "Create NCR" one-click; open → "Close inspection".
+- Cross-links to the affected weld with readiness impact.
+
+## Slice 5 — Instruments / Calibration
+
+- Banner: In-tolerance / Due-soon / Expired with "Request recalibration" one-click.
+- List: risk badge + days-until + affected-welds hint.
+
+## Slice 6 — Decision-Oriented Dashboard
+
+Rebuild `app.index.tsx` around the recommendation engine:
+- **Action Queue** (top): top N critical recommendations across all entities, role-filtered, each a one-click row.
+- **Risk lanes**: Highest-Risk Welds · Expiring Quals · Blocked Production · Pending Approvals · Open NCR Priorities · Calibration Risks · Release Bottlenecks.
+- Keep the existing alert strip but make every tile deep-link into a pre-filtered list (already partially built).
+
+## Slice 7 — Role-aware filtering + polish
+
+- Hook `useUserRole()` so recommendations are filtered to what the current user can actually act on.
+- Audit every page for the "What is wrong / Why / Severity / Next / Who / Blocks release" checklist.
 
 ---
 
-## Backend-to-Frontend Gap Audit
+### Technical notes
+- 100% frontend — **no DB migrations**. All inputs already exist in tenant tables.
+- Pure functions; covered by unit-style invariants in the engine.
+- Design tokens only — semantic colours via `src/styles.css` (`--success`, `--warning`, `--destructive`, `--info`).
+- Each slice ships independently and is small enough to QA visually.
 
-Already built, NOT yet visible enough:
+### Delivery order
+Slice 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7, with a checkpoint after each.
 
-| Capability | Where it lives | Where it's missing |
-|---|---|---|
-| Qualification validation findings | `qualification-validation.ts` | Qualification detail + list (no findings panel / risk badge) |
-| Continuity / expiry intelligence | `qualification-status.ts` | List rows, dashboard, welder picker on welds |
-| WPS compliance / essential variables | `wps-intelligence.ts`, `WpsCompliancePanel` | Procedures list (no compliance score column), dashboard |
-| WPS ↔ Weld usage | welds.procedure_id | WPS detail has no "Used by" production welds tab |
-| Welder ↔ Production welds | welds.welder_name | Qualification detail has no production-weld history |
-| Revision / approval history | `procedure_revisions`, `procedure_approvals` | Not visible from list, no contextual "last approved" chip |
-| Audit logs | `audit_logs` table | No contextual "recent activity" anywhere outside `/app/audit` |
-| NCR ↔ Weld impact | ncrs.weld_id | NCR list/detail has no linked-weld card or readiness impact |
-| Inspection ↔ Weld / NCR | inspections.weld_id | Inspection list has no traceability column or NCR shortcut |
-| Instrument calibration impact | `instruments.calibration_due` | Only surfaces inside Compliance Center — not on instrument list as risk |
-| Notifications / alerts | `notifications.ts` | Bell exists but dashboard has no operational alert strip |
-| Workflow stepper/action bar | `weld-workflow.ts` | Only on weld detail — list doesn't show stepper progress hint |
-
----
-
-## Phase A — Dashboard Operationalization (`app.index.tsx`)
-
-Rebuild the home dashboard around live KPIs already computable from the DB:
-
-- **Alert strip** — expiring qualifications (≤30d), expired calibrations, open NCRs, blocked welds, pending approvals. Each is a clickable card → filtered list route.
-- **Readiness KPI tiles** — % welds ready for release, % qualifications active, % instruments in-calibration, open NCR count, average readiness score (sampled).
-- **Operational bottlenecks** — "Awaiting Inspection" count, "Ready for Release" awaiting approval count, NCRs overdue.
-- **Recent activity feed** — last 10 entries from `audit_logs` + `weld_events` (cross-entity).
-- **Coverage panels** — qualification coverage by process, WPS approval status mix.
-
-## Phase B — Qualification Intelligence Exposure
-
-- **List (`app.qualifications.index.tsx`)**: add Status / Continuity / Expiry-risk badges using `deriveQualStatus` + `continuityBroken/Warning`. Add filter pills (Expired, Expiring, Continuity broken, Suspended).
-- **Detail (`app.qualifications.$qualId.tsx`)**: add **Qualification Findings panel** (reuse same pattern as Compliance Center — Critical/Warning/Info collapsibles) driven by `qualification-validation.ts`. Add **Production Welds** tab listing welds matched by welder_name (relational visibility, deep-link to weld). Add **Continuity Risk** banner when broken/warning.
-
-## Phase C — WPS / Procedure Operationalization
-
-- **Procedures list (`app.procedures.tsx`)**: add Approval status chip, Revision chip, Compliance score column (cheap: re-uses `WpsCompliancePanel` logic at a summary level), QR / Verify shortcut, hover quick-actions (Open, Sign, Compare revisions).
-- **Procedure detail**: add **"Used by" tab** showing production welds referencing this WPS with their workflow status — direct relationship visibility WPS ↔ Welds. Add a top **Status & Approval banner** (revision, last approved, signers count) so users see the engineering state without scrolling.
-
-## Phase D — NCR / Inspection Traceability
-
-- **NCRs list**: add linked-weld / inspection columns + severity heatmap chip.
-- **NCR detail**: add relationship cards (Weld, Inspection, raised by, assigned to) + impact note ("This NCR is blocking release readiness for weld X").
-- **Inspections list**: linked-weld column, NCR shortcut when severity = reject, inspector/date.
-- **Inspection row → weld**: hover quick-action "Open weld" using same `QuickActionButton` pattern as welds list.
-
-## Phase E — Instruments Risk Exposure
-
-- **Instruments list (`app.instruments.tsx`)**: calibration risk badge (Expired / Due soon / OK), days-until column, filter pills. Row → opens detail.
-- **Detail**: add "Welds potentially affected" hint when expired (welds inspected with this instrument's category in the last 90 days — best-effort, advisory).
-
-## Phase F — Cross-cutting UX activation
-
-- **Reusable** `<RecentActivityCard entity="welds|procedures|qualifications" id={...} />` reading from `audit_logs` + entity-specific event tables — drop into each detail route so audit becomes contextual, not just `/app/audit`.
-- **Reusable** `<RelationshipCard />` primitive (icon, label, value, deep-link button) consumed by NCR detail, inspection detail, qualification detail, procedure detail.
-- **Reusable** `<RiskBadge level="ok|warn|fail" />` + `<DaysUntilChip />` reused across qualifications, procedures, instruments.
-
----
-
-## Technical notes
-
-- 100% frontend & query work — **no migrations**. All data is already in tables with RLS.
-- New components live under `src/components/{dashboard,common,qualifications,procedures,ncrs,inspections,instruments}/`.
-- No new intelligence libraries — reuses existing `*-intelligence.ts`, `*-validation.ts`, `*-status.ts`, `*-readiness.ts`, `weld-workflow.ts`.
-- Design tokens only — no raw colors, follows `src/styles.css`.
-- Each phase ships independently and is small enough to QA visually.
-
----
-
-## Visible-completion checklist (per phase)
-
-For every phase delivery I will report:
-1. **What users will notice** — concrete UI changes.
-2. **Pages changed** — file list.
-3. **Workflows now operational** — e.g. "click an alert on dashboard → land on filtered welds list".
-4. **Backend capabilities now exposed** — e.g. "qualification validation findings now visible on qualification detail".
-
----
-
-## Proposed delivery order
-
-Phase A → B → C → D → E → F, with a user checkpoint after each.
-
-**Confirm and I'll start with Phase A (Dashboard Operationalization).**
+**Confirm and I'll start with Slice 0 (engine + primitives) and Slice 1 (Welds) in the same delivery so you immediately see it in action on a weld detail page.**
