@@ -98,6 +98,8 @@ function WeldDetail() {
         canEdit={canEdit}
       />
 
+      <WeldGuidanceStrip weld={w} />
+
       <WeldWorkflowStepper status={(w.workflow_status ?? "Draft") as WeldWorkflowStatus} />
 
       <div className="rounded-xl border border-border bg-[image:var(--gradient-surface)] p-6">
