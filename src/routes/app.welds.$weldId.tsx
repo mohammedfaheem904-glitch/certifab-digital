@@ -16,6 +16,7 @@ import { WeldWorkflowStepper } from "@/components/welds/WeldWorkflowStepper";
 import { WeldActionBar } from "@/components/welds/WeldActionBar";
 import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
 import { WeldTimeline } from "@/components/welds/WeldTimeline";
+import { WeldGuidanceStrip } from "@/components/welds/WeldGuidanceStrip";
 import type { WeldWorkflowStatus } from "@/lib/weld-workflow";
 
 export const Route = createFileRoute("/app/welds/$weldId")({
