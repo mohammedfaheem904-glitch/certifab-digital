@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ModulePage } from "@/components/ModulePage";
 import { StatusBadge } from "@/components/StatusBadge";
 import { NewRecordDialog } from "@/components/NewRecordDialog";
