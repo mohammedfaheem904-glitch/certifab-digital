@@ -85,13 +85,13 @@ export function AppLayout() {
   };
 
   const isSuperAdmin = roles.includes("super_admin");
-  const nav_items = [
-    { to: "/app", label: t("dashboard"), icon: LayoutDashboard, exact: true },
-    { to: "/app/procedures", label: t("procedures"), icon: FileText },
-    { to: "/app/qualifications", label: t("qualifications"), icon: BadgeCheck },
-    { to: "/app/welds", label: t("welds"), icon: Flame },
+  const nav_items: Array<{ to: string; label: string; icon: any; exact?: boolean; surface?: Feature["surface"] }> = [
+    { to: "/app", label: t("dashboard"), icon: LayoutDashboard, exact: true, surface: "dashboard" },
+    { to: "/app/procedures", label: t("procedures"), icon: FileText, surface: "procedures" },
+    { to: "/app/qualifications", label: t("qualifications"), icon: BadgeCheck, surface: "qualifications" },
+    { to: "/app/welds", label: t("welds"), icon: Flame, surface: "welds" },
     { to: "/app/inspections", label: t("inspections"), icon: ClipboardCheck },
-    { to: "/app/ncrs", label: "NCRs", icon: ScrollText },
+    { to: "/app/ncrs", label: "NCRs", icon: ScrollText, surface: "ncrs" },
     { to: "/app/equipment", label: t("equipment"), icon: Wrench },
     { to: "/app/instruments", label: "QA/QC Instruments", icon: Gauge },
     { to: "/app/projects", label: t("projects"), icon: FolderKanban },
