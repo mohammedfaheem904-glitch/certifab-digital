@@ -234,42 +234,141 @@ export function weldVerdict(readiness: ReleaseReadiness, recs: Recommendation[])
 /*  Qualifications (used in later slice — exported now for reuse)      */
 /* ──────────────────────────────────────────────────────────────────── */
 
-export interface RecommendQualInput {
-  qualification: {
-    id: string;
-    expiry_date: string;
-    last_continuity_date?: string | null;
-    status?: string | null;
-  };
+export interface QualificationLite {
+  id: string;
+  welder_name?: string | null;
+  process?: string | null;
+  expiry_date: string;
+  qualification_date?: string | null;
+  last_continuity_date?: string | null;
+  status?: string | null;
+  position_qualified?: string | null;
+  test_thickness_mm?: number | string | null;
+  code_family?: string | null;
 }
 
-export function recommendForQualification({ qualification: q }: RecommendQualInput): Recommendation[] {
+export interface QualImpact {
+  affectedWelds: number;
+  affectedProjects: number;
+  pendingReleases: number;
+  blockedWelds: number;
+}
+
+export interface ReplacementWelder {
+  id: string;
+  welder_name: string;
+  employee_id?: string | null;
+  process?: string | null;
+  expiry_date?: string | null;
+  position_qualified?: string | null;
+  test_thickness_mm?: number | string | null;
+}
+
+export interface QualReadinessScore {
+  score: number;            // 0-100
+  band: "Ready" | "Attention Required" | "Expiring Soon" | "High Risk";
+  continuityHealth: "Healthy" | "At Risk" | "Broken";
+  complianceHealth: "Pass" | "Warning" | "Fail";
+  expiryRisk: "None" | "30 days" | "Expired";
+}
+
+export interface RecommendQualInput {
+  qualification: QualificationLite;
+  impact?: QualImpact;
+  replacements?: ReplacementWelder[];
+}
+
+export function qualReadinessScore(q: QualificationLite): QualReadinessScore {
+  const status = deriveQualStatus({
+    expiry_date: q.expiry_date,
+    status: q.status,
+    last_continuity_date: q.last_continuity_date,
+  });
+  const broken = continuityBroken(q.last_continuity_date ?? null);
+  const warn = continuityWarning(q.last_continuity_date ?? null);
+
+  let score = 100;
+  if (status === "Expired") score -= 60;
+  else if (status === "Expiring Soon") score -= 25;
+  else if (status === "Suspended") score -= 80;
+  if (broken) score -= 40;
+  else if (warn) score -= 12;
+  if (!q.position_qualified) score -= 4;
+  if (!q.test_thickness_mm) score -= 4;
+  score = Math.max(0, Math.min(100, score));
+
+  const continuityHealth: QualReadinessScore["continuityHealth"] =
+    broken ? "Broken" : warn ? "At Risk" : "Healthy";
+  const expiryRisk: QualReadinessScore["expiryRisk"] =
+    status === "Expired" ? "Expired" : status === "Expiring Soon" ? "30 days" : "None";
+  const complianceHealth: QualReadinessScore["complianceHealth"] =
+    status === "Expired" || status === "Suspended" || broken ? "Fail"
+      : status === "Expiring Soon" || warn ? "Warning"
+      : "Pass";
+
+  let band: QualReadinessScore["band"] = "Ready";
+  if (score < 40) band = "High Risk";
+  else if (status === "Expiring Soon") band = "Expiring Soon";
+  else if (score < 80) band = "Attention Required";
+
+  return { score, band, continuityHealth, complianceHealth, expiryRisk };
+}
+
+export function recommendForQualification({
+  qualification: q,
+  impact,
+  replacements,
+}: RecommendQualInput): Recommendation[] {
   const recs: Recommendation[] = [];
   const status = deriveQualStatus({ expiry_date: q.expiry_date, status: q.status });
   const broken = continuityBroken(q.last_continuity_date ?? null);
   const warn = continuityWarning(q.last_continuity_date ?? null);
+
+  const impactSuffix = impact && (impact.affectedWelds + impact.pendingReleases > 0)
+    ? ` Currently impacts ${impact.affectedWelds} active weld${impact.affectedWelds === 1 ? "" : "s"} across ${impact.affectedProjects} project${impact.affectedProjects === 1 ? "" : "s"}` +
+      (impact.pendingReleases > 0 ? ` and ${impact.pendingReleases} pending release workflow${impact.pendingReleases === 1 ? "" : "s"}.` : ".")
+    : "";
+
+  const replacementHint = replacements && replacements.length > 0
+    ? ` Suggested replacements: ${replacements.slice(0, 3).map((r) => r.welder_name).join(", ")}.`
+    : "";
 
   if (status === "Expired") {
     recs.push({
       id: `qual-${q.id}-expired`,
       severity: "critical",
       title: "Renew welder qualification",
-      why: `Qualification expired on ${q.expiry_date}.`,
+      why: `Qualification expired on ${q.expiry_date}.${impactSuffix}`,
       rule: "ASME IX QW-322",
-      impact: "Welder cannot legitimately weld on production work — any weld signed off under this WPQ may fail audit.",
-      remediation: "Re-test the welder against the same essential variables and issue a new WPQ.",
+      impact: `Welder cannot legitimately weld on production work — any weld signed off under this WPQ may fail audit.${impactSuffix}`,
+      remediation: `Re-test the welder against the same essential variables and issue a new WPQ.${replacementHint}`,
       action: { label: "Renew qualification", kind: "open-dialog", dialog: "renew-qualification", payload: { qualId: q.id } },
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
     });
   } else if (status === "Expiring Soon") {
     recs.push({
       id: `qual-${q.id}-expiring`,
       severity: "warning",
       title: "Qualification expiring soon",
-      why: `Qualification expires on ${q.expiry_date}.`,
+      why: `Qualification expires on ${q.expiry_date}.${impactSuffix}`,
       rule: "ASME IX QW-322",
-      impact: "Production planning should re-assign welders or schedule re-tests before expiry.",
-      remediation: "Schedule a renewal test now to avoid production interruption.",
+      impact: `Production planning should re-assign welders or schedule re-tests before expiry.${impactSuffix}`,
+      remediation: `Schedule a renewal test now to avoid production interruption.${replacementHint}`,
       action: { label: "Schedule renewal", kind: "open-dialog", dialog: "renew-qualification", payload: { qualId: q.id } },
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
+    });
+  }
+
+  if (status === "Suspended") {
+    recs.push({
+      id: `qual-${q.id}-suspended`,
+      severity: "critical",
+      title: "Qualification is suspended",
+      why: `This WPQ is currently suspended.${impactSuffix}`,
+      rule: "ASME IX QW-322",
+      impact: `Welder cannot perform production work under this qualification until reinstated.${impactSuffix}`,
+      remediation: `Resolve the suspension cause and reinstate, or re-qualify the welder.${replacementHint}`,
+      roles: ["super_admin", "qa_qc_manager"],
     });
   }
 
@@ -278,11 +377,12 @@ export function recommendForQualification({ qualification: q }: RecommendQualInp
       id: `qual-${q.id}-continuity-broken`,
       severity: "critical",
       title: "Continuity broken",
-      why: `No welding activity logged in over 6 months (last activity ${q.last_continuity_date ?? "never recorded"}).`,
+      why: `No welding activity logged in over 6 months (last activity ${q.last_continuity_date ?? "never recorded"}).${impactSuffix}`,
       rule: "ASME IX QW-322.1",
-      impact: "Qualification is suspended for the affected process(es) until requalified.",
-      remediation: "Log production welding evidence (or schedule a renewal test) to restore continuity.",
+      impact: `Qualification is suspended for the affected process(es) until requalified.${impactSuffix}`,
+      remediation: `Log production welding evidence (or schedule a renewal test) to restore continuity.${replacementHint}`,
       action: { label: "Log continuity", kind: "open-dialog", dialog: "log-continuity", payload: { qualId: q.id } },
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
     });
   } else if (warn) {
     recs.push({
@@ -294,10 +394,67 @@ export function recommendForQualification({ qualification: q }: RecommendQualInp
       impact: "Without an evidence log soon, the qualification will be suspended automatically.",
       remediation: "Log a recent production weld to extend continuity.",
       action: { label: "Log continuity", kind: "open-dialog", dialog: "log-continuity", payload: { qualId: q.id } },
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
+    });
+  }
+
+  if (!q.position_qualified) {
+    recs.push({
+      id: `qual-${q.id}-no-position`,
+      severity: "info",
+      title: "Position not recorded",
+      why: "Position qualification is missing — coverage cannot be derived per QW-461.9.",
+      rule: "ASME IX QW-461.9",
+      impact: "Compliance reports will flag this WPQ as incomplete for position coverage.",
+      remediation: "Edit the WPQ and record the tested position (e.g. 6G, 3G+4G).",
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
     });
   }
 
   return sortRecs(recs);
+}
+
+export function qualVerdict(
+  q: QualificationLite,
+  recs: Recommendation[],
+  score: QualReadinessScore,
+  impact?: QualImpact,
+): Verdict {
+  const sev = highestSeverity(recs);
+  const impactPhrase = impact && (impact.affectedWelds + impact.pendingReleases > 0)
+    ? ` Impacts ${impact.affectedWelds} weld${impact.affectedWelds === 1 ? "" : "s"} / ${impact.affectedProjects} project${impact.affectedProjects === 1 ? "" : "s"}` +
+      (impact.pendingReleases > 0 ? `, ${impact.pendingReleases} pending release.` : ".")
+    : "";
+
+  if (sev === "critical") {
+    return {
+      severity: "critical",
+      label: score.band === "High Risk" ? "High Risk" : "Critical Risk",
+      summary: `Qualification is not valid for production work.${impactPhrase}`,
+      next: recs.find((r) => r.severity === "critical")?.title,
+    };
+  }
+  if (sev === "warning") {
+    return {
+      severity: "warning",
+      label: score.band === "Expiring Soon" ? "Expiring Soon" : "Attention Required",
+      summary: `Engineering review required to keep ${q.welder_name ?? "this welder"} on production.${impactPhrase}`,
+      next: recs.find((r) => r.severity === "warning")?.title,
+    };
+  }
+  if (sev === "info") {
+    return {
+      severity: "info",
+      label: "Pending Review",
+      summary: `Minor data gaps to address.${impactPhrase}`,
+      next: recs[0]?.title,
+    };
+  }
+  return {
+    severity: "ok",
+    label: "Ready",
+    summary: `Qualification valid and active.${impactPhrase}`,
+  };
 }
 
 /* ──────────────────────────────────────────────────────────────────── */
