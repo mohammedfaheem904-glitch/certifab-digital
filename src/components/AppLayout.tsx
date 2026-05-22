@@ -127,7 +127,8 @@ export function AppLayout() {
             )}
           >
             <Icon className="size-4" />
-            {item.label}
+            <span className="flex-1">{item.label}</span>
+            {item.surface && <NewPill surface={item.surface} />}
           </Link>
         );
       })}
