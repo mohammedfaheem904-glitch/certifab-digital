@@ -55,6 +55,15 @@ export function AppLayout() {
   const { profile, user, companyName, roles, signOut } = useAuth();
   const qc = useQueryClient();
   const [seeding, setSeeding] = useState(false);
+  const palette = useCommandPalette();
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false);
+  const [unseen, setUnseen] = useState(0);
+  useEffect(() => {
+    const refresh = () => setUnseen(unseenCount());
+    refresh();
+    window.addEventListener("cf:discovery-changed", refresh);
+    return () => window.removeEventListener("cf:discovery-changed", refresh);
+  }, []);
 
   const initials = (profile?.display_name || user?.email || "U")
     .split(/[ @.]/)
