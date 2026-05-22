@@ -458,6 +458,356 @@ export function qualVerdict(
 }
 
 /* ──────────────────────────────────────────────────────────────────── */
+/*  WPS / Procedures                                                   */
+/* ──────────────────────────────────────────────────────────────────── */
+
+export interface WpsLite {
+  id: string;
+  code?: string | null;
+  wps_no?: string | null;
+  status?: string | null;
+  process?: string | null;
+  standard?: string | null;
+  revision?: string | null;
+  pqr_no?: string | null;
+  position_qualified?: string | null;
+  position?: string | null;
+  thickness_range?: string | null;
+  heat_input_min?: number | null;
+  heat_input_max?: number | null;
+  voltage_min?: number | null;
+  voltage_max?: number | null;
+  current_min?: number | null;
+  current_max?: number | null;
+  travel_speed_min?: number | null;
+  travel_speed_max?: number | null;
+}
+
+export interface WpsUsage {
+  activeWelds: number;
+  activeProjects: number;
+  pendingApprovals: number;
+  blockedWelds: number;
+  releasedWelds: number;
+  openNcrs: number;
+  outOfToleranceLogs: number;
+}
+
+export interface CompatibleWelder {
+  id: string;
+  welder_name: string;
+  employee_id?: string | null;
+  process?: string | null;
+  position_qualified?: string | null;
+  expiry_date?: string | null;
+  test_thickness_mm?: number | string | null;
+}
+
+export interface WpsReadinessScore {
+  score: number;
+  band: "Approved" | "In Review" | "Draft" | "Attention Required" | "High Risk";
+  approvalHealth: "Approved" | "Pending" | "Draft" | "Rejected";
+  completeness: "Complete" | "Gaps" | "Missing";
+  productionImpact: "None" | "Low" | "Medium" | "High";
+}
+
+export function wpsReadinessScore(
+  wps: WpsLite,
+  bundle: { joints: any[]; baseMetals: any[]; fillers: any[]; electrical: any[]; signatures: any[] },
+  usage: WpsUsage,
+): WpsReadinessScore {
+  let score = 100;
+  const status = (wps.status ?? "Draft").toLowerCase();
+  if (status === "draft") score -= 20;
+  else if (status === "review") score -= 10;
+  else if (status === "rejected") score -= 60;
+
+  if (bundle.joints.length === 0) score -= 10;
+  if (bundle.baseMetals.length === 0) score -= 12;
+  if (bundle.fillers.length === 0) score -= 12;
+  if (bundle.electrical.length === 0) score -= 12;
+  if (status === "approved" && bundle.signatures.length === 0) score -= 6;
+  if (!wps.pqr_no) score -= 6;
+
+  if (usage.outOfToleranceLogs > 0) score -= Math.min(15, usage.outOfToleranceLogs * 3);
+  if (usage.blockedWelds > 0) score -= Math.min(15, usage.blockedWelds * 3);
+  if (usage.openNcrs > 0) score -= Math.min(10, usage.openNcrs * 4);
+
+  score = Math.max(0, Math.min(100, score));
+
+  const approvalHealth: WpsReadinessScore["approvalHealth"] =
+    status === "approved" ? "Approved"
+      : status === "review" ? "Pending"
+      : status === "rejected" ? "Rejected"
+      : "Draft";
+
+  const gaps =
+    (bundle.joints.length === 0 ? 1 : 0) +
+    (bundle.baseMetals.length === 0 ? 1 : 0) +
+    (bundle.fillers.length === 0 ? 1 : 0) +
+    (bundle.electrical.length === 0 ? 1 : 0);
+  const completeness: WpsReadinessScore["completeness"] =
+    gaps === 0 ? "Complete" : gaps <= 1 ? "Gaps" : "Missing";
+
+  const productionImpact: WpsReadinessScore["productionImpact"] =
+    usage.activeWelds >= 25 || usage.pendingApprovals >= 5 ? "High"
+      : usage.activeWelds >= 10 || usage.pendingApprovals >= 2 ? "Medium"
+      : usage.activeWelds > 0 ? "Low"
+      : "None";
+
+  let band: WpsReadinessScore["band"] = "Approved";
+  if (score < 40) band = "High Risk";
+  else if (score < 70) band = "Attention Required";
+  else if (status === "review") band = "In Review";
+  else if (status === "draft") band = "Draft";
+  return { score, band, approvalHealth, completeness, productionImpact };
+}
+
+export interface ParameterDrift {
+  id: string;
+  metric: "heat_input" | "voltage" | "current" | "travel_speed";
+  label: string;
+  recorded: number;
+  min?: number | null;
+  max?: number | null;
+  severity: "warning" | "critical";
+  message: string;
+  weldId?: string | null;
+  loggedAt?: string | null;
+}
+
+export function detectParameterDrift(wps: WpsLite, logs: any[]): ParameterDrift[] {
+  const out: ParameterDrift[] = [];
+  for (const log of logs) {
+    const v = Number(log.voltage), a = Number(log.current_amp),
+      ts = Number(log.travel_speed), hi = Number(log.heat_input);
+    const check = (
+      metric: ParameterDrift["metric"], label: string, val: number,
+      min?: number | null, max?: number | null,
+    ) => {
+      if (!Number.isFinite(val)) return;
+      if (max != null && val > max) {
+        out.push({
+          id: `${log.id}-${metric}-high`, metric, label, recorded: val, min, max,
+          severity: "critical",
+          message: `${label} ${val} exceeds WPS max ${max}.`,
+          weldId: log.weld_id, loggedAt: log.created_at,
+        });
+      } else if (min != null && val < min) {
+        out.push({
+          id: `${log.id}-${metric}-low`, metric, label, recorded: val, min, max,
+          severity: "warning",
+          message: `${label} ${val} below WPS min ${min}.`,
+          weldId: log.weld_id, loggedAt: log.created_at,
+        });
+      }
+    };
+    check("voltage", "Voltage", v, wps.voltage_min, wps.voltage_max);
+    check("current", "Current (A)", a, wps.current_min, wps.current_max);
+    check("travel_speed", "Travel speed", ts, wps.travel_speed_min, wps.travel_speed_max);
+    check("heat_input", "Heat input (kJ/mm)", hi, wps.heat_input_min, wps.heat_input_max);
+  }
+  return out.slice(0, 12);
+}
+
+export interface RecommendWpsInput {
+  wps: WpsLite;
+  bundle: { joints: any[]; baseMetals: any[]; fillers: any[]; electrical: any[]; signatures: any[] };
+  usage: WpsUsage;
+  compatibleWelders?: CompatibleWelder[];
+  drift?: ParameterDrift[];
+}
+
+export function recommendForWps({
+  wps, bundle, usage, compatibleWelders, drift = [],
+}: RecommendWpsInput): Recommendation[] {
+  const recs: Recommendation[] = [];
+  const status = (wps.status ?? "Draft").toLowerCase();
+
+  const impactSuffix =
+    usage.activeWelds > 0
+      ? ` Currently impacts ${usage.activeWelds} active weld${usage.activeWelds === 1 ? "" : "s"} across ${usage.activeProjects} project${usage.activeProjects === 1 ? "" : "s"}` +
+        (usage.pendingApprovals > 0 ? ` and ${usage.pendingApprovals} pending release${usage.pendingApprovals === 1 ? "" : "s"}.` : ".")
+      : "";
+
+  if (status === "draft") {
+    recs.push({
+      id: `wps-${wps.id}-submit`,
+      severity: "info",
+      title: "Submit WPS for review",
+      why: "This WPS is still in Draft — production welding cannot reference it for compliance.",
+      rule: "ASME IX QW-200.2",
+      impact: `Any weld linked to a draft WPS will fail release readiness.${impactSuffix}`,
+      remediation: "Complete the essential variables and submit the WPS for engineering review.",
+      action: { label: "Submit for review", kind: "open-dialog", dialog: "request-approval", payload: { wpsId: wps.id } },
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
+    });
+  } else if (status === "review") {
+    recs.push({
+      id: `wps-${wps.id}-approve`,
+      severity: "info",
+      title: "Awaiting approval signature",
+      why: "WPS is under review and waiting for the welding engineer / QA-QC manager sign-off.",
+      rule: "ASME IX QW-201",
+      impact: `Production welds linked to this WPS cannot be released until approved.${impactSuffix}`,
+      remediation: "Review the procedure, confirm essential variables, and approve or reject.",
+      roles: ["super_admin", "qa_qc_manager"],
+    });
+  } else if (status === "rejected") {
+    recs.push({
+      id: `wps-${wps.id}-rejected`,
+      severity: "critical",
+      title: "WPS rejected — production blocked",
+      why: "This WPS was rejected during review and cannot be used for production welding.",
+      impact: `All welds linked to this WPS are non-compliant until a new revision is approved.${impactSuffix}`,
+      remediation: "Issue a corrected revision, address the rejection comments, and re-submit for approval.",
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
+    });
+  }
+
+  if (bundle.joints.length === 0) {
+    recs.push({
+      id: `wps-${wps.id}-no-joints`, severity: "warning",
+      title: "Add joint configuration",
+      why: "No joint configuration is defined for this WPS.",
+      rule: "ASME IX QW-402",
+      impact: "Welds will not have geometry traceability and the WPS document will print incomplete.",
+      remediation: "Add at least one joint with groove geometry and (optionally) a sketch.",
+      roles: ["super_admin", "welding_engineer"],
+    });
+  }
+  if (bundle.baseMetals.length === 0) {
+    recs.push({
+      id: `wps-${wps.id}-no-base`, severity: "warning",
+      title: "Add base metals",
+      why: "No base metals are defined — P-Number coverage cannot be derived.",
+      rule: "ASME IX QW-403",
+      impact: "Material compatibility checks will fail for every linked weld.",
+      remediation: "Add at least one base metal with P-No and thickness range.",
+      roles: ["super_admin", "welding_engineer"],
+    });
+  }
+  if (bundle.fillers.length === 0) {
+    recs.push({
+      id: `wps-${wps.id}-no-filler`, severity: "warning",
+      title: "Add filler metals",
+      why: "No filler metals are defined for this procedure.",
+      rule: "ASME IX QW-404",
+      impact: "Consumable traceability is missing and WPS↔WPQ matching cannot resolve F-Number.",
+      remediation: "Add at least one filler with AWS class / SFA No and F-No.",
+      roles: ["super_admin", "welding_engineer"],
+    });
+  }
+  if (bundle.electrical.length === 0) {
+    recs.push({
+      id: `wps-${wps.id}-no-electrical`, severity: "warning",
+      title: "Add electrical parameters",
+      why: "No amperage / voltage ranges are defined — parameter drift cannot be detected.",
+      rule: "ASME IX QW-409",
+      impact: "Heat-input and parameter compliance for every linked weld is unverifiable.",
+      remediation: "Add at least one pass with amperage and voltage ranges.",
+      roles: ["super_admin", "welding_engineer"],
+    });
+  }
+
+  if (drift.length > 0) {
+    const crit = drift.filter((d) => d.severity === "critical").length;
+    recs.push({
+      id: `wps-${wps.id}-drift`,
+      severity: crit > 0 ? "critical" : "warning",
+      title: `Parameter drift detected on ${drift.length} log${drift.length === 1 ? "" : "s"}`,
+      why: `Production logs are drifting outside WPS expected ranges (${crit} critical, ${drift.length - crit} warning).`,
+      rule: "ASME IX QW-409",
+      impact: "Affected welds may be non-compliant and could trigger NCRs at audit.",
+      remediation: "Review the highlighted logs, retrain welders, or revise the WPS ranges if production conditions changed.",
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
+    });
+  }
+
+  if (usage.openNcrs > 0) {
+    recs.push({
+      id: `wps-${wps.id}-ncrs`, severity: "critical",
+      title: `${usage.openNcrs} open NCR${usage.openNcrs === 1 ? "" : "s"} linked to this WPS`,
+      why: "Welds executed under this procedure are currently under non-conformance investigation.",
+      impact: "Production may need to halt this procedure until the root cause is closed.",
+      remediation: "Review the open NCRs, identify root cause, and close them with preventive actions.",
+      action: { label: "Open NCRs", kind: "navigate", to: "/app/ncrs" },
+      roles: ["super_admin", "qa_qc_manager"],
+    });
+  }
+
+  if (usage.blockedWelds > 0) {
+    recs.push({
+      id: `wps-${wps.id}-blocked`, severity: "warning",
+      title: `${usage.blockedWelds} blocked weld${usage.blockedWelds === 1 ? "" : "s"} reference this WPS`,
+      why: "Production welds are blocked in the release workflow under this procedure.",
+      impact: "Project schedule is exposed — release of these welds is on hold.",
+      remediation: "Open the affected welds and resolve their blocking conditions, or assign an alternative WPS.",
+      action: { label: "View welds", kind: "navigate", to: "/app/welds" },
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
+    });
+  }
+
+  if (status === "approved" && (compatibleWelders?.length ?? 0) === 0 && usage.activeWelds > 0) {
+    recs.push({
+      id: `wps-${wps.id}-no-compat-welders`, severity: "warning",
+      title: "No active welders qualified for this WPS process",
+      why: "No active WPQ records match this WPS's process — production cannot be staffed compliantly.",
+      rule: "ASME IX QW-301",
+      impact: "Welds executed under this WPS may not be backed by a valid welder qualification.",
+      remediation: "Qualify welders on this process or extend an existing WPQ before continuing production.",
+      action: { label: "Browse welders", kind: "navigate", to: "/app/qualifications" },
+      roles: ["super_admin", "qa_qc_manager", "welding_engineer"],
+    });
+  }
+
+  return sortRecs(recs);
+}
+
+export function wpsVerdict(
+  _wps: WpsLite,
+  recs: Recommendation[],
+  score: WpsReadinessScore,
+  usage: WpsUsage,
+): Verdict {
+  const sev = highestSeverity(recs);
+  const impactPhrase =
+    usage.activeWelds > 0
+      ? ` Impacts ${usage.activeWelds} weld${usage.activeWelds === 1 ? "" : "s"} / ${usage.activeProjects} project${usage.activeProjects === 1 ? "" : "s"}.`
+      : "";
+
+  if (sev === "critical") {
+    return {
+      severity: "critical",
+      label: score.band === "High Risk" ? "High Risk" : "Critical Risk",
+      summary: `WPS is exposing production to non-compliance.${impactPhrase}`,
+      next: recs.find((r) => r.severity === "critical")?.title,
+    };
+  }
+  if (sev === "warning") {
+    return {
+      severity: "warning",
+      label: "Attention Required",
+      summary: `Engineering review required to keep this WPS production-ready.${impactPhrase}`,
+      next: recs.find((r) => r.severity === "warning")?.title,
+    };
+  }
+  if (sev === "info") {
+    return {
+      severity: "info",
+      label: score.band === "In Review" ? "In Review" : score.band === "Draft" ? "Draft" : "Pending Review",
+      summary: `WPS workflow has open steps before it can drive production.${impactPhrase}`,
+      next: recs[0]?.title,
+    };
+  }
+  return {
+    severity: "ok",
+    label: "Approved & Production-Ready",
+    summary: `WPS is approved and driving production.${impactPhrase}`,
+  };
+}
+
+/* ──────────────────────────────────────────────────────────────────── */
 /*  Role filtering                                                     */
 /* ──────────────────────────────────────────────────────────────────── */
 
