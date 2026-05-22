@@ -26,6 +26,7 @@ import {
   deriveQualificationRanges,
   formatRange,
 } from "@/lib/qualification-intelligence";
+import { QualificationGuidanceStrip } from "@/components/qualifications/QualificationGuidanceStrip";
 
 export const Route = createFileRoute("/app/qualifications/$qualId")({
   component: QualDetail,
@@ -191,6 +192,7 @@ function QualDetail() {
           <Field label="Result" value={q.result ?? "—"} />
         </div>
       </div>
+      {!q.deleted_at && <QualificationGuidanceStrip qualification={merged} />}
 
       <Tabs defaultValue="overview">
         <TabsList className="flex-wrap h-auto">
