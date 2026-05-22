@@ -18,6 +18,7 @@ import { ElectricalCharacteristicsTable } from "@/components/procedures/Electric
 import { WpsCompliancePanel } from "@/components/procedures/WpsCompliancePanel";
 import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
 import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
+import { WpsGuidanceStrip } from "@/components/procedures/WpsGuidanceStrip";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
   component: ProcedureDetailPage,
@@ -263,6 +264,17 @@ function ProcedureDetailPage() {
           )}
         </div>
       </div>
+
+      <WpsGuidanceStrip
+        wps={proc}
+        bundle={{
+          joints: jointsQ.data ?? [],
+          baseMetals: baseMetalsQ.data ?? [],
+          fillers: fillersQ.data ?? [],
+          electrical: electricalQ.data ?? [],
+          signatures: sigsQ.data ?? [],
+        }}
+      />
 
       <Tabs defaultValue="details">
         <TabsList className="print:hidden flex-wrap h-auto">
