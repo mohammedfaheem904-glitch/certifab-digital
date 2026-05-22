@@ -191,16 +191,35 @@ export function AppLayout() {
             </SheetContent>
           </Sheet>
 
-          <div className="flex-1 max-w-xl relative">
-            <Search className="size-4 absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={t("search")}
-              className="ps-9 bg-background/60 border-border h-9"
-            />
-          </div>
+          <button
+            onClick={() => palette.setOpen(true)}
+            className="flex-1 max-w-xl relative h-9 rounded-md border border-border bg-background/60 px-3 flex items-center gap-2 text-sm text-muted-foreground hover:bg-background transition-colors"
+            aria-label="Open command palette"
+          >
+            <Search className="size-4" />
+            <span className="flex-1 text-start truncate">{t("search")} — routes, features, actions…</span>
+            <kbd className="hidden md:inline-flex items-center gap-0.5 text-[10px] font-mono rounded border border-border px-1.5 py-0.5 bg-muted/60">
+              ⌘K
+            </kbd>
+          </button>
           <Button variant="ghost" size="sm" onClick={toggle} className="gap-2">
             <Languages className="size-4" />
             {lang === "en" ? "العربية" : "English"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setWhatsNewOpen(true)}
+            className="relative gap-1.5"
+            aria-label="What's new"
+          >
+            <Sparkles className="size-4" />
+            <span className="hidden lg:inline">What's new</span>
+            {unseen > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center">
+                {unseen}
+              </span>
+            )}
           </Button>
           <NotificationsBell />
           <PlanPill />
