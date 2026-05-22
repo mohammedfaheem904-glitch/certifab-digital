@@ -241,6 +241,43 @@ export function WpsDocument({ proc, approvals = [], revisions = [], children, ki
         ["Technique notes", proc.technique_notes ?? "—"],
       ]} />
 
+      {variables.length > 0 && (
+        <>
+          <SectionTitle index={7} title="Qualified Variables (ASME IX / QW)" />
+          {Object.entries(varsByGroup).map(([group, items]) => (
+            <div key={group} className="mb-2 avoid-break">
+              <div className="text-[9.5pt] font-semibold uppercase tracking-wide bg-muted/60 border border-foreground/40 px-2 py-1">
+                {group}
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th style={{ width: "10%" }}>Code</th>
+                    <th style={{ width: "32%" }}>Variable</th>
+                    <th style={{ width: "16%" }}>Category</th>
+                    <th style={{ width: "21%" }}>Qualified value</th>
+                    <th style={{ width: "21%" }}>Actual range</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((v: any) => (
+                    <tr key={v.id}>
+                      <td className="font-mono text-[9pt]">{v.code_reference ?? "—"}</td>
+                      <td>{v.variable_label ?? v.variable_key ?? "—"}</td>
+                      <td>{CAT_LABEL[v.category] ?? v.category ?? "—"}</td>
+                      <td>{v.qualified_value ?? "—"}</td>
+                      <td>{v.actual_range ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </>
+      )}
+
+
+
       {sigs.length > 0 && (
         <>
           <SectionTitle index={7} title="Digital Signatures" />
