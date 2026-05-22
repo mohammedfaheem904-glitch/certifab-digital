@@ -280,7 +280,7 @@ export function WpsDocument({ proc, approvals = [], revisions = [], children, ki
 
       {sigs.length > 0 && (
         <>
-          <SectionTitle index={7} title="Digital Signatures" />
+          <SectionTitle index={8} title="Digital Signatures" />
           <div className="grid grid-cols-3 gap-2">
             {sigs.map((s: any) => (
               <div key={s.id} className="border border-foreground/30 p-2">
