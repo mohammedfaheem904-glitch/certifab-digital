@@ -496,6 +496,24 @@ function ProcedureDetailPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Print-only mirror — ensures the full WPS document prints from any tab */}
+      <div className="hidden print:block">
+        <WpsDocument
+          proc={proc}
+          approvals={apprQ.data ?? []}
+          revisions={revsQ.data ?? []}
+          children={{
+            joints: jointsQ.data ?? [],
+            baseMetals: baseMetalsQ.data ?? [],
+            fillers: fillersQ.data ?? [],
+            electrical: electricalQ.data ?? [],
+            signatures: sigsQ.data ?? [],
+            variables: variablesQ.data ?? [],
+            sketchUrls,
+          }}
+        />
+      </div>
     </div>
   );
 }
