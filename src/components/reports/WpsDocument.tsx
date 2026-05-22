@@ -300,7 +300,7 @@ export function WpsDocument({ proc, approvals = [], revisions = [], children, ki
 
       {proc.notes && (
         <>
-          <SectionTitle index={8} title="Technical Notes & Special Requirements" />
+          <SectionTitle index={9} title="Technical Notes & Special Requirements" />
           <div className="text-[10pt] whitespace-pre-wrap border border-foreground/30 p-3 bg-muted/40">{proc.notes}</div>
         </>
       )}
