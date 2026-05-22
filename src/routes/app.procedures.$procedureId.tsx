@@ -267,6 +267,12 @@ function ProcedureDetailPage() {
         </div>
       </div>
 
+      <SpotlightTip
+        id="wps-variables-tip-v1"
+        title="New: Variables Matrix tab"
+        body="Open the Variables tab below to manage Essential / Non-Essential / Supplementary variables. Use Seed ASME IX defaults to auto-populate ~38 QW-402…QW-410 rows."
+      />
+
       <WpsGuidanceStrip
         wps={proc}
         bundle={{
