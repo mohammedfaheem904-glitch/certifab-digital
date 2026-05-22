@@ -35,6 +35,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { OperationalAlertStrip } from "@/components/dashboard/OperationalAlertStrip";
 import { WorkflowBottlenecks } from "@/components/dashboard/WorkflowBottlenecks";
 import { RecentActivityFeed } from "@/components/dashboard/RecentActivityFeed";
+import { SpotlightTip } from "@/components/discovery/SpotlightTip";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -142,6 +143,13 @@ function Dashboard() {
         </div>
         <ComplianceRing score={stats.compliance} />
       </div>
+
+      {/* Contextual onboarding hint — dismissible */}
+      <SpotlightTip
+        id="dashboard-operational-v1"
+        title="Operational alerts now live"
+        body="The strip below surfaces overdue NCRs, expiring qualifications, calibration due dates and blocked welds across every project. Click any chip to jump to the source record. Press ⌘K to open the new command palette anywhere."
+      />
 
       {/* Operational alerts — actionable, deep-linked to filtered lists */}
       <OperationalAlertStrip />
