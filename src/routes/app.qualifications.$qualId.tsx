@@ -26,6 +26,7 @@ import {
   deriveQualificationRanges,
   formatRange,
 } from "@/lib/qualification-intelligence";
+import { QualificationGuidanceStrip } from "@/components/qualifications/QualificationGuidanceStrip";
 
 export const Route = createFileRoute("/app/qualifications/$qualId")({
   component: QualDetail,
