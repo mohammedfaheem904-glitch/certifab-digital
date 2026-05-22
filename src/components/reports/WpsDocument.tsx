@@ -37,7 +37,14 @@ export function WpsDocument({ proc, approvals = [], revisions = [], children, ki
   const fillers = children?.fillers ?? [];
   const electrical = children?.electrical ?? [];
   const sigs = children?.signatures ?? [];
+  const variables = children?.variables ?? [];
   const sketchUrls = children?.sketchUrls ?? {};
+
+  const varsByGroup = variables.reduce<Record<string, any[]>>((acc, v) => {
+    const g = v.group_name ?? "Other";
+    (acc[g] ||= []).push(v);
+    return acc;
+  }, {});
 
   const fallbackSignatories = [
     {
