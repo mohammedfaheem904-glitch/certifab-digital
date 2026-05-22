@@ -327,6 +327,11 @@ function ProcedureDetailPage() {
           <ElectricalCharacteristicsTable procedureId={procedureId} canEdit={isEditor} />
         </TabsContent>
 
+        <TabsContent value="variables" className="mt-4">
+          <WpsVariablesMatrix procedureId={procedureId} canEdit={isEditor} process={proc.process} />
+        </TabsContent>
+
+
         <TabsContent value="compliance" className="mt-4">
           <WpsCompliancePanel proc={proc} />
         </TabsContent>
