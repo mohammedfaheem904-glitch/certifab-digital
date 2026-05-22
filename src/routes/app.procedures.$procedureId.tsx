@@ -130,6 +130,18 @@ function ProcedureDetailPage() {
       return data ?? [];
     },
   });
+  const variablesQ = useQuery({
+    queryKey: ["wps_variables", procedureId],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("wps_variables" as any) as any)
+        .select("*")
+        .eq("procedure_id", procedureId)
+        .order("group_name", { ascending: true })
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
 
   // Resolve signed URLs for joint sketches (for printable doc)
   const [sketchUrls, setSketchUrls] = useState<Record<string, string>>({});
