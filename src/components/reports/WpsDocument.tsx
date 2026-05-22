@@ -11,7 +11,14 @@ export type WpsChildren = {
   fillers?: any[];
   electrical?: any[];
   signatures?: any[];
+  variables?: any[];
   sketchUrls?: Record<string, string>;
+};
+
+const CAT_LABEL: Record<string, string> = {
+  essential: "Essential",
+  non_essential: "Non-Essential",
+  supplementary_essential: "Supplementary Essential",
 };
 
 export type WpsDocumentProps = {
@@ -30,7 +37,14 @@ export function WpsDocument({ proc, approvals = [], revisions = [], children, ki
   const fillers = children?.fillers ?? [];
   const electrical = children?.electrical ?? [];
   const sigs = children?.signatures ?? [];
+  const variables = children?.variables ?? [];
   const sketchUrls = children?.sketchUrls ?? {};
+
+  const varsByGroup = variables.reduce<Record<string, any[]>>((acc, v) => {
+    const g = v.group_name ?? "Other";
+    (acc[g] ||= []).push(v);
+    return acc;
+  }, {});
 
   const fallbackSignatories = [
     {
@@ -227,9 +241,46 @@ export function WpsDocument({ proc, approvals = [], revisions = [], children, ki
         ["Technique notes", proc.technique_notes ?? "—"],
       ]} />
 
+      {variables.length > 0 && (
+        <>
+          <SectionTitle index={7} title="Qualified Variables (ASME IX / QW)" />
+          {Object.entries(varsByGroup).map(([group, items]) => (
+            <div key={group} className="mb-2 avoid-break">
+              <div className="text-[9.5pt] font-semibold uppercase tracking-wide bg-muted/60 border border-foreground/40 px-2 py-1">
+                {group}
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th style={{ width: "10%" }}>Code</th>
+                    <th style={{ width: "32%" }}>Variable</th>
+                    <th style={{ width: "16%" }}>Category</th>
+                    <th style={{ width: "21%" }}>Qualified value</th>
+                    <th style={{ width: "21%" }}>Actual range</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((v: any) => (
+                    <tr key={v.id}>
+                      <td className="font-mono text-[9pt]">{v.code_reference ?? "—"}</td>
+                      <td>{v.variable_label ?? v.variable_key ?? "—"}</td>
+                      <td>{CAT_LABEL[v.category] ?? v.category ?? "—"}</td>
+                      <td>{v.qualified_value ?? "—"}</td>
+                      <td>{v.actual_range ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </>
+      )}
+
+
+
       {sigs.length > 0 && (
         <>
-          <SectionTitle index={7} title="Digital Signatures" />
+          <SectionTitle index={8} title="Digital Signatures" />
           <div className="grid grid-cols-3 gap-2">
             {sigs.map((s: any) => (
               <div key={s.id} className="border border-foreground/30 p-2">
@@ -249,7 +300,7 @@ export function WpsDocument({ proc, approvals = [], revisions = [], children, ki
 
       {proc.notes && (
         <>
-          <SectionTitle index={8} title="Technical Notes & Special Requirements" />
+          <SectionTitle index={9} title="Technical Notes & Special Requirements" />
           <div className="text-[10pt] whitespace-pre-wrap border border-foreground/30 p-3 bg-muted/40">{proc.notes}</div>
         </>
       )}
