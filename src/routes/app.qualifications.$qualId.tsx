@@ -192,6 +192,7 @@ function QualDetail() {
           <Field label="Result" value={q.result ?? "—"} />
         </div>
       </div>
+      {!q.deleted_at && <QualificationGuidanceStrip qualification={merged} />}
 
       <Tabs defaultValue="overview">
         <TabsList className="flex-wrap h-auto">
