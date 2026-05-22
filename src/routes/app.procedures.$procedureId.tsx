@@ -19,6 +19,7 @@ import { WpsCompliancePanel } from "@/components/procedures/WpsCompliancePanel";
 import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
 import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
 import { WpsGuidanceStrip } from "@/components/procedures/WpsGuidanceStrip";
+import { WpsVariablesMatrix } from "@/components/procedures/WpsVariablesMatrix";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
   component: ProcedureDetailPage,
@@ -283,6 +284,7 @@ function ProcedureDetailPage() {
           <TabsTrigger value="basemetals"><Boxes className="size-4 me-1.5" /> Base metals</TabsTrigger>
           <TabsTrigger value="fillers"><Wrench className="size-4 me-1.5" /> Fillers</TabsTrigger>
           <TabsTrigger value="electrical"><Zap className="size-4 me-1.5" /> Electrical</TabsTrigger>
+          <TabsTrigger value="variables"><Sparkles className="size-4 me-1.5" /> Variables</TabsTrigger>
           <TabsTrigger value="compliance"><Sparkles className="size-4 me-1.5" /> Compliance</TabsTrigger>
           <TabsTrigger value="heat"><Flame className="size-4 me-1.5" /> Heat input</TabsTrigger>
           <TabsTrigger value="revisions"><GitBranch className="size-4 me-1.5" /> Revisions ({revsQ.data?.length ?? 0})</TabsTrigger>
@@ -324,6 +326,11 @@ function ProcedureDetailPage() {
         <TabsContent value="electrical" className="mt-4">
           <ElectricalCharacteristicsTable procedureId={procedureId} canEdit={isEditor} />
         </TabsContent>
+
+        <TabsContent value="variables" className="mt-4">
+          <WpsVariablesMatrix procedureId={procedureId} canEdit={isEditor} process={proc.process} />
+        </TabsContent>
+
 
         <TabsContent value="compliance" className="mt-4">
           <WpsCompliancePanel proc={proc} />

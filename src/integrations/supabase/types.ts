@@ -1939,6 +1939,63 @@ export type Database = {
           },
         ]
       }
+      wps_variables: {
+        Row: {
+          actual_range: string | null
+          category: Database["public"]["Enums"]["wps_variable_category"]
+          code_reference: string | null
+          company_id: string
+          created_at: string
+          group_name: string
+          id: string
+          notes: string | null
+          procedure_id: string
+          process_ref: string | null
+          qualified_value: string | null
+          sort_order: number
+          transferable: boolean | null
+          updated_at: string
+          variable_key: string | null
+          variable_label: string
+        }
+        Insert: {
+          actual_range?: string | null
+          category?: Database["public"]["Enums"]["wps_variable_category"]
+          code_reference?: string | null
+          company_id: string
+          created_at?: string
+          group_name: string
+          id?: string
+          notes?: string | null
+          procedure_id: string
+          process_ref?: string | null
+          qualified_value?: string | null
+          sort_order?: number
+          transferable?: boolean | null
+          updated_at?: string
+          variable_key?: string | null
+          variable_label: string
+        }
+        Update: {
+          actual_range?: string | null
+          category?: Database["public"]["Enums"]["wps_variable_category"]
+          code_reference?: string | null
+          company_id?: string
+          created_at?: string
+          group_name?: string
+          id?: string
+          notes?: string | null
+          procedure_id?: string
+          process_ref?: string | null
+          qualified_value?: string | null
+          sort_order?: number
+          transferable?: boolean | null
+          updated_at?: string
+          variable_key?: string | null
+          variable_label?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -2094,6 +2151,10 @@ export type Database = {
         | "Released"
         | "Rejected"
         | "Blocked"
+      wps_variable_category:
+        | "essential"
+        | "non_essential"
+        | "supplementary_essential"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2273,6 +2334,11 @@ export const Constants = {
         "Released",
         "Rejected",
         "Blocked",
+      ],
+      wps_variable_category: [
+        "essential",
+        "non_essential",
+        "supplementary_essential",
       ],
     },
   },
