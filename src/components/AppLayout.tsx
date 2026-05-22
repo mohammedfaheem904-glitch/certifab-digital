@@ -269,6 +269,8 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+      <CommandPalette open={palette.open} onOpenChange={palette.setOpen} />
+      <WhatsNewSheet open={whatsNewOpen} onOpenChange={setWhatsNewOpen} />
     </div>
   );
 }
