@@ -325,10 +325,13 @@ function ProcedureDetailPage() {
               fillers: fillersQ.data ?? [],
               electrical: electricalQ.data ?? [],
               signatures: sigsQ.data ?? [],
+              variables: variablesQ.data ?? [],
               sketchUrls,
             }}
           />
         </TabsContent>
+
+
 
         <TabsContent value="joints" className="mt-4">
           <JointConfigList procedureId={procedureId} canEdit={isEditor} />
