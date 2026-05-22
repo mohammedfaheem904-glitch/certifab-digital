@@ -20,6 +20,7 @@ import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
 import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
 import { WpsGuidanceStrip } from "@/components/procedures/WpsGuidanceStrip";
 import { WpsVariablesMatrix } from "@/components/procedures/WpsVariablesMatrix";
+import { SpotlightTip } from "@/components/discovery/SpotlightTip";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
   component: ProcedureDetailPage,
