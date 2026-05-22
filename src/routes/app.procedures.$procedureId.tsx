@@ -314,7 +314,7 @@ function ProcedureDetailPage() {
           <TabsTrigger value="audit"><History className="size-4 me-1.5" /> Audit log</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="details" className="mt-4">
+        <TabsContent value="details" className="mt-4 print:hidden">
           <WpsDocument
             proc={proc}
             approvals={apprQ.data ?? []}
