@@ -11,7 +11,14 @@ export type WpsChildren = {
   fillers?: any[];
   electrical?: any[];
   signatures?: any[];
+  variables?: any[];
   sketchUrls?: Record<string, string>;
+};
+
+const CAT_LABEL: Record<string, string> = {
+  essential: "Essential",
+  non_essential: "Non-Essential",
+  supplementary_essential: "Supplementary Essential",
 };
 
 export type WpsDocumentProps = {
