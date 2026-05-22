@@ -25,7 +25,7 @@ import { PlanBadge } from "@/components/PlanBadge";
 import { usePlan } from "@/lib/use-plan";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { useI18n } from "@/lib/i18n";
-import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
