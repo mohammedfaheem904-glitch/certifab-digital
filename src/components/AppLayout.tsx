@@ -41,7 +41,12 @@ import { useAuth } from "@/lib/auth";
 import { seedDemoData } from "@/lib/seed";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CommandPalette, useCommandPalette } from "@/components/discovery/CommandPalette";
+import { WhatsNewSheet } from "@/components/discovery/WhatsNewSheet";
+import { NewPill } from "@/components/discovery/NewPill";
+import { unseenCount } from "@/lib/discovery";
+import type { Feature } from "@/lib/discovery";
 
 export function AppLayout() {
   const { t, lang, toggle } = useI18n();
