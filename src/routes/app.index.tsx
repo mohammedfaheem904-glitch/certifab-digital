@@ -35,6 +35,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { OperationalAlertStrip } from "@/components/dashboard/OperationalAlertStrip";
 import { WorkflowBottlenecks } from "@/components/dashboard/WorkflowBottlenecks";
 import { RecentActivityFeed } from "@/components/dashboard/RecentActivityFeed";
+import { SpotlightTip } from "@/components/discovery/SpotlightTip";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
