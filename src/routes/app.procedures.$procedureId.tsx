@@ -518,7 +518,17 @@ function ProcedureDetailPage() {
             </table>
           </div>
         </TabsContent>
+
+        <TabsContent value="positions" className="mt-4"><PositionsTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
+        {showGases && <TabsContent value="gases" className="mt-4"><ShieldingGasesTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>}
+        <TabsContent value="preheat" className="mt-4"><PreheatTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
+        <TabsContent value="pwht" className="mt-4"><PwhtTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
+        <TabsContent value="techniques" className="mt-4"><TechniquesTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
+        <TabsContent value="notes" className="mt-4"><NotesTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
       </Tabs>
+          </>
+        );
+      })()}
 
       {/* Print-only mirror — ensures the full WPS document prints from any tab */}
       <div className="hidden print:block">
