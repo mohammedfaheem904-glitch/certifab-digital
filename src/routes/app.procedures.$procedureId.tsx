@@ -20,6 +20,11 @@ import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
 import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
 import { WpsGuidanceStrip } from "@/components/procedures/WpsGuidanceStrip";
 import { WpsVariablesMatrix } from "@/components/procedures/WpsVariablesMatrix";
+import {
+  PositionsTable, PreheatTable, TechniquesTable,
+  ShieldingGasesTable, PwhtTable, NotesTable,
+} from "@/components/procedures/DynamicSectionTables";
+import { getApplicableSections, compatibilityWarnings, parseProcesses } from "@/lib/wps-rules";
 import { SpotlightTip } from "@/components/discovery/SpotlightTip";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
@@ -296,14 +301,32 @@ function ProcedureDetailPage() {
         }}
       />
 
-      <Tabs defaultValue="details">
+      {(() => {
+        const ctx = { process: proc.process, processes: parseProcesses(proc.process), standard: proc.standard, joint_type: proc.joint_type, pipe_or_plate: proc.pipe_or_plate, automation: proc.automation };
+        const warns = compatibilityWarnings(ctx);
+        const sections = getApplicableSections(ctx).map((s) => s.key);
+        const showGases = sections.includes("shielding_gases");
+        return (
+          <>
+            {warns.length > 0 && (
+              <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-300 space-y-1 print:hidden">
+                {warns.map((w, i) => <div key={i}>⚠ {w}</div>)}
+              </div>
+            )}
+            <Tabs defaultValue="details">
         <TabsList className="print:hidden flex-wrap h-auto">
           <TabsTrigger value="details"><FileText className="size-4 me-1.5" /> Details</TabsTrigger>
           <TabsTrigger value="joints"><Layers className="size-4 me-1.5" /> Joints</TabsTrigger>
+          <TabsTrigger value="positions"><Layers className="size-4 me-1.5" /> Positions</TabsTrigger>
           <TabsTrigger value="basemetals"><Boxes className="size-4 me-1.5" /> Base metals</TabsTrigger>
           <TabsTrigger value="fillers"><Wrench className="size-4 me-1.5" /> Fillers</TabsTrigger>
+          {showGases && <TabsTrigger value="gases"><Wrench className="size-4 me-1.5" /> Gases</TabsTrigger>}
           <TabsTrigger value="electrical"><Zap className="size-4 me-1.5" /> Electrical</TabsTrigger>
+          <TabsTrigger value="preheat"><Flame className="size-4 me-1.5" /> Preheat</TabsTrigger>
+          <TabsTrigger value="pwht"><Flame className="size-4 me-1.5" /> PWHT</TabsTrigger>
+          <TabsTrigger value="techniques"><Wrench className="size-4 me-1.5" /> Technique</TabsTrigger>
           <TabsTrigger value="variables"><Sparkles className="size-4 me-1.5" /> Variables</TabsTrigger>
+          <TabsTrigger value="notes"><FileText className="size-4 me-1.5" /> Notes</TabsTrigger>
           <TabsTrigger value="compliance"><Sparkles className="size-4 me-1.5" /> Compliance</TabsTrigger>
           <TabsTrigger value="heat"><Flame className="size-4 me-1.5" /> Heat input</TabsTrigger>
           <TabsTrigger value="revisions"><GitBranch className="size-4 me-1.5" /> Revisions ({revsQ.data?.length ?? 0})</TabsTrigger>
@@ -495,7 +518,17 @@ function ProcedureDetailPage() {
             </table>
           </div>
         </TabsContent>
+
+        <TabsContent value="positions" className="mt-4"><PositionsTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
+        {showGases && <TabsContent value="gases" className="mt-4"><ShieldingGasesTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>}
+        <TabsContent value="preheat" className="mt-4"><PreheatTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
+        <TabsContent value="pwht" className="mt-4"><PwhtTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
+        <TabsContent value="techniques" className="mt-4"><TechniquesTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
+        <TabsContent value="notes" className="mt-4"><NotesTable procedureId={procedureId} canEdit={isEditor} /></TabsContent>
       </Tabs>
+          </>
+        );
+      })()}
 
       {/* Print-only mirror — ensures the full WPS document prints from any tab */}
       <div className="hidden print:block">
