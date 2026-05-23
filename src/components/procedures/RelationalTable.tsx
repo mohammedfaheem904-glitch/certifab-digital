@@ -18,7 +18,17 @@ export type ColumnDef = {
 type Props = {
   title: string;
   description?: string;
-  table: "wps_base_metals" | "wps_filler_metals" | "wps_electrical_characteristics" | "wps_joint_configurations";
+  table:
+    | "wps_base_metals"
+    | "wps_filler_metals"
+    | "wps_electrical_characteristics"
+    | "wps_joint_configurations"
+    | "wps_positions"
+    | "wps_preheat_entries"
+    | "wps_techniques"
+    | "wps_shielding_gases"
+    | "wps_pwht"
+    | "wps_notes";
   procedureId: string;
   columns: ColumnDef[];
   emptyMessage?: string;
