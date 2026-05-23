@@ -1898,6 +1898,225 @@ export type Database = {
           },
         ]
       }
+      wps_notes: {
+        Row: {
+          body: string
+          category: string
+          company_id: string
+          created_at: string
+          id: string
+          procedure_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          category?: string
+          company_id: string
+          created_at?: string
+          id?: string
+          procedure_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          procedure_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wps_positions: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          position: string
+          procedure_id: string
+          progression: string | null
+          qualified_range: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          position: string
+          procedure_id: string
+          progression?: string | null
+          qualified_range?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          position?: string
+          procedure_id?: string
+          progression?: string | null
+          qualified_range?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wps_preheat_entries: {
+        Row: {
+          applicability: string | null
+          company_id: string
+          created_at: string
+          id: string
+          interpass_max_c: number | null
+          maintenance: string | null
+          notes: string | null
+          preheat_max_c: number | null
+          preheat_method: string | null
+          preheat_min_c: number | null
+          procedure_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          applicability?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          interpass_max_c?: number | null
+          maintenance?: string | null
+          notes?: string | null
+          preheat_max_c?: number | null
+          preheat_method?: string | null
+          preheat_min_c?: number | null
+          procedure_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          applicability?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          interpass_max_c?: number | null
+          maintenance?: string | null
+          notes?: string | null
+          preheat_max_c?: number | null
+          preheat_method?: string | null
+          preheat_min_c?: number | null
+          procedure_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wps_pwht: {
+        Row: {
+          applicability: string | null
+          atmosphere: string | null
+          company_id: string
+          cooling_rate: string | null
+          created_at: string
+          heating_rate: string | null
+          hold_time_min: number | null
+          id: string
+          notes: string | null
+          procedure_id: string
+          sort_order: number
+          temperature_c: number | null
+          updated_at: string
+        }
+        Insert: {
+          applicability?: string | null
+          atmosphere?: string | null
+          company_id: string
+          cooling_rate?: string | null
+          created_at?: string
+          heating_rate?: string | null
+          hold_time_min?: number | null
+          id?: string
+          notes?: string | null
+          procedure_id: string
+          sort_order?: number
+          temperature_c?: number | null
+          updated_at?: string
+        }
+        Update: {
+          applicability?: string | null
+          atmosphere?: string | null
+          company_id?: string
+          cooling_rate?: string | null
+          created_at?: string
+          heating_rate?: string | null
+          hold_time_min?: number | null
+          id?: string
+          notes?: string | null
+          procedure_id?: string
+          sort_order?: number
+          temperature_c?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wps_shielding_gases: {
+        Row: {
+          company_id: string
+          composition: string | null
+          created_at: string
+          flow_rate_lpm: number | null
+          gas_type: string | null
+          id: string
+          notes: string | null
+          procedure_id: string
+          process: string | null
+          purge_flow_lpm: number | null
+          purge_gas: string | null
+          sort_order: number
+          trailing_gas: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          composition?: string | null
+          created_at?: string
+          flow_rate_lpm?: number | null
+          gas_type?: string | null
+          id?: string
+          notes?: string | null
+          procedure_id: string
+          process?: string | null
+          purge_flow_lpm?: number | null
+          purge_gas?: string | null
+          sort_order?: number
+          trailing_gas?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          composition?: string | null
+          created_at?: string
+          flow_rate_lpm?: number | null
+          gas_type?: string | null
+          id?: string
+          notes?: string | null
+          procedure_id?: string
+          process?: string | null
+          purge_flow_lpm?: number | null
+          purge_gas?: string | null
+          sort_order?: number
+          trailing_gas?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       wps_signatures: {
         Row: {
           actor_id: string | null
@@ -1938,6 +2157,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      wps_techniques: {
+        Row: {
+          automation: string | null
+          back_gouging: string | null
+          cleaning_method: string | null
+          company_id: string
+          created_at: string
+          electrode_mode: string | null
+          id: string
+          multi_or_single_pass: string | null
+          notes: string | null
+          oscillation: string | null
+          pass_type: string | null
+          peening: string | null
+          procedure_id: string
+          process: string | null
+          sort_order: number
+          string_or_weave: string | null
+          updated_at: string
+        }
+        Insert: {
+          automation?: string | null
+          back_gouging?: string | null
+          cleaning_method?: string | null
+          company_id: string
+          created_at?: string
+          electrode_mode?: string | null
+          id?: string
+          multi_or_single_pass?: string | null
+          notes?: string | null
+          oscillation?: string | null
+          pass_type?: string | null
+          peening?: string | null
+          procedure_id: string
+          process?: string | null
+          sort_order?: number
+          string_or_weave?: string | null
+          updated_at?: string
+        }
+        Update: {
+          automation?: string | null
+          back_gouging?: string | null
+          cleaning_method?: string | null
+          company_id?: string
+          created_at?: string
+          electrode_mode?: string | null
+          id?: string
+          multi_or_single_pass?: string | null
+          notes?: string | null
+          oscillation?: string | null
+          pass_type?: string | null
+          peening?: string | null
+          procedure_id?: string
+          process?: string | null
+          sort_order?: number
+          string_or_weave?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       wps_variables: {
         Row: {
