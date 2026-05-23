@@ -20,6 +20,11 @@ import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
 import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
 import { WpsGuidanceStrip } from "@/components/procedures/WpsGuidanceStrip";
 import { WpsVariablesMatrix } from "@/components/procedures/WpsVariablesMatrix";
+import {
+  PositionsTable, PreheatTable, TechniquesTable,
+  ShieldingGasesTable, PwhtTable, NotesTable,
+} from "@/components/procedures/DynamicSectionTables";
+import { getApplicableSections, compatibilityWarnings, parseProcesses } from "@/lib/wps-rules";
 import { SpotlightTip } from "@/components/discovery/SpotlightTip";
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
