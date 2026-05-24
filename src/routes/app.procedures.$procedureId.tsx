@@ -341,6 +341,21 @@ function ProcedureDetailPage() {
           <TabsTrigger value="audit"><History className="size-4 me-1.5" /> Audit log</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="builder" className="mt-4 print:hidden">
+          <WpsBuilderWorkspace
+            procedureId={procedureId}
+            canEdit={isEditor}
+            bundle={{
+              wps: proc,
+              joints: jointsQ.data ?? [],
+              baseMetals: baseMetalsQ.data ?? [],
+              fillers: fillersQ.data ?? [],
+              electrical: electricalQ.data ?? [],
+              signatures: sigsQ.data ?? [],
+            }}
+          />
+        </TabsContent>
+
         <TabsContent value="details" className="mt-4 print:hidden">
           <WpsDocument
             proc={proc}
