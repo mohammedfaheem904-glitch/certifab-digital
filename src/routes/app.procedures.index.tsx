@@ -84,6 +84,29 @@ function ProceduresPage() {
       title="Welding Procedures (WPS / pWPS / PQR)"
       subtitle="Create, revise and approve welding procedure specifications across ASME, EN ISO, AWS, AS/NZS and JIS."
       action={
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => nav({ to: "/app/procedures/dashboard" })}>
+            <BarChart3 className="size-4 me-1.5" /> Dashboard
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Download className="size-4 me-1.5" /> Bulk Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => { bulkExportProceduresCsv(filtered, "wps-export"); toast.success("CSV exported"); }}>
+                Export visible to CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={async () => { await bulkExportProceduresXlsx(filtered, "wps-export"); toast.success("Excel exported"); }}>
+                Export visible to Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { bulkExportProceduresCsv(data ?? [], "wps-all"); toast.success("CSV exported"); }}>
+                Export all to CSV
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         <NewRecordDialog
           table="procedures"
           quota="procedures"
