@@ -39,7 +39,7 @@ type Row = {
   status: string;
 };
 
-export const Route = createFileRoute("/app/procedures")({
+export const Route = createFileRoute("/app/procedures/")({
   component: ProceduresPage,
 });
 

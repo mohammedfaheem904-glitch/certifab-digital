@@ -28,7 +28,6 @@ import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
 import { Route as AppProjectsRouteImport } from './routes/app.projects'
-import { Route as AppProceduresRouteImport } from './routes/app.procedures'
 import { Route as AppNcrsRouteImport } from './routes/app.ncrs'
 import { Route as AppInstrumentsRouteImport } from './routes/app.instruments'
 import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
@@ -37,6 +36,7 @@ import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
+import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
 import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
 import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qualification.$token'
@@ -147,11 +147,6 @@ const AppProjectsRoute = AppProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AppRoute,
 } as any)
-const AppProceduresRoute = AppProceduresRouteImport.update({
-  id: '/procedures',
-  path: '/procedures',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppNcrsRoute = AppNcrsRouteImport.update({
   id: '/ncrs',
   path: '/ncrs',
@@ -191,6 +186,11 @@ const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppQualificationsRoute,
+} as any)
+const AppProceduresIndexRoute = AppProceduresIndexRouteImport.update({
+  id: '/procedures/',
+  path: '/procedures/',
+  getParentRoute: () => AppRoute,
 } as any)
 const VerifyWpsTokenRoute = VerifyWpsTokenRouteImport.update({
   id: '/verify/wps/$token',
@@ -246,9 +246,9 @@ const AppQualificationsQualIdRoute = AppQualificationsQualIdRouteImport.update({
 } as any)
 const AppProceduresProcedureIdRoute =
   AppProceduresProcedureIdRouteImport.update({
-    id: '/$procedureId',
-    path: '/$procedureId',
-    getParentRoute: () => AppProceduresRoute,
+    id: '/procedures/$procedureId',
+    path: '/procedures/$procedureId',
+    getParentRoute: () => AppRoute,
   } as any)
 const AppNcrsNcrIdRoute = AppNcrsNcrIdRouteImport.update({
   id: '/$ncrId',
@@ -287,7 +287,6 @@ export interface FileRoutesByFullPath {
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
-  '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
@@ -309,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -330,7 +330,6 @@ export interface FileRoutesByTo {
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
-  '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
@@ -351,6 +350,7 @@ export interface FileRoutesByTo {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/procedures': typeof AppProceduresIndexRoute
   '/app/qualifications': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesById {
@@ -374,7 +374,6 @@ export interface FileRoutesById {
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
-  '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/qualifications': typeof AppQualificationsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
@@ -396,6 +395,7 @@ export interface FileRoutesById {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRouteTypes {
@@ -420,7 +420,6 @@ export interface FileRouteTypes {
     | '/app/inspections'
     | '/app/instruments'
     | '/app/ncrs'
-    | '/app/procedures'
     | '/app/projects'
     | '/app/qualifications'
     | '/app/reports'
@@ -442,6 +441,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/procedures/'
     | '/app/qualifications/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -463,7 +463,6 @@ export interface FileRouteTypes {
     | '/app/inspections'
     | '/app/instruments'
     | '/app/ncrs'
-    | '/app/procedures'
     | '/app/projects'
     | '/app/reports'
     | '/app/settings'
@@ -484,6 +483,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/procedures'
     | '/app/qualifications'
   id:
     | '__root__'
@@ -506,7 +506,6 @@ export interface FileRouteTypes {
     | '/app/inspections'
     | '/app/instruments'
     | '/app/ncrs'
-    | '/app/procedures'
     | '/app/projects'
     | '/app/qualifications'
     | '/app/reports'
@@ -528,6 +527,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/procedures/'
     | '/app/qualifications/'
   fileRoutesById: FileRoutesById
 }
@@ -685,13 +685,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProjectsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/procedures': {
-      id: '/app/procedures'
-      path: '/procedures'
-      fullPath: '/app/procedures'
-      preLoaderRoute: typeof AppProceduresRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/ncrs': {
       id: '/app/ncrs'
       path: '/ncrs'
@@ -747,6 +740,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/qualifications/'
       preLoaderRoute: typeof AppQualificationsIndexRouteImport
       parentRoute: typeof AppQualificationsRoute
+    }
+    '/app/procedures/': {
+      id: '/app/procedures/'
+      path: '/procedures'
+      fullPath: '/app/procedures/'
+      preLoaderRoute: typeof AppProceduresIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/verify/wps/$token': {
       id: '/verify/wps/$token'
@@ -820,10 +820,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/procedures/$procedureId': {
       id: '/app/procedures/$procedureId'
-      path: '/$procedureId'
+      path: '/procedures/$procedureId'
       fullPath: '/app/procedures/$procedureId'
       preLoaderRoute: typeof AppProceduresProcedureIdRouteImport
-      parentRoute: typeof AppProceduresRoute
+      parentRoute: typeof AppRoute
     }
     '/app/ncrs/$ncrId': {
       id: '/app/ncrs/$ncrId'
@@ -884,18 +884,6 @@ const AppNcrsRouteChildren: AppNcrsRouteChildren = {
 const AppNcrsRouteWithChildren =
   AppNcrsRoute._addFileChildren(AppNcrsRouteChildren)
 
-interface AppProceduresRouteChildren {
-  AppProceduresProcedureIdRoute: typeof AppProceduresProcedureIdRoute
-}
-
-const AppProceduresRouteChildren: AppProceduresRouteChildren = {
-  AppProceduresProcedureIdRoute: AppProceduresProcedureIdRoute,
-}
-
-const AppProceduresRouteWithChildren = AppProceduresRoute._addFileChildren(
-  AppProceduresRouteChildren,
-)
-
 interface AppQualificationsRouteChildren {
   AppQualificationsQualIdRoute: typeof AppQualificationsQualIdRoute
   AppQualificationsDashboardRoute: typeof AppQualificationsDashboardRoute
@@ -947,7 +935,6 @@ interface AppRouteChildren {
   AppInspectionsRoute: typeof AppInspectionsRoute
   AppInstrumentsRoute: typeof AppInstrumentsRouteWithChildren
   AppNcrsRoute: typeof AppNcrsRouteWithChildren
-  AppProceduresRoute: typeof AppProceduresRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRoute
   AppQualificationsRoute: typeof AppQualificationsRouteWithChildren
   AppReportsRoute: typeof AppReportsRouteWithChildren
@@ -955,6 +942,8 @@ interface AppRouteChildren {
   AppTeamRoute: typeof AppTeamRoute
   AppWeldsRoute: typeof AppWeldsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
+  AppProceduresProcedureIdRoute: typeof AppProceduresProcedureIdRoute
+  AppProceduresIndexRoute: typeof AppProceduresIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -965,7 +954,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppInspectionsRoute: AppInspectionsRoute,
   AppInstrumentsRoute: AppInstrumentsRouteWithChildren,
   AppNcrsRoute: AppNcrsRouteWithChildren,
-  AppProceduresRoute: AppProceduresRouteWithChildren,
   AppProjectsRoute: AppProjectsRoute,
   AppQualificationsRoute: AppQualificationsRouteWithChildren,
   AppReportsRoute: AppReportsRouteWithChildren,
@@ -973,6 +961,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppTeamRoute: AppTeamRoute,
   AppWeldsRoute: AppWeldsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
+  AppProceduresProcedureIdRoute: AppProceduresProcedureIdRoute,
+  AppProceduresIndexRoute: AppProceduresIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
