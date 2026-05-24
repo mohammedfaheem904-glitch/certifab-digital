@@ -16,6 +16,7 @@ import { BaseMetalsTable } from "@/components/procedures/BaseMetalsTable";
 import { FillerMetalsTable } from "@/components/procedures/FillerMetalsTable";
 import { ElectricalCharacteristicsTable } from "@/components/procedures/ElectricalCharacteristicsTable";
 import { WpsCompliancePanel } from "@/components/procedures/WpsCompliancePanel";
+import { WpsIntelligencePanel } from "@/components/procedures/WpsIntelligencePanel";
 import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
 import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
 import { WpsGuidanceStrip } from "@/components/procedures/WpsGuidanceStrip";
@@ -327,6 +328,7 @@ function ProcedureDetailPage() {
           <TabsTrigger value="techniques"><Wrench className="size-4 me-1.5" /> Technique</TabsTrigger>
           <TabsTrigger value="variables"><Sparkles className="size-4 me-1.5" /> Variables</TabsTrigger>
           <TabsTrigger value="notes"><FileText className="size-4 me-1.5" /> Notes</TabsTrigger>
+          <TabsTrigger value="intelligence"><Sparkles className="size-4 me-1.5" /> Intelligence</TabsTrigger>
           <TabsTrigger value="compliance"><Sparkles className="size-4 me-1.5" /> Compliance</TabsTrigger>
           <TabsTrigger value="heat"><Flame className="size-4 me-1.5" /> Heat input</TabsTrigger>
           <TabsTrigger value="revisions"><GitBranch className="size-4 me-1.5" /> Revisions ({revsQ.data?.length ?? 0})</TabsTrigger>
@@ -376,6 +378,10 @@ function ProcedureDetailPage() {
           <WpsVariablesMatrix procedureId={procedureId} canEdit={isEditor} process={proc.process} />
         </TabsContent>
 
+
+        <TabsContent value="intelligence" className="mt-4">
+          <WpsIntelligencePanel proc={proc} />
+        </TabsContent>
 
         <TabsContent value="compliance" className="mt-4">
           <WpsCompliancePanel proc={proc} />
