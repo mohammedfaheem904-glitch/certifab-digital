@@ -48,6 +48,7 @@ import { Route as AppQualificationsTrashRouteImport } from './routes/app.qualifi
 import { Route as AppQualificationsNewRouteImport } from './routes/app.qualifications.new'
 import { Route as AppQualificationsDashboardRouteImport } from './routes/app.qualifications.dashboard'
 import { Route as AppQualificationsQualIdRouteImport } from './routes/app.qualifications.$qualId'
+import { Route as AppProceduresDashboardRouteImport } from './routes/app.procedures.dashboard'
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
@@ -250,6 +251,11 @@ const AppQualificationsQualIdRoute = AppQualificationsQualIdRouteImport.update({
   path: '/$qualId',
   getParentRoute: () => AppQualificationsRoute,
 } as any)
+const AppProceduresDashboardRoute = AppProceduresDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppProceduresRoute,
+} as any)
 const AppProceduresProcedureIdRoute =
   AppProceduresProcedureIdRouteImport.update({
     id: '/$procedureId',
@@ -305,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -347,6 +354,7 @@ export interface FileRoutesByTo {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -393,6 +401,7 @@ export interface FileRoutesById {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
+  '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -440,6 +449,7 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
+    | '/app/procedures/dashboard'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -482,6 +492,7 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
+    | '/app/procedures/dashboard'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -527,6 +538,7 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
+    | '/app/procedures/dashboard'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -835,6 +847,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppQualificationsQualIdRouteImport
       parentRoute: typeof AppQualificationsRoute
     }
+    '/app/procedures/dashboard': {
+      id: '/app/procedures/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/procedures/dashboard'
+      preLoaderRoute: typeof AppProceduresDashboardRouteImport
+      parentRoute: typeof AppProceduresRoute
+    }
     '/app/procedures/$procedureId': {
       id: '/app/procedures/$procedureId'
       path: '/$procedureId'
@@ -903,11 +922,13 @@ const AppNcrsRouteWithChildren =
 
 interface AppProceduresRouteChildren {
   AppProceduresProcedureIdRoute: typeof AppProceduresProcedureIdRoute
+  AppProceduresDashboardRoute: typeof AppProceduresDashboardRoute
   AppProceduresIndexRoute: typeof AppProceduresIndexRoute
 }
 
 const AppProceduresRouteChildren: AppProceduresRouteChildren = {
   AppProceduresProcedureIdRoute: AppProceduresProcedureIdRoute,
+  AppProceduresDashboardRoute: AppProceduresDashboardRoute,
   AppProceduresIndexRoute: AppProceduresIndexRoute,
 }
 
