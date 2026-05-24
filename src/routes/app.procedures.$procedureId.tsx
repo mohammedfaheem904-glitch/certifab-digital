@@ -315,8 +315,9 @@ function ProcedureDetailPage() {
                 {warns.map((w, i) => <div key={i}>⚠ {w}</div>)}
               </div>
             )}
-            <Tabs defaultValue="details">
+            <Tabs defaultValue="builder">
         <TabsList className="print:hidden flex-wrap h-auto">
+          <TabsTrigger value="builder"><Sparkles className="size-4 me-1.5" /> Builder</TabsTrigger>
           <TabsTrigger value="details"><FileText className="size-4 me-1.5" /> Details</TabsTrigger>
           <TabsTrigger value="joints"><Layers className="size-4 me-1.5" /> Joints</TabsTrigger>
           <TabsTrigger value="positions"><Layers className="size-4 me-1.5" /> Positions</TabsTrigger>
