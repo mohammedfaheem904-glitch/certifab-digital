@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Download, Filter, Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 
 export function ModulePage({
   title,
@@ -35,15 +34,6 @@ export function ModulePage({
       </div>
 
       <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="p-4 border-b border-border flex flex-wrap items-center gap-2">
-          <div className="flex-1 min-w-60 relative">
-            <Search className="size-4 absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search..." className="ps-9 bg-background/60 h-9" />
-          </div>
-          <Button variant="outline" size="sm">
-            <Filter className="size-4 me-1" /> Filters
-          </Button>
-        </div>
         {children}
       </div>
     </div>
