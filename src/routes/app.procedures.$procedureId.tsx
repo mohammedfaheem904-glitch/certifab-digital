@@ -255,10 +255,9 @@ function ProcedureDetailPage() {
             {proc.standard} · {proc.process} · {proc.revision}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => window.print()}>
-            <Printer className="size-4 me-1" /> Print / PDF
-          </Button>
+        <div className="flex flex-wrap gap-2 items-center">
+          <PrintModeMenu />
+
           {isEditor && (
             <Button variant="outline" size="sm" onClick={newRevision}>
               <GitBranch className="size-4 me-1" /> New revision
