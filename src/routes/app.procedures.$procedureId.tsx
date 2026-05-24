@@ -28,6 +28,38 @@ import {
 } from "@/components/procedures/DynamicSectionTables";
 import { getApplicableSections, compatibilityWarnings, parseProcesses } from "@/lib/wps-rules";
 import { SpotlightTip } from "@/components/discovery/SpotlightTip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { PRINT_MODES, type WpsPrintMode } from "@/lib/wps-export";
+
+function PrintModeMenu() {
+  const print = (mode: WpsPrintMode) => {
+    document.body.setAttribute("data-wps-print-mode", mode);
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => document.body.removeAttribute("data-wps-print-mode"), 1000);
+    }, 50);
+  };
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">
+          <Printer className="size-4 me-1" /> Print / PDF
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72">
+        <DropdownMenuLabel className="text-xs">Choose print mode</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {PRINT_MODES.map((m) => (
+          <DropdownMenuItem key={m.id} onClick={() => print(m.id)} className="flex-col items-start gap-0.5 py-2">
+            <div className="text-sm font-medium">{m.label}</div>
+            <div className="text-[11px] text-muted-foreground leading-snug">{m.description}</div>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 
 export const Route = createFileRoute("/app/procedures/$procedureId")({
   component: ProcedureDetailPage,
@@ -255,10 +287,9 @@ function ProcedureDetailPage() {
             {proc.standard} · {proc.process} · {proc.revision}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => window.print()}>
-            <Printer className="size-4 me-1" /> Print / PDF
-          </Button>
+        <div className="flex flex-wrap gap-2 items-center">
+          <PrintModeMenu />
+
           {isEditor && (
             <Button variant="outline" size="sm" onClick={newRevision}>
               <GitBranch className="size-4 me-1" /> New revision

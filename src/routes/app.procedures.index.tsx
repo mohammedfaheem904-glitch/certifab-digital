@@ -6,7 +6,10 @@ import { useCompanyRows } from "@/lib/use-company-rows";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronRight, Eye, Trash2 } from "lucide-react";
+import { Loader2, ChevronRight, Eye, Trash2, BarChart3, Download } from "lucide-react";
+import { bulkExportProceduresCsv, bulkExportProceduresXlsx } from "@/lib/wps-export";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -81,6 +84,29 @@ function ProceduresPage() {
       title="Welding Procedures (WPS / pWPS / PQR)"
       subtitle="Create, revise and approve welding procedure specifications across ASME, EN ISO, AWS, AS/NZS and JIS."
       action={
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => nav({ to: "/app/procedures/dashboard" })}>
+            <BarChart3 className="size-4 me-1.5" /> Dashboard
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Download className="size-4 me-1.5" /> Bulk Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => { bulkExportProceduresCsv(filtered, "wps-export"); toast.success("CSV exported"); }}>
+                Export visible to CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={async () => { await bulkExportProceduresXlsx(filtered, "wps-export"); toast.success("Excel exported"); }}>
+                Export visible to Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { bulkExportProceduresCsv(data ?? [], "wps-all"); toast.success("CSV exported"); }}>
+                Export all to CSV
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         <NewRecordDialog
           table="procedures"
           quota="procedures"
@@ -109,7 +135,9 @@ function ProceduresPage() {
             </div>
           )}
         </NewRecordDialog>
+        </div>
       }
+
     >
       <div className="p-3 border-b border-border">
         <Input placeholder="Search by code, standard, process, status…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm bg-background/60" />

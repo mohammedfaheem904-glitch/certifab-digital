@@ -308,3 +308,28 @@
   vertical-align: top;
   font-size: 12px;
 }
+
+/* WPS print mode watermarks (Phase 5B) */
+@media print {
+  body[data-wps-print-mode="review"] .doc-sheet::before,
+  body[data-wps-print-mode="approval"] .doc-sheet::before {
+    content: attr(data-watermark);
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    font-weight: 700;
+    color: rgba(220, 38, 38, 0.12);
+    transform: rotate(-30deg);
+    pointer-events: none;
+    z-index: 9999;
+    letter-spacing: 0.1em;
+  }
+  body[data-wps-print-mode="review"] .doc-sheet { position: relative; }
+  body[data-wps-print-mode="review"] .doc-sheet::before { content: "FOR REVIEW"; }
+  body[data-wps-print-mode="approval"] .doc-sheet::before { content: "APPROVAL COPY"; }
+  body[data-wps-print-mode="client"] .doc-sheet::before { content: "CLIENT COPY"; color: rgba(15, 118, 110, 0.10); position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 120px; font-weight: 700; transform: rotate(-30deg); pointer-events: none; z-index: 9999; }
+  body[data-wps-print-mode="shop_floor"] .doc-sheet { font-size: 13pt !important; }
+}
