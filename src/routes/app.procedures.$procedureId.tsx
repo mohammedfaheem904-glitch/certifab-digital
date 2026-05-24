@@ -21,6 +21,7 @@ import { WpsSignatureBlock } from "@/components/procedures/WpsSignatureBlock";
 import { WpsRevisionCompare } from "@/components/procedures/WpsRevisionCompare";
 import { WpsGuidanceStrip } from "@/components/procedures/WpsGuidanceStrip";
 import { WpsVariablesMatrix } from "@/components/procedures/WpsVariablesMatrix";
+import { WpsBuilderWorkspace } from "@/components/procedures/WpsBuilderWorkspace";
 import {
   PositionsTable, PreheatTable, TechniquesTable,
   ShieldingGasesTable, PwhtTable, NotesTable,
@@ -314,8 +315,9 @@ function ProcedureDetailPage() {
                 {warns.map((w, i) => <div key={i}>⚠ {w}</div>)}
               </div>
             )}
-            <Tabs defaultValue="details">
+            <Tabs defaultValue="builder">
         <TabsList className="print:hidden flex-wrap h-auto">
+          <TabsTrigger value="builder"><Sparkles className="size-4 me-1.5" /> Builder</TabsTrigger>
           <TabsTrigger value="details"><FileText className="size-4 me-1.5" /> Details</TabsTrigger>
           <TabsTrigger value="joints"><Layers className="size-4 me-1.5" /> Joints</TabsTrigger>
           <TabsTrigger value="positions"><Layers className="size-4 me-1.5" /> Positions</TabsTrigger>
@@ -338,6 +340,21 @@ function ProcedureDetailPage() {
           <TabsTrigger value="approvals"><ShieldCheck className="size-4 me-1.5" /> Approvals ({apprQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="audit"><History className="size-4 me-1.5" /> Audit log</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="builder" className="mt-4 print:hidden">
+          <WpsBuilderWorkspace
+            procedureId={procedureId}
+            canEdit={isEditor}
+            bundle={{
+              wps: proc,
+              joints: jointsQ.data ?? [],
+              baseMetals: baseMetalsQ.data ?? [],
+              fillers: fillersQ.data ?? [],
+              electrical: electricalQ.data ?? [],
+              signatures: sigsQ.data ?? [],
+            }}
+          />
+        </TabsContent>
 
         <TabsContent value="details" className="mt-4 print:hidden">
           <WpsDocument
