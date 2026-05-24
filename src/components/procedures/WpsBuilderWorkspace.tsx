@@ -86,7 +86,7 @@ export function WpsBuilderWorkspace({ procedureId, canEdit, bundle }: Props) {
         overall={overall}
         readiness={readiness}
         canEdit={canEdit}
-        onDuplicate={() => duplicateProcedure(proc, profile?.company_id, user?.id, nav)}
+        onDuplicate={() => duplicateProcedure(proc, profile?.company_id ?? undefined, user?.id, nav)}
       />
 
       <div className="grid grid-cols-12 gap-4">
