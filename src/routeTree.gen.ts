@@ -37,6 +37,7 @@ import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
+import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
 import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
 import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qualification.$token'
@@ -192,6 +193,11 @@ const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppQualificationsRoute,
 } as any)
+const AppProceduresIndexRoute = AppProceduresIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppProceduresRoute,
+} as any)
 const VerifyWpsTokenRoute = VerifyWpsTokenRouteImport.update({
   id: '/verify/wps/$token',
   path: '/verify/wps/$token',
@@ -309,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -330,7 +337,6 @@ export interface FileRoutesByTo {
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
-  '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
@@ -351,6 +357,7 @@ export interface FileRoutesByTo {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/procedures': typeof AppProceduresIndexRoute
   '/app/qualifications': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesById {
@@ -396,6 +403,7 @@ export interface FileRoutesById {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRouteTypes {
@@ -442,6 +450,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/procedures/'
     | '/app/qualifications/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -463,7 +472,6 @@ export interface FileRouteTypes {
     | '/app/inspections'
     | '/app/instruments'
     | '/app/ncrs'
-    | '/app/procedures'
     | '/app/projects'
     | '/app/reports'
     | '/app/settings'
@@ -484,6 +492,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/procedures'
     | '/app/qualifications'
   id:
     | '__root__'
@@ -528,6 +537,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/procedures/'
     | '/app/qualifications/'
   fileRoutesById: FileRoutesById
 }
@@ -748,6 +758,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppQualificationsIndexRouteImport
       parentRoute: typeof AppQualificationsRoute
     }
+    '/app/procedures/': {
+      id: '/app/procedures/'
+      path: '/'
+      fullPath: '/app/procedures/'
+      preLoaderRoute: typeof AppProceduresIndexRouteImport
+      parentRoute: typeof AppProceduresRoute
+    }
     '/verify/wps/$token': {
       id: '/verify/wps/$token'
       path: '/verify/wps/$token'
@@ -886,10 +903,12 @@ const AppNcrsRouteWithChildren =
 
 interface AppProceduresRouteChildren {
   AppProceduresProcedureIdRoute: typeof AppProceduresProcedureIdRoute
+  AppProceduresIndexRoute: typeof AppProceduresIndexRoute
 }
 
 const AppProceduresRouteChildren: AppProceduresRouteChildren = {
   AppProceduresProcedureIdRoute: AppProceduresProcedureIdRoute,
+  AppProceduresIndexRoute: AppProceduresIndexRoute,
 }
 
 const AppProceduresRouteWithChildren = AppProceduresRoute._addFileChildren(
@@ -998,13 +1017,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
