@@ -135,7 +135,9 @@ function ProceduresPage() {
             </div>
           )}
         </NewRecordDialog>
+        </div>
       }
+
     >
       <div className="p-3 border-b border-border">
         <Input placeholder="Search by code, standard, process, status…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm bg-background/60" />
