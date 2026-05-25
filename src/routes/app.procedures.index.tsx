@@ -82,7 +82,7 @@ function ProceduresPage() {
     <TooltipProvider delayDuration={200}>
     <ModulePage
       title="Procedures"
-      subtitle="Create, revise and approve welding procedure specifications across ASME, EN ISO, AWS, AS/NZS and JIS."
+      subtitle="Create, revise and approve ( P WPS - PQR - WPS ) across ASME, EN ISO, AWS, AS/NZS and JIS."
       action={
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => nav({ to: "/app/procedures/dashboard" })}>
