@@ -18,7 +18,7 @@ export const Route = createFileRoute("/modules")({
 
 const MODULES = [
   { icon: FolderOpen, n: "Projects", d: "Multi-project workspace with client, location and scope." },
-  { icon: FileText, n: "Procedures (WPS / PQR)", d: "Versioned procedure register with approval, lock, attachments and PDF export." },
+  { icon: FileText, n: "Procedures", d: "Versioned procedure register with approval, lock, attachments and PDF export." },
   { icon: ClipboardCheck, n: "Welder Qualifications", d: "WPQ register, scope of approval, continuity, expiry alerts." },
   { icon: Activity, n: "Weld Traceability", d: "Joint log with QR token, heat numbers, filler metals, drawing/spool/line." },
   { icon: ShieldCheck, n: "Inspections (NDT)", d: "VT, RT, UT, PT, MT outcomes with inspector and signed-off evidence." },
