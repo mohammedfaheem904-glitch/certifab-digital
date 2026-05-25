@@ -7,7 +7,7 @@ const dict = {
     appName: "Weld Yard",
     tagline: "Digital Welding Management System",
     dashboard: "Dashboard",
-    procedures: "Procedures (WPS)",
+    procedures: "Procedures",
     qualifications: "Qualifications",
     welds: "Weld Log",
     inspections: "Inspections",
