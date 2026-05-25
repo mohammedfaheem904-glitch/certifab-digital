@@ -22,7 +22,7 @@ export async function seedDemoData(companyId: string) {
   const { data: ins } = await supabase.from("projects").insert(projects).select("id, code");
   const byCode = Object.fromEntries((ins ?? []).map((p) => [p.code, p.id as string]));
 
-  // ----- Procedures (WPS) -----
+  // ----- Procedures -----
   const procs = [
     { code: "WPS-SAW-014", standard: "ASME IX", process: "SAW", thickness_range: "8–40 mm", revision: "Rev 3", status: "Approved" as const, base_material: "ASTM A106 Gr B", filler_material: "F7A2-EM12K", joint_type: "Butt", position: "1G", heat_input_min: 1.0, heat_input_max: 2.5 },
     { code: "WPS-GTAW-008", standard: "EN ISO 15614-1", process: "GTAW", thickness_range: "1.5–12 mm", revision: "Rev 2", status: "Approved" as const, base_material: "ASTM A312 TP316L", filler_material: "ER316L", joint_type: "Butt", position: "6G", heat_input_min: 0.6, heat_input_max: 1.8 },
