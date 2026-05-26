@@ -51,6 +51,7 @@ export const Route = createFileRoute("/app/procedures/")({
 function ProceduresPage() {
   const { data, isLoading } = useCompanyRows<Row>("procedures", { order: { column: "created_at" } });
   const [q, setQ] = useState("");
+  const [tab, setTab] = useState<"all" | "qualified" | "legacy">("all");
   const nav = useNavigate();
   const qc = useQueryClient();
   const { roles } = useAuth();
@@ -59,10 +60,16 @@ function ProceduresPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const filtered = (data ?? []).filter((p) => {
+  const all = data ?? [];
+  const qualifiedAll = all.filter((p) => !!p.pqr_id);
+  const legacyAll = all.filter((p) => !p.pqr_id);
+  const pendingApproval = qualifiedAll.filter((p) => p.status === "Draft").length;
+
+  const scoped = tab === "qualified" ? qualifiedAll : tab === "legacy" ? legacyAll : all;
+  const filtered = scoped.filter((p) => {
     if (!q.trim()) return true;
     const s = q.toLowerCase();
-    return [p.code, p.standard, p.process, p.revision, p.status]
+    return [p.code, p.standard, p.process, p.revision, p.status, p.pqr_no]
       .filter(Boolean).some((x) => String(x).toLowerCase().includes(s));
   });
 
