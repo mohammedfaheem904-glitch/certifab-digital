@@ -1,7 +1,7 @@
 /**
  * Helpers for promoting a Passed PQR (+ its linked pWPS) into a Draft WPS
  * row in the `procedures` table. Pure functions only — DB calls happen in
- * `pqr-promotion.client.ts`.
+ * `pqr-promotion-runtime.ts`.
  */
 
 export type RangeShape = {

@@ -147,7 +147,7 @@ function PwpsDetailPage() {
         return toast.error("No Passed PQR linked to this pWPS. Pass a PQR first.");
       }
       try {
-        const { promotePqrToWps } = await import("@/lib/pqr-promotion.client");
+        const { promotePqrToWps } = await import("@/lib/pqr-promotion-runtime");
         const { procedureId } = await promotePqrToWps(pqrRow.id);
         toast.success("Promoted — opening new WPS draft");
         qc.invalidateQueries({ queryKey: ["pwps", pwpsId] });

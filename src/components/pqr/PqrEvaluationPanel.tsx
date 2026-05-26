@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { promotePqrToWps } from "@/lib/pqr-promotion.client";
+import { promotePqrToWps } from "@/lib/pqr-promotion-runtime";
 import type { EvaluationResult } from "@/lib/pqr-evaluation";
 
 const ICON: Record<string, any> = {
