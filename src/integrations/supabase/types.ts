@@ -445,6 +445,84 @@ export type Database = {
         }
         Relationships: []
       }
+      mechanical_tests: {
+        Row: {
+          attachment_path: string | null
+          company_id: string
+          coupon_id: string | null
+          created_at: string
+          created_by: string | null
+          dimensions: Json | null
+          id: string
+          laboratory: string | null
+          minimum_requirement: string | null
+          pqr_id: string | null
+          remarks: string | null
+          report_number: string | null
+          result: Database["public"]["Enums"]["test_result"]
+          results: Json | null
+          specimen_id: string | null
+          test_date: string | null
+          test_type: Database["public"]["Enums"]["mechanical_test_type"]
+          updated_at: string
+        }
+        Insert: {
+          attachment_path?: string | null
+          company_id: string
+          coupon_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          dimensions?: Json | null
+          id?: string
+          laboratory?: string | null
+          minimum_requirement?: string | null
+          pqr_id?: string | null
+          remarks?: string | null
+          report_number?: string | null
+          result?: Database["public"]["Enums"]["test_result"]
+          results?: Json | null
+          specimen_id?: string | null
+          test_date?: string | null
+          test_type: Database["public"]["Enums"]["mechanical_test_type"]
+          updated_at?: string
+        }
+        Update: {
+          attachment_path?: string | null
+          company_id?: string
+          coupon_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          dimensions?: Json | null
+          id?: string
+          laboratory?: string | null
+          minimum_requirement?: string | null
+          pqr_id?: string | null
+          remarks?: string | null
+          report_number?: string | null
+          result?: Database["public"]["Enums"]["test_result"]
+          results?: Json | null
+          specimen_id?: string | null
+          test_date?: string | null
+          test_type?: Database["public"]["Enums"]["mechanical_test_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mechanical_tests_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "test_coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mechanical_tests_pqr_id_fkey"
+            columns: ["pqr_id"]
+            isOneToOne: false
+            referencedRelation: "pqrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ncr_attachments: {
         Row: {
           company_id: string
@@ -592,6 +670,84 @@ export type Database = {
         }
         Relationships: []
       }
+      ndt_tests: {
+        Row: {
+          acceptance_criteria: string | null
+          attachment_path: string | null
+          company_id: string
+          coupon_id: string | null
+          created_at: string
+          created_by: string | null
+          equipment_id: string | null
+          findings: string | null
+          id: string
+          method: Database["public"]["Enums"]["ndt_method"]
+          pqr_id: string | null
+          remarks: string | null
+          report_number: string | null
+          result: Database["public"]["Enums"]["test_result"]
+          technician_id: string | null
+          technician_name: string | null
+          test_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          acceptance_criteria?: string | null
+          attachment_path?: string | null
+          company_id: string
+          coupon_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          equipment_id?: string | null
+          findings?: string | null
+          id?: string
+          method: Database["public"]["Enums"]["ndt_method"]
+          pqr_id?: string | null
+          remarks?: string | null
+          report_number?: string | null
+          result?: Database["public"]["Enums"]["test_result"]
+          technician_id?: string | null
+          technician_name?: string | null
+          test_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          acceptance_criteria?: string | null
+          attachment_path?: string | null
+          company_id?: string
+          coupon_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          equipment_id?: string | null
+          findings?: string | null
+          id?: string
+          method?: Database["public"]["Enums"]["ndt_method"]
+          pqr_id?: string | null
+          remarks?: string | null
+          report_number?: string | null
+          result?: Database["public"]["Enums"]["test_result"]
+          technician_id?: string | null
+          technician_name?: string | null
+          test_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ndt_tests_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "test_coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ndt_tests_pqr_id_fkey"
+            columns: ["pqr_id"]
+            isOneToOne: false
+            referencedRelation: "pqrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
@@ -630,6 +786,145 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      pqr_findings: {
+        Row: {
+          affected_variable: string | null
+          code_reference: string | null
+          company_id: string
+          created_at: string
+          id: string
+          message: string | null
+          pqr_id: string
+          remediation: string | null
+          resolved: boolean
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["finding_severity"]
+          title: string
+        }
+        Insert: {
+          affected_variable?: string | null
+          code_reference?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          pqr_id: string
+          remediation?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["finding_severity"]
+          title: string
+        }
+        Update: {
+          affected_variable?: string | null
+          code_reference?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          pqr_id?: string
+          remediation?: string | null
+          resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["finding_severity"]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pqr_findings_pqr_id_fkey"
+            columns: ["pqr_id"]
+            isOneToOne: false
+            referencedRelation: "pqrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pqrs: {
+        Row: {
+          code_family: string
+          company_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          evaluator_id: string | null
+          evaluator_name: string | null
+          expiry_date: string | null
+          id: string
+          overall_result: Database["public"]["Enums"]["test_result"]
+          pqr_no: string
+          pwps_id: string | null
+          qr_token: string
+          qualification_date: string | null
+          qualified_ranges: Json
+          remarks: string | null
+          resulting_wps_id: string | null
+          revision: string
+          standard: string | null
+          status: Database["public"]["Enums"]["pqr_status"]
+          test_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          code_family?: string
+          company_id: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          evaluator_id?: string | null
+          evaluator_name?: string | null
+          expiry_date?: string | null
+          id?: string
+          overall_result?: Database["public"]["Enums"]["test_result"]
+          pqr_no: string
+          pwps_id?: string | null
+          qr_token?: string
+          qualification_date?: string | null
+          qualified_ranges?: Json
+          remarks?: string | null
+          resulting_wps_id?: string | null
+          revision?: string
+          standard?: string | null
+          status?: Database["public"]["Enums"]["pqr_status"]
+          test_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code_family?: string
+          company_id?: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          evaluator_id?: string | null
+          evaluator_name?: string | null
+          expiry_date?: string | null
+          id?: string
+          overall_result?: Database["public"]["Enums"]["test_result"]
+          pqr_no?: string
+          pwps_id?: string | null
+          qr_token?: string
+          qualification_date?: string | null
+          qualified_ranges?: Json
+          remarks?: string | null
+          resulting_wps_id?: string | null
+          revision?: string
+          standard?: string | null
+          status?: Database["public"]["Enums"]["pqr_status"]
+          test_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pqrs_pwps_id_fkey"
+            columns: ["pwps_id"]
+            isOneToOne: false
+            referencedRelation: "pwps"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       procedure_approvals: {
         Row: {
@@ -719,6 +1014,45 @@ export type Database = {
           },
         ]
       }
+      procedure_links: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          metadata: Json | null
+          relationship: string
+          source_id: string
+          source_type: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          relationship: string
+          source_id: string
+          source_type: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          relationship?: string
+          source_id?: string
+          source_type?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
       procedure_revisions: {
         Row: {
           change_summary: string | null
@@ -792,6 +1126,7 @@ export type Database = {
           pipe_or_plate: string | null
           position: string | null
           position_qualified: string | null
+          pqr_id: string | null
           pqr_no: string | null
           preheat_method: string | null
           preheat_min_c: number | null
@@ -799,6 +1134,7 @@ export type Database = {
           procedure_type: string | null
           process: string
           pwht: string | null
+          pwps_id: string | null
           qr_token: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -852,6 +1188,7 @@ export type Database = {
           pipe_or_plate?: string | null
           position?: string | null
           position_qualified?: string | null
+          pqr_id?: string | null
           pqr_no?: string | null
           preheat_method?: string | null
           preheat_min_c?: number | null
@@ -859,6 +1196,7 @@ export type Database = {
           procedure_type?: string | null
           process: string
           pwht?: string | null
+          pwps_id?: string | null
           qr_token?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -912,6 +1250,7 @@ export type Database = {
           pipe_or_plate?: string | null
           position?: string | null
           position_qualified?: string | null
+          pqr_id?: string | null
           pqr_no?: string | null
           preheat_method?: string | null
           preheat_min_c?: number | null
@@ -919,6 +1258,7 @@ export type Database = {
           procedure_type?: string | null
           process?: string
           pwht?: string | null
+          pwps_id?: string | null
           qr_token?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -947,6 +1287,20 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "procedures_pqr_id_fkey"
+            columns: ["pqr_id"]
+            isOneToOne: false
+            referencedRelation: "pqrs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "procedures_pwps_id_fkey"
+            columns: ["pwps_id"]
+            isOneToOne: false
+            referencedRelation: "pwps"
             referencedColumns: ["id"]
           },
         ]
@@ -1047,6 +1401,159 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pwps: {
+        Row: {
+          backing: string | null
+          base_material: string | null
+          code_family: string
+          company_id: string
+          converted_at: string | null
+          converted_to_procedure_id: string | null
+          created_at: string
+          created_by: string | null
+          current_max: number | null
+          current_min: number | null
+          deleted_at: string | null
+          deleted_by: string | null
+          diameter_max_mm: number | null
+          diameter_min_mm: number | null
+          filler_classification: string | null
+          filler_material: string | null
+          groove_type: string | null
+          group_number: string | null
+          heat_input_max: number | null
+          heat_input_min: number | null
+          id: string
+          interpass_max_c: number | null
+          joint_type: string | null
+          notes: string | null
+          p_number: string | null
+          polarity: string | null
+          position: string | null
+          preheat_min_c: number | null
+          process: string | null
+          project_id: string | null
+          pwht: string | null
+          pwps_no: string
+          qualified_at: string | null
+          rejected_at: string | null
+          revision: string
+          shielding_gas: string | null
+          standard: string | null
+          status: Database["public"]["Enums"]["pwps_status"]
+          submitted_at: string | null
+          technique_notes: string | null
+          thickness_max_mm: number | null
+          thickness_min_mm: number | null
+          title: string | null
+          travel_speed_max: number | null
+          travel_speed_min: number | null
+          updated_at: string
+          voltage_max: number | null
+          voltage_min: number | null
+        }
+        Insert: {
+          backing?: string | null
+          base_material?: string | null
+          code_family?: string
+          company_id: string
+          converted_at?: string | null
+          converted_to_procedure_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_max?: number | null
+          current_min?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          diameter_max_mm?: number | null
+          diameter_min_mm?: number | null
+          filler_classification?: string | null
+          filler_material?: string | null
+          groove_type?: string | null
+          group_number?: string | null
+          heat_input_max?: number | null
+          heat_input_min?: number | null
+          id?: string
+          interpass_max_c?: number | null
+          joint_type?: string | null
+          notes?: string | null
+          p_number?: string | null
+          polarity?: string | null
+          position?: string | null
+          preheat_min_c?: number | null
+          process?: string | null
+          project_id?: string | null
+          pwht?: string | null
+          pwps_no: string
+          qualified_at?: string | null
+          rejected_at?: string | null
+          revision?: string
+          shielding_gas?: string | null
+          standard?: string | null
+          status?: Database["public"]["Enums"]["pwps_status"]
+          submitted_at?: string | null
+          technique_notes?: string | null
+          thickness_max_mm?: number | null
+          thickness_min_mm?: number | null
+          title?: string | null
+          travel_speed_max?: number | null
+          travel_speed_min?: number | null
+          updated_at?: string
+          voltage_max?: number | null
+          voltage_min?: number | null
+        }
+        Update: {
+          backing?: string | null
+          base_material?: string | null
+          code_family?: string
+          company_id?: string
+          converted_at?: string | null
+          converted_to_procedure_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_max?: number | null
+          current_min?: number | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          diameter_max_mm?: number | null
+          diameter_min_mm?: number | null
+          filler_classification?: string | null
+          filler_material?: string | null
+          groove_type?: string | null
+          group_number?: string | null
+          heat_input_max?: number | null
+          heat_input_min?: number | null
+          id?: string
+          interpass_max_c?: number | null
+          joint_type?: string | null
+          notes?: string | null
+          p_number?: string | null
+          polarity?: string | null
+          position?: string | null
+          preheat_min_c?: number | null
+          process?: string | null
+          project_id?: string | null
+          pwht?: string | null
+          pwps_no?: string
+          qualified_at?: string | null
+          rejected_at?: string | null
+          revision?: string
+          shielding_gas?: string | null
+          standard?: string | null
+          status?: Database["public"]["Enums"]["pwps_status"]
+          submitted_at?: string | null
+          technique_notes?: string | null
+          thickness_max_mm?: number | null
+          thickness_min_mm?: number | null
+          title?: string | null
+          travel_speed_max?: number | null
+          travel_speed_min?: number | null
+          updated_at?: string
+          voltage_max?: number | null
+          voltage_min?: number | null
+        }
+        Relationships: []
       }
       qualification_attachments: {
         Row: {
@@ -1389,6 +1896,105 @@ export type Database = {
         }
         Relationships: []
       }
+      test_coupons: {
+        Row: {
+          backing: string | null
+          company_id: string
+          coupon_no: string
+          created_at: string
+          created_by: string | null
+          diameter_mm: number | null
+          filler_classification: string | null
+          filler_metal: string | null
+          group_number: string | null
+          heat_number: string | null
+          id: string
+          joint_type: string | null
+          material_spec: string | null
+          notes: string | null
+          p_number: string | null
+          position: string | null
+          pqr_id: string | null
+          process: string | null
+          project_id: string | null
+          pwps_id: string | null
+          test_date: string | null
+          thickness_mm: number | null
+          updated_at: string
+          welder_name: string | null
+          welder_qualification_id: string | null
+        }
+        Insert: {
+          backing?: string | null
+          company_id: string
+          coupon_no: string
+          created_at?: string
+          created_by?: string | null
+          diameter_mm?: number | null
+          filler_classification?: string | null
+          filler_metal?: string | null
+          group_number?: string | null
+          heat_number?: string | null
+          id?: string
+          joint_type?: string | null
+          material_spec?: string | null
+          notes?: string | null
+          p_number?: string | null
+          position?: string | null
+          pqr_id?: string | null
+          process?: string | null
+          project_id?: string | null
+          pwps_id?: string | null
+          test_date?: string | null
+          thickness_mm?: number | null
+          updated_at?: string
+          welder_name?: string | null
+          welder_qualification_id?: string | null
+        }
+        Update: {
+          backing?: string | null
+          company_id?: string
+          coupon_no?: string
+          created_at?: string
+          created_by?: string | null
+          diameter_mm?: number | null
+          filler_classification?: string | null
+          filler_metal?: string | null
+          group_number?: string | null
+          heat_number?: string | null
+          id?: string
+          joint_type?: string | null
+          material_spec?: string | null
+          notes?: string | null
+          p_number?: string | null
+          position?: string | null
+          pqr_id?: string | null
+          process?: string | null
+          project_id?: string | null
+          pwps_id?: string | null
+          test_date?: string | null
+          thickness_mm?: number | null
+          updated_at?: string
+          welder_name?: string | null
+          welder_qualification_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_coupons_pqr_id_fkey"
+            columns: ["pqr_id"]
+            isOneToOne: false
+            referencedRelation: "pqrs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "test_coupons_pwps_id_fkey"
+            columns: ["pwps_id"]
+            isOneToOne: false
+            referencedRelation: "pwps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           company_id: string | null
@@ -1489,6 +2095,89 @@ export type Database = {
           weld_id?: string
         }
         Relationships: []
+      }
+      welding_execution_records: {
+        Row: {
+          amperage: number | null
+          company_id: string
+          coupon_id: string
+          created_at: string
+          filler_classification: string | null
+          filler_diameter_mm: number | null
+          gas_flow: number | null
+          gas_type: string | null
+          heat_input: number | null
+          id: string
+          interpass_temp_c: number | null
+          pass_number: number | null
+          pass_type: string | null
+          polarity: string | null
+          preheat_temp_c: number | null
+          process: string | null
+          recorded_at: string
+          recorded_by: string | null
+          sequence_notes: string | null
+          travel_speed: number | null
+          updated_at: string
+          voltage: number | null
+        }
+        Insert: {
+          amperage?: number | null
+          company_id: string
+          coupon_id: string
+          created_at?: string
+          filler_classification?: string | null
+          filler_diameter_mm?: number | null
+          gas_flow?: number | null
+          gas_type?: string | null
+          heat_input?: number | null
+          id?: string
+          interpass_temp_c?: number | null
+          pass_number?: number | null
+          pass_type?: string | null
+          polarity?: string | null
+          preheat_temp_c?: number | null
+          process?: string | null
+          recorded_at?: string
+          recorded_by?: string | null
+          sequence_notes?: string | null
+          travel_speed?: number | null
+          updated_at?: string
+          voltage?: number | null
+        }
+        Update: {
+          amperage?: number | null
+          company_id?: string
+          coupon_id?: string
+          created_at?: string
+          filler_classification?: string | null
+          filler_diameter_mm?: number | null
+          gas_flow?: number | null
+          gas_type?: string | null
+          heat_input?: number | null
+          id?: string
+          interpass_temp_c?: number | null
+          pass_number?: number | null
+          pass_type?: string | null
+          polarity?: string | null
+          preheat_temp_c?: number | null
+          process?: string | null
+          recorded_at?: string
+          recorded_by?: string | null
+          sequence_notes?: string | null
+          travel_speed?: number | null
+          updated_at?: string
+          voltage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "welding_execution_records_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "test_coupons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       welds: {
         Row: {
@@ -2396,7 +3085,15 @@ export type Database = {
         | "Maintenance"
         | "Calibration Due"
         | "Out of Service"
+      finding_severity: "info" | "warning" | "error" | "critical"
       instrument_status: "Active" | "Calibration Due" | "Out of Service"
+      mechanical_test_type:
+        | "Tensile"
+        | "Bend"
+        | "Impact"
+        | "Hardness"
+        | "Macro Etch"
+        | "Fracture"
       ncr_status:
         | "Draft"
         | "Open"
@@ -2405,6 +3102,15 @@ export type Database = {
         | "In Review"
         | "Closed"
         | "Rejected"
+      ndt_method: "RT" | "UT" | "PT" | "MT" | "VT"
+      pqr_status:
+        | "Draft"
+        | "In Testing"
+        | "Under Review"
+        | "Passed"
+        | "Failed"
+        | "Withdrawn"
+        | "Expired"
       procedure_status:
         | "Draft"
         | "Review"
@@ -2417,8 +3123,17 @@ export type Database = {
         | "On Hold"
         | "Completed"
         | "Cancelled"
+      pwps_status:
+        | "Draft"
+        | "Under Qualification"
+        | "Testing"
+        | "Pending Validation"
+        | "Qualified"
+        | "Rejected"
+        | "Converted"
       qualification_status: "Active" | "Expiring Soon" | "Expired" | "Suspended"
       severity_level: "Low" | "Medium" | "High" | "Critical"
+      test_result: "Pending" | "Pass" | "Fail" | "N/A"
       weld_status: "Accepted" | "Rejected" | "Repair" | "Pending"
       weld_workflow_status:
         | "Draft"
@@ -2582,7 +3297,16 @@ export const Constants = {
         "Calibration Due",
         "Out of Service",
       ],
+      finding_severity: ["info", "warning", "error", "critical"],
       instrument_status: ["Active", "Calibration Due", "Out of Service"],
+      mechanical_test_type: [
+        "Tensile",
+        "Bend",
+        "Impact",
+        "Hardness",
+        "Macro Etch",
+        "Fracture",
+      ],
       ncr_status: [
         "Draft",
         "Open",
@@ -2592,6 +3316,16 @@ export const Constants = {
         "Closed",
         "Rejected",
       ],
+      ndt_method: ["RT", "UT", "PT", "MT", "VT"],
+      pqr_status: [
+        "Draft",
+        "In Testing",
+        "Under Review",
+        "Passed",
+        "Failed",
+        "Withdrawn",
+        "Expired",
+      ],
       procedure_status: ["Draft", "Review", "Approved", "Archived", "Rejected"],
       project_status: [
         "Planning",
@@ -2600,8 +3334,18 @@ export const Constants = {
         "Completed",
         "Cancelled",
       ],
+      pwps_status: [
+        "Draft",
+        "Under Qualification",
+        "Testing",
+        "Pending Validation",
+        "Qualified",
+        "Rejected",
+        "Converted",
+      ],
       qualification_status: ["Active", "Expiring Soon", "Expired", "Suspended"],
       severity_level: ["Low", "Medium", "High", "Critical"],
+      test_result: ["Pending", "Pass", "Fail", "N/A"],
       weld_status: ["Accepted", "Rejected", "Repair", "Pending"],
       weld_workflow_status: [
         "Draft",
