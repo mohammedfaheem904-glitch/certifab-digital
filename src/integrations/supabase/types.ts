@@ -850,6 +850,7 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
+          evaluation_snapshot: Json | null
           evaluator_id: string | null
           evaluator_name: string | null
           expiry_date: string | null
@@ -874,6 +875,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
+          evaluation_snapshot?: Json | null
           evaluator_id?: string | null
           evaluator_name?: string | null
           expiry_date?: string | null
@@ -898,6 +900,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
+          evaluation_snapshot?: Json | null
           evaluator_id?: string | null
           evaluator_name?: string | null
           expiry_date?: string | null
@@ -1636,7 +1639,8 @@ export type Database = {
           company_id: string
           id: string
           name: string
-          qualification_id: string
+          pqr_id: string | null
+          qualification_id: string | null
           role: string
           signature_data_url: string | null
           signed_at: string
@@ -1646,7 +1650,8 @@ export type Database = {
           company_id: string
           id?: string
           name: string
-          qualification_id: string
+          pqr_id?: string | null
+          qualification_id?: string | null
           role: string
           signature_data_url?: string | null
           signed_at?: string
@@ -1656,7 +1661,8 @@ export type Database = {
           company_id?: string
           id?: string
           name?: string
-          qualification_id?: string
+          pqr_id?: string | null
+          qualification_id?: string | null
           role?: string
           signature_data_url?: string | null
           signed_at?: string

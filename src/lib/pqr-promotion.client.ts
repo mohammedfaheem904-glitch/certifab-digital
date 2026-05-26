@@ -14,7 +14,7 @@ export async function promotePqrToWps(pqrId: string): Promise<{ procedureId: str
     .maybeSingle();
   if (pqrErr) throw pqrErr;
   if (!pqr) throw new Error("PQR not found");
-  if (pqr.overall_result !== "Passed") throw new Error("PQR must be Passed before promotion");
+  if (pqr.overall_result !== "Pass" && pqr.overall_result !== "Passed") throw new Error("PQR must be Passed before promotion");
   if (!pqr.pwps_id) throw new Error("PQR has no linked pWPS");
 
   if (pqr.resulting_wps_id) {

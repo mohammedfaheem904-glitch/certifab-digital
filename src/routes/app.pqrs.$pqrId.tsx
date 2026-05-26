@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Loader2, Save, ShieldCheck, CheckCircle2, XCircle, ArrowUpRightFromSquare } from "lucide-react";
+import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -12,27 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { promotePqrToWps } from "@/lib/pqr-promotion.client";
-
-type Pqr = {
-  id: string;
-  company_id: string;
-  pqr_no: string;
-  pwps_id: string | null;
-  revision: string;
-  status: string;
-  code_family: string;
-  standard: string | null;
-  test_date: string | null;
-  qualification_date: string | null;
-  expiry_date: string | null;
-  overall_result: "Pending" | "Passed" | "Failed" | "Inconclusive";
-  evaluator_name: string | null;
-  evaluator_id: string | null;
-  qualified_ranges: any;
-  remarks: string | null;
-  resulting_wps_id: string | null;
-};
+import { NdtTestsTable } from "@/components/pqr/NdtTestsTable";
+import { MechanicalTestsTable } from "@/components/pqr/MechanicalTestsTable";
+import { PqrFindingsTable } from "@/components/pqr/PqrFindingsTable";
+import { QualifiedRangesForm } from "@/components/pqr/QualifiedRangesForm";
+import { PqrEvaluationPanel } from "@/components/pqr/PqrEvaluationPanel";
+import { PqrWorkflowStepper, type StepperStep } from "@/components/pqr/PqrWorkflowStepper";
+import { evaluatePqr } from "@/lib/pqr-evaluation";
 
 export const Route = createFileRoute("/app/pqrs/$pqrId")({
   component: PqrDetailPage,
@@ -40,21 +26,22 @@ export const Route = createFileRoute("/app/pqrs/$pqrId")({
 
 const RESULT_TONE: Record<string, string> = {
   Pending: "bg-muted text-muted-foreground border-border",
+  Pass: "bg-success/15 text-success border-success/30",
   Passed: "bg-success/15 text-success border-success/30",
+  Fail: "bg-destructive/15 text-destructive border-destructive/30",
   Failed: "bg-destructive/15 text-destructive border-destructive/30",
-  Inconclusive: "bg-warning/15 text-warning border-warning/30",
+  "N/A": "bg-muted text-muted-foreground border-border",
 };
 
 function PqrDetailPage() {
   const { pqrId } = Route.useParams();
   const nav = useNavigate();
-  const qc = useQueryClient();
-  const { roles, profile, user } = useAuth();
+  const { roles } = useAuth();
   const isEditor = roles.some((r) =>
     ["super_admin", "qa_qc_manager", "welding_engineer", "inspector"].includes(r),
   );
 
-  const { data, isLoading } = useQuery<Pqr | null>({
+  const { data, isLoading } = useQuery<any>({
     queryKey: ["pqr", pqrId],
     queryFn: async () => {
       const { data, error } = await (supabase.from("pqrs" as any) as any)
@@ -62,31 +49,84 @@ function PqrDetailPage() {
         .eq("id", pqrId)
         .maybeSingle();
       if (error) throw error;
-      return data as Pqr | null;
+      return data;
     },
   });
 
-  const [draft, setDraft] = useState<Partial<Pqr>>({});
-  const [saving, setSaving] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const { data: pwps } = useQuery<any>({
+    queryKey: ["pwps-for-pqr", data?.pwps_id],
+    queryFn: async () => {
+      if (!data?.pwps_id) return null;
+      const { data: row, error } = await (supabase.from("pwps" as any) as any)
+        .select("*")
+        .eq("id", data.pwps_id)
+        .maybeSingle();
+      if (error) throw error;
+      return row;
+    },
+    enabled: !!data?.pwps_id,
+  });
 
-  const merged = useMemo(() => ({ ...(data ?? {}), ...draft }) as Pqr, [data, draft]);
-  const set = (k: keyof Pqr, v: any) => setDraft((d) => ({ ...d, [k]: v }));
+  const { data: ndt = [] } = useQuery<any[]>({
+    queryKey: ["ndt", pqrId],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("ndt_tests" as any) as any).select("*").eq("pqr_id", pqrId);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const { data: mech = [] } = useQuery<any[]>({
+    queryKey: ["mech", pqrId],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("mechanical_tests" as any) as any).select("*").eq("pqr_id", pqrId);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const { data: findings = [] } = useQuery<any[]>({
+    queryKey: ["findings", pqrId],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("pqr_findings" as any) as any).select("*").eq("pqr_id", pqrId);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const evaluation = useMemo(
+    () => evaluatePqr({ pqr: data ?? {}, pwps: pwps ?? null, ndt, mech, findings }),
+    [data, pwps, ndt, mech, findings],
+  );
+
+  const steps: StepperStep[] = useMemo(() => {
+    const overall = data?.overall_result;
+    const ck = (id: string) => evaluation.checklist.find((c) => c.id === id);
+    const setup = ck("pwps_linked")?.status === "pass" ? "done" : "active";
+    const ndtDone = ck("ndt_coverage")?.status === "pass" && ck("ndt_results")?.status === "pass" ? "done" : ndt.length ? "active" : "todo";
+    const mechDone = ck("mech_coverage")?.status === "pass" && ck("mech_results")?.status === "pass" ? "done" : mech.length ? "active" : "todo";
+    const evalDone = evaluation.ready ? "done" : (ndtDone === "done" || mechDone === "done") ? "active" : "todo";
+    const signed = overall === "Pass" || overall === "Passed" ? "done" : overall === "Fail" || overall === "Failed" ? "active" : evalDone === "done" ? "active" : "todo";
+    return [
+      { id: "setup", label: "Setup", status: setup as any },
+      { id: "ndt", label: "NDT", status: ndtDone as any },
+      { id: "mech", label: "Mechanical", status: mechDone as any },
+      { id: "eval", label: "Evaluation", status: evalDone as any },
+      { id: "sign", label: "Sign & Promote", status: signed as any },
+    ];
+  }, [data, evaluation, ndt.length, mech.length]);
+
+  const [draft, setDraft] = useState<any>({});
+  const [saving, setSaving] = useState(false);
+  const merged = useMemo(() => ({ ...(data ?? {}), ...draft }), [data, draft]);
+  const set = (k: string, v: any) => setDraft((d: any) => ({ ...d, [k]: v }));
 
   if (isLoading) {
-    return (
-      <div className="min-h-[60vh] grid place-items-center text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin me-2 inline" /> Loading PQR…
-      </div>
-    );
+    return <div className="min-h-[60vh] grid place-items-center text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin me-2 inline" /> Loading PQR…</div>;
   }
   if (!data) {
     return (
       <div className="p-8 text-center">
         <p className="text-sm text-muted-foreground">PQR not found.</p>
-        <Button variant="outline" className="mt-4" onClick={() => nav({ to: "/app/pqrs" })}>
-          Back to list
-        </Button>
+        <Button variant="outline" className="mt-4" onClick={() => nav({ to: "/app/pqrs" })}>Back to list</Button>
       </div>
     );
   }
@@ -99,64 +139,12 @@ function PqrDetailPage() {
     if (error) return toast.error(error.message);
     toast.success("PQR saved.");
     setDraft({});
-    qc.invalidateQueries({ queryKey: ["pqr", pqrId] });
-    qc.invalidateQueries({ queryKey: ["pqrs"] });
   };
 
-  const markPassed = async () => {
-    if (!data.pwps_id) {
-      toast.error("Link a pWPS first — promotion requires a source pWPS.");
-      return;
-    }
-    setBusy(true);
-    const update: any = {
-      overall_result: "Passed",
-      status: "Passed",
-      qualification_date: new Date().toISOString().slice(0, 10),
-      evaluator_id: user?.id ?? null,
-      evaluator_name: profile?.display_name ?? null,
-    };
-    const { error } = await (supabase.from("pqrs" as any) as any).update(update).eq("id", pqrId);
-    if (error) {
-      setBusy(false);
-      return toast.error(error.message);
-    }
-    // Auto-promote to draft WPS
-    try {
-      const { procedureId, created } = await promotePqrToWps(pqrId);
-      toast.success(created ? "PQR Passed — Draft WPS created in Procedures." : "PQR Passed — WPS already existed.");
-      qc.invalidateQueries({ queryKey: ["pqr", pqrId] });
-      qc.invalidateQueries({ queryKey: ["pqrs"] });
-      qc.invalidateQueries({ queryKey: ["company-rows", "procedures"] });
-      nav({ to: "/app/procedures/$procedureId", params: { procedureId } });
-    } catch (e: any) {
-      toast.error(`Saved as Passed, but WPS creation failed: ${e.message}`);
-      qc.invalidateQueries({ queryKey: ["pqr", pqrId] });
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const markFailed = async () => {
-    setBusy(true);
-    const { error } = await (supabase.from("pqrs" as any) as any)
-      .update({ overall_result: "Failed", status: "Failed" })
-      .eq("id", pqrId);
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("PQR marked as Failed.");
-    qc.invalidateQueries({ queryKey: ["pqr", pqrId] });
-    qc.invalidateQueries({ queryKey: ["pqrs"] });
-  };
-
-  const openResultingWps = () => {
-    if (!data.resulting_wps_id) return;
-    nav({ to: "/app/procedures/$procedureId", params: { procedureId: data.resulting_wps_id } });
-  };
+  const overall = data.overall_result;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Button variant="ghost" size="sm" onClick={() => nav({ to: "/app/pqrs" })} className="mb-2 -ms-2">
@@ -164,46 +152,30 @@ function PqrDetailPage() {
           </Button>
           <h1 className="text-2xl font-semibold tracking-tight">{data.pqr_no}</h1>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <Badge variant="outline" className={RESULT_TONE[merged.overall_result] ?? ""}>{merged.overall_result}</Badge>
+            <Badge variant="outline" className={RESULT_TONE[overall] ?? ""}>{overall}</Badge>
             <span className="text-xs text-muted-foreground">{data.revision} · {data.code_family}</span>
             {data.qualification_date && (
-              <span className="text-xs text-muted-foreground">
-                Qualified {new Date(data.qualification_date).toLocaleDateString()}
-              </span>
+              <span className="text-xs text-muted-foreground">Qualified {new Date(data.qualification_date).toLocaleDateString()}</span>
             )}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {isEditor && Object.keys(draft).length > 0 && (
-            <Button onClick={handleSave} disabled={saving} variant="outline">
-              {saving ? <Loader2 className="size-4 animate-spin me-1" /> : <Save className="size-4 me-1" />}
-              Save changes
-            </Button>
-          )}
-          {isEditor && merged.overall_result !== "Passed" && merged.overall_result !== "Failed" && (
-            <>
-              <Button onClick={markFailed} disabled={busy} variant="outline" className="text-destructive border-destructive/40">
-                <XCircle className="size-4 me-1" /> Mark Failed
-              </Button>
-              <Button onClick={markPassed} disabled={busy}>
-                {busy ? <Loader2 className="size-4 animate-spin me-1" /> : <CheckCircle2 className="size-4 me-1" />}
-                Mark Passed & Promote to WPS
-              </Button>
-            </>
-          )}
-          {data.resulting_wps_id && (
-            <Button onClick={openResultingWps} variant="outline">
-              <ArrowUpRightFromSquare className="size-4 me-1" /> Open resulting WPS
-            </Button>
-          )}
-        </div>
+        {isEditor && Object.keys(draft).length > 0 && (
+          <Button onClick={handleSave} disabled={saving} variant="outline">
+            {saving ? <Loader2 className="size-4 animate-spin me-1" /> : <Save className="size-4 me-1" />}Save changes
+          </Button>
+        )}
       </div>
 
+      <PqrWorkflowStepper steps={steps} />
+
       <Tabs defaultValue="overview">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="ndt">NDT ({ndt.length})</TabsTrigger>
+          <TabsTrigger value="mech">Mechanical ({mech.length})</TabsTrigger>
+          <TabsTrigger value="findings">Findings ({findings.filter((f: any) => !f.resolved).length})</TabsTrigger>
           <TabsTrigger value="ranges">Qualified Ranges</TabsTrigger>
-          <TabsTrigger value="tests">Tests</TabsTrigger>
+          <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4 mt-4">
@@ -211,41 +183,23 @@ function PqrDetailPage() {
             <Card>
               <CardHeader><CardTitle className="text-base">Identification</CardTitle></CardHeader>
               <CardContent className="space-y-3">
-                <Field label="PQR number">
-                  <Input value={merged.pqr_no ?? ""} onChange={(e) => set("pqr_no", e.target.value)} disabled={!isEditor} />
-                </Field>
-                <Field label="Standard">
-                  <Input value={merged.standard ?? ""} onChange={(e) => set("standard", e.target.value)} disabled={!isEditor} />
-                </Field>
-                <Field label="Code family">
-                  <Input value={merged.code_family ?? ""} onChange={(e) => set("code_family", e.target.value)} disabled={!isEditor} />
-                </Field>
-                <Field label="Revision">
-                  <Input value={merged.revision ?? ""} onChange={(e) => set("revision", e.target.value)} disabled={!isEditor} />
-                </Field>
+                <Field label="PQR number"><Input value={merged.pqr_no ?? ""} onChange={(e) => set("pqr_no", e.target.value)} disabled={!isEditor} /></Field>
+                <Field label="Standard"><Input value={merged.standard ?? ""} onChange={(e) => set("standard", e.target.value)} disabled={!isEditor} /></Field>
+                <Field label="Code family"><Input value={merged.code_family ?? ""} onChange={(e) => set("code_family", e.target.value)} disabled={!isEditor} /></Field>
+                <Field label="Revision"><Input value={merged.revision ?? ""} onChange={(e) => set("revision", e.target.value)} disabled={!isEditor} /></Field>
               </CardContent>
             </Card>
-
             <Card>
               <CardHeader><CardTitle className="text-base">Dates & evaluator</CardTitle></CardHeader>
               <CardContent className="space-y-3">
-                <Field label="Test date">
-                  <Input type="date" value={merged.test_date ?? ""} onChange={(e) => set("test_date", e.target.value || null)} disabled={!isEditor} />
-                </Field>
-                <Field label="Qualification date">
-                  <Input type="date" value={merged.qualification_date ?? ""} onChange={(e) => set("qualification_date", e.target.value || null)} disabled={!isEditor} />
-                </Field>
-                <Field label="Expiry date">
-                  <Input type="date" value={merged.expiry_date ?? ""} onChange={(e) => set("expiry_date", e.target.value || null)} disabled={!isEditor} />
-                </Field>
-                <Field label="Evaluator">
-                  <Input value={merged.evaluator_name ?? ""} onChange={(e) => set("evaluator_name", e.target.value)} disabled={!isEditor} />
-                </Field>
+                <Field label="Test date"><Input type="date" value={merged.test_date ?? ""} onChange={(e) => set("test_date", e.target.value || null)} disabled={!isEditor} /></Field>
+                <Field label="Qualification date"><Input type="date" value={merged.qualification_date ?? ""} onChange={(e) => set("qualification_date", e.target.value || null)} disabled={!isEditor} /></Field>
+                <Field label="Expiry date"><Input type="date" value={merged.expiry_date ?? ""} onChange={(e) => set("expiry_date", e.target.value || null)} disabled={!isEditor} /></Field>
+                <Field label="Evaluator"><Input value={merged.evaluator_name ?? ""} onChange={(e) => set("evaluator_name", e.target.value)} disabled={!isEditor} /></Field>
               </CardContent>
             </Card>
-
             <Card className="md:col-span-2">
-              <CardHeader><CardTitle className="text-base flex items-center gap-2"><ShieldCheck className="size-4" /> Remarks</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">Remarks</CardTitle></CardHeader>
               <CardContent>
                 <Textarea rows={4} value={merged.remarks ?? ""} onChange={(e) => set("remarks", e.target.value)} disabled={!isEditor} />
               </CardContent>
@@ -253,41 +207,20 @@ function PqrDetailPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="ranges" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Qualified ranges (JSON)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-xs text-muted-foreground mb-2">
-                Edit qualified ranges as JSON. Keys like <code>thickness_min_mm</code>, <code>thickness_max_mm</code>,
-                <code>diameter_min_mm</code>, <code>diameter_max_mm</code>, <code>heat_input_min</code>,
-                <code>heat_input_max</code>, <code>position</code> will override pWPS values when promoting to WPS.
-              </p>
-              <Textarea
-                rows={10}
-                className="font-mono text-xs"
-                value={JSON.stringify(merged.qualified_ranges ?? {}, null, 2)}
-                onChange={(e) => {
-                  try {
-                    set("qualified_ranges", JSON.parse(e.target.value || "{}"));
-                  } catch {
-                    /* ignore partial JSON */
-                  }
-                }}
-                disabled={!isEditor}
-              />
-            </CardContent>
-          </Card>
+        <TabsContent value="ndt" className="mt-4">
+          <NdtTestsTable pqrId={pqrId} standard={data.standard} />
         </TabsContent>
-
-        <TabsContent value="tests" className="mt-4">
-          <Card>
-            <CardContent className="py-10 text-sm text-muted-foreground text-center">
-              NDT and Mechanical test builders ship in the next phase. For now, attach test reports via Remarks
-              and set the overall result here.
-            </CardContent>
-          </Card>
+        <TabsContent value="mech" className="mt-4">
+          <MechanicalTestsTable pqrId={pqrId} />
+        </TabsContent>
+        <TabsContent value="findings" className="mt-4">
+          <PqrFindingsTable pqrId={pqrId} />
+        </TabsContent>
+        <TabsContent value="ranges" className="mt-4">
+          <QualifiedRangesForm pqrId={pqrId} ranges={data.qualified_ranges} pwps={pwps} disabled={!isEditor} />
+        </TabsContent>
+        <TabsContent value="evaluation" className="mt-4">
+          <PqrEvaluationPanel pqrId={pqrId} pqr={data} evaluation={evaluation} canEdit={isEditor} />
         </TabsContent>
       </Tabs>
     </div>
