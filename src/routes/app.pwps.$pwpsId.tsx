@@ -132,6 +132,34 @@ function PwpsDetailPage() {
 
   const handleTransition = async (to: PwpsStatus, _label: string) => {
     setTransitioning(true);
+    // Special-case: Promote to WPS — find a Passed PQR and create the procedure.
+    if (to === "Converted") {
+      const { data: pqrRow, error: pqrErr } = await (supabase.from("pqrs" as any) as any)
+        .select("id")
+        .eq("pwps_id", pwpsId)
+        .eq("overall_result", "Passed")
+        .order("qualification_date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (pqrErr) { setTransitioning(false); return toast.error(pqrErr.message); }
+      if (!pqrRow) {
+        setTransitioning(false);
+        return toast.error("No Passed PQR linked to this pWPS. Pass a PQR first.");
+      }
+      try {
+        const { promotePqrToWps } = await import("@/lib/pqr-promotion.client");
+        const { procedureId } = await promotePqrToWps(pqrRow.id);
+        toast.success("Promoted — opening new WPS draft");
+        qc.invalidateQueries({ queryKey: ["pwps", pwpsId] });
+        qc.invalidateQueries({ queryKey: ["company-rows", "procedures"] });
+        nav({ to: "/app/procedures/$procedureId", params: { procedureId } });
+      } catch (e: any) {
+        toast.error(e.message);
+      } finally {
+        setTransitioning(false);
+      }
+      return;
+    }
     const payload: Record<string, any> = { status: to };
     if (to === "Qualified") payload.qualified_at = new Date().toISOString();
     if (to === "Rejected") payload.rejected_at = new Date().toISOString();
