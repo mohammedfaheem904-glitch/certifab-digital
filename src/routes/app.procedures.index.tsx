@@ -40,6 +40,8 @@ type Row = {
   thickness_range: string | null;
   revision: string;
   status: string;
+  pqr_id: string | null;
+  pqr_no: string | null;
 };
 
 export const Route = createFileRoute("/app/procedures/")({
