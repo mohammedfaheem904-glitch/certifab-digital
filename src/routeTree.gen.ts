@@ -30,6 +30,7 @@ import { Route as AppQualificationsRouteImport } from './routes/app.qualificatio
 import { Route as AppPwpsRouteImport } from './routes/app.pwps'
 import { Route as AppProjectsRouteImport } from './routes/app.projects'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
+import { Route as AppPqrsRouteImport } from './routes/app.pqrs'
 import { Route as AppNcrsRouteImport } from './routes/app.ncrs'
 import { Route as AppInstrumentsRouteImport } from './routes/app.instruments'
 import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
@@ -40,6 +41,7 @@ import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
 import { Route as AppPwpsIndexRouteImport } from './routes/app.pwps.index'
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
+import { Route as AppPqrsIndexRouteImport } from './routes/app.pqrs.index'
 import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
 import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qualification.$token'
@@ -53,6 +55,7 @@ import { Route as AppQualificationsQualIdRouteImport } from './routes/app.qualif
 import { Route as AppPwpsPwpsIdRouteImport } from './routes/app.pwps.$pwpsId'
 import { Route as AppProceduresDashboardRouteImport } from './routes/app.procedures.dashboard'
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
+import { Route as AppPqrsPqrIdRouteImport } from './routes/app.pqrs.$pqrId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
 import { Route as AppAdminCompaniesRouteImport } from './routes/app.admin.companies'
@@ -162,6 +165,11 @@ const AppProceduresRoute = AppProceduresRouteImport.update({
   path: '/procedures',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPqrsRoute = AppPqrsRouteImport.update({
+  id: '/pqrs',
+  path: '/pqrs',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppNcrsRoute = AppNcrsRouteImport.update({
   id: '/ncrs',
   path: '/ncrs',
@@ -211,6 +219,11 @@ const AppProceduresIndexRoute = AppProceduresIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppProceduresRoute,
+} as any)
+const AppPqrsIndexRoute = AppPqrsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppPqrsRoute,
 } as any)
 const VerifyWpsTokenRoute = VerifyWpsTokenRouteImport.update({
   id: '/verify/wps/$token',
@@ -280,6 +293,11 @@ const AppProceduresProcedureIdRoute =
     path: '/$procedureId',
     getParentRoute: () => AppProceduresRoute,
   } as any)
+const AppPqrsPqrIdRoute = AppPqrsPqrIdRouteImport.update({
+  id: '/$pqrId',
+  path: '/$pqrId',
+  getParentRoute: () => AppPqrsRoute,
+} as any)
 const AppNcrsNcrIdRoute = AppNcrsNcrIdRouteImport.update({
   id: '/$ncrId',
   path: '/$ncrId',
@@ -317,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
+  '/app/pqrs': typeof AppPqrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/pwps': typeof AppPwpsRouteWithChildren
@@ -329,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
+  '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
@@ -342,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
@@ -374,6 +395,7 @@ export interface FileRoutesByTo {
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
+  '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
@@ -387,6 +409,7 @@ export interface FileRoutesByTo {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/pqrs': typeof AppPqrsIndexRoute
   '/app/procedures': typeof AppProceduresIndexRoute
   '/app/pwps': typeof AppPwpsIndexRoute
   '/app/qualifications': typeof AppQualificationsIndexRoute
@@ -412,6 +435,7 @@ export interface FileRoutesById {
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
+  '/app/pqrs': typeof AppPqrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/pwps': typeof AppPwpsRouteWithChildren
@@ -424,6 +448,7 @@ export interface FileRoutesById {
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
+  '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
@@ -437,6 +462,7 @@ export interface FileRoutesById {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
@@ -463,6 +489,7 @@ export interface FileRouteTypes {
     | '/app/inspections'
     | '/app/instruments'
     | '/app/ncrs'
+    | '/app/pqrs'
     | '/app/procedures'
     | '/app/projects'
     | '/app/pwps'
@@ -475,6 +502,7 @@ export interface FileRouteTypes {
     | '/app/admin/companies'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
+    | '/app/pqrs/$pqrId'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
@@ -488,6 +516,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/pqrs/'
     | '/app/procedures/'
     | '/app/pwps/'
     | '/app/qualifications/'
@@ -520,6 +549,7 @@ export interface FileRouteTypes {
     | '/app/admin/companies'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
+    | '/app/pqrs/$pqrId'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
@@ -533,6 +563,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/pqrs'
     | '/app/procedures'
     | '/app/pwps'
     | '/app/qualifications'
@@ -557,6 +588,7 @@ export interface FileRouteTypes {
     | '/app/inspections'
     | '/app/instruments'
     | '/app/ncrs'
+    | '/app/pqrs'
     | '/app/procedures'
     | '/app/projects'
     | '/app/pwps'
@@ -569,6 +601,7 @@ export interface FileRouteTypes {
     | '/app/admin/companies'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
+    | '/app/pqrs/$pqrId'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
@@ -582,6 +615,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/pqrs/'
     | '/app/procedures/'
     | '/app/pwps/'
     | '/app/qualifications/'
@@ -755,6 +789,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProceduresRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/pqrs': {
+      id: '/app/pqrs'
+      path: '/pqrs'
+      fullPath: '/app/pqrs'
+      preLoaderRoute: typeof AppPqrsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/ncrs': {
       id: '/app/ncrs'
       path: '/ncrs'
@@ -824,6 +865,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/procedures/'
       preLoaderRoute: typeof AppProceduresIndexRouteImport
       parentRoute: typeof AppProceduresRoute
+    }
+    '/app/pqrs/': {
+      id: '/app/pqrs/'
+      path: '/'
+      fullPath: '/app/pqrs/'
+      preLoaderRoute: typeof AppPqrsIndexRouteImport
+      parentRoute: typeof AppPqrsRoute
     }
     '/verify/wps/$token': {
       id: '/verify/wps/$token'
@@ -916,6 +964,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProceduresProcedureIdRouteImport
       parentRoute: typeof AppProceduresRoute
     }
+    '/app/pqrs/$pqrId': {
+      id: '/app/pqrs/$pqrId'
+      path: '/$pqrId'
+      fullPath: '/app/pqrs/$pqrId'
+      preLoaderRoute: typeof AppPqrsPqrIdRouteImport
+      parentRoute: typeof AppPqrsRoute
+    }
     '/app/ncrs/$ncrId': {
       id: '/app/ncrs/$ncrId'
       path: '/$ncrId'
@@ -974,6 +1029,19 @@ const AppNcrsRouteChildren: AppNcrsRouteChildren = {
 
 const AppNcrsRouteWithChildren =
   AppNcrsRoute._addFileChildren(AppNcrsRouteChildren)
+
+interface AppPqrsRouteChildren {
+  AppPqrsPqrIdRoute: typeof AppPqrsPqrIdRoute
+  AppPqrsIndexRoute: typeof AppPqrsIndexRoute
+}
+
+const AppPqrsRouteChildren: AppPqrsRouteChildren = {
+  AppPqrsPqrIdRoute: AppPqrsPqrIdRoute,
+  AppPqrsIndexRoute: AppPqrsIndexRoute,
+}
+
+const AppPqrsRouteWithChildren =
+  AppPqrsRoute._addFileChildren(AppPqrsRouteChildren)
 
 interface AppProceduresRouteChildren {
   AppProceduresProcedureIdRoute: typeof AppProceduresProcedureIdRoute
@@ -1055,6 +1123,7 @@ interface AppRouteChildren {
   AppInspectionsRoute: typeof AppInspectionsRoute
   AppInstrumentsRoute: typeof AppInstrumentsRouteWithChildren
   AppNcrsRoute: typeof AppNcrsRouteWithChildren
+  AppPqrsRoute: typeof AppPqrsRouteWithChildren
   AppProceduresRoute: typeof AppProceduresRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRoute
   AppPwpsRoute: typeof AppPwpsRouteWithChildren
@@ -1074,6 +1143,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppInspectionsRoute: AppInspectionsRoute,
   AppInstrumentsRoute: AppInstrumentsRouteWithChildren,
   AppNcrsRoute: AppNcrsRouteWithChildren,
+  AppPqrsRoute: AppPqrsRouteWithChildren,
   AppProceduresRoute: AppProceduresRouteWithChildren,
   AppProjectsRoute: AppProjectsRoute,
   AppPwpsRoute: AppPwpsRouteWithChildren,

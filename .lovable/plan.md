@@ -1,96 +1,79 @@
-# Welding Procedure Qualification & Governance System
+## Goal
 
-This is a major strategic evolution — far beyond a single build turn. I'm proposing a phased plan so each phase ships working, testable value rather than a half-wired megastructure. Please confirm scope (or pick a starting phase) before I begin.
-
-## Lifecycle the system will enforce
-
-```text
-pWPS ─► Test Coupon ─► Welding Execution ─► NDT / Mechanical Tests
-       ─► PQR Evaluation ─► Engineering Validation ─► WPS Approval ─► Production Release
-```
-
-A pWPS cannot become a production WPS until PQR tests pass, engineering validation succeeds, and approvals are signed.
+Close the loop between `pWPS → PQR → WPS`. When a PQR is marked **Passed** and signed, the system auto-creates a Draft WPS in the Procedures module (linked back to its pWPS + PQR). A welding engineer still manually approves it before it becomes Active. The Procedures list separates **All / Qualified / Legacy** so qualified items are easy to find.
 
 ---
 
-## Phase 1 — Data foundation (DB + traceability)
+## 1. PQR detail — Pass & Sign
 
-New tables (all tenant-scoped via `company_id`, RLS mirroring `procedures`):
+In `src/routes/app.pqrs.$pqrId.tsx` (created in this phase, mirrors pWPS detail):
+- Tabs: Overview · Coupons · NDT · Mechanical · Findings · Signatures
+- Header action **Mark as Passed** (enabled when all required NDT + mechanical tests have `result = Passed` and no unresolved blocker findings)
+- On click: opens `SignaturePad` dialog → writes `pqrs.overall_result = 'Passed'`, `status = 'Approved'`, `qualification_date = today`, `evaluator_id/name = current user`, inserts `qualification_signatures`-style row (reuse pattern), then triggers promotion (step 2).
+- Also exposes **Mark as Failed** which sets `overall_result = 'Failed'`, `status = 'Rejected'`, and surfaces remediation note to the linked pWPS.
 
-- `pwps` — preliminary procedures (status: Draft, Under Qualification, Testing, Pending Validation, Qualified, Rejected, Converted)
-- `pqrs` — qualification records, links `pwps_id`, resulting `wps_id`
-- `test_coupons` — coupon ID, pwps_id, material, P-No/Group, thickness, dia, process, welder, position, joint, backing, heat#, fillers, date, project
-- `welding_execution_records` — planned vs actual amps/volts/travel/heat input/pass/interpass/polarity/consumables/gas/sequence, linked to coupon
-- `ndt_tests` — type (RT/UT/PT/MT/VT), result, criteria, technician, equipment_id (→ instruments), report attachment, findings
-- `mechanical_tests` — type (Tensile/Bend/Impact/Hardness/Macro/Fracture), specimen, dims, results JSON, min req, pass/fail, lab ref
-- `pqr_findings` — engine-generated validation findings (severity, code ref, message, affected variable)
-- `procedure_links` — generic edges between pwps/pqr/wps/wpq/coupon/ndt/mech/weld/ncr for traceability graph
+## 2. Auto-promote: PQR Passed → Draft WPS
 
-Extend `procedures` with `pwps_id`, `pqr_id` FKs so an approved WPS knows its lineage.
+New server function `src/lib/pqr-promotion.functions.ts`:
+- Input: `pqrId`
+- Guards: PQR must be `overall_result = 'Passed'`, must have `pwps_id`, must not already have `resulting_wps_id`, caller must be `is_editor`.
+- Reads the linked `pwps` row + the `pqr` row.
+- Inserts into `procedures` with:
+  - `status = 'Draft'`, `revision = 'Rev 0'`
+  - `procedure_type = 'WPS'`
+  - `code` / `wps_no` = derived (`WPS-` + pwps_no, collision-safe with suffix)
+  - `pqr_no` = pqr's `pqr_no`
+  - `pwps_id`, `pqr_id` FKs populated
+  - All welding variables (process, joint, base/filler, position, preheat/interpass, ranges, gas, pwht, technique) copied from pWPS
+  - Qualified ranges from `pqrs.qualified_ranges` JSONB override pWPS ranges where present (thickness, diameter, heat input, position envelope)
+  - `notes` seeded with `"Auto-generated from {pwps_no} qualified by {pqr_no} on {date}"`
+- Updates `pqrs.resulting_wps_id`, `pwps.converted_to_procedure_id`, `pwps.converted_at`, `pwps.status = 'Converted'`.
+- Inserts a `procedure_links` row (`source_type='pqr', target_type='procedure', relationship='qualified_by'`).
+- Sends in-app notification to all `welding_engineer` + `qa_qc_manager` in the company: *"New qualified WPS draft ready for approval."*
+- Returns the new `procedure.id` so the UI can navigate to it.
 
-## Phase 2 — pWPS module
+Called automatically from the PQR Pass action; also exposed as a manual **"Promote to WPS"** button on the pWPS detail and PQR detail headers (idempotent — re-clicking returns the existing WPS id).
 
-- Route group `/app/pwps` (index, $id detail, new) reusing the existing WPS builder workspace pattern
-- Status state machine in `src/lib/pwps-workflow.ts`
-- Conversion action "Promote to WPS" — gated by `qualified` status + signed PQR
+## 3. Manual approval inside Procedures
 
-## Phase 3 — Coupon + execution capture
+No new workflow code needed — reuses the existing `procedures.status` flow (Draft → Submitted → Approved) and `WpsBuilderWorkspace` / `WpsSignatureBlock`. The auto-created draft simply shows up there, pre-filled, ready for the engineer to review and approve.
 
-- `/app/coupons` list + builder
-- Execution record sub-form with planned-vs-actual diff highlighting and live heat-input calc (reuse `HeatInputCalculator`)
+Small additions to `src/routes/app.procedures.$procedureId.tsx`:
+- If `proc.pqr_id` is set, show a **"Qualification lineage"** strip at the top: `pWPS-001 → PQR-001 (Passed, 26 May 2026) → this WPS`, each segment a link.
+- Approval is blocked (with explanatory tooltip) if the linked PQR is later set back to non-Passed.
 
-## Phase 4 — NDT + Mechanical test engine
+## 4. Procedures list — All / Qualified / Legacy tabs
 
-- Tabbed test workspace inside the PQR detail page
-- Per-test-type schemas (Zod) with acceptance criteria per code family
-- Attachment uploads to new `pqr-attachments` bucket
-- Equipment linkage pulls calibration status from `instruments`
+Edit `src/routes/app.procedures.index.tsx`:
+- Add `Tabs` above the table: **All** (default) · **Qualified** (`pqr_id IS NOT NULL`) · **Legacy** (`pqr_id IS NULL`).
+- Each row in Qualified shows a `Badge` "Qualified by PQR-xxx" linking to the PQR.
+- Header KPI strip: counts per tab + "Pending approval" count (Draft WPSs with a `pqr_id`).
+- "New WPS" button stays, but adds a hint *"Tip: production WPSs are normally created automatically from a passed PQR."*
 
-## Phase 5 — Qualification Intelligence Engine
+## 5. Navigation + sidebar
 
-New `src/lib/pqr-engine.ts` extending existing `qualification-intelligence.ts`:
+`src/components/AppLayout.tsx`: add **PQR** entry between "Preliminary WPS" and "Procedures" so the lifecycle reads `pWPS → PQR → Procedures` in the sidebar.
 
-- Inputs: coupon + execution + NDT + mechanical results + code family
-- Applies ASME IX (QW-403/404/405/406/451/452) and ISO 15614 / 9606 rules
-- Outputs:
-  - pass/fail per essential variable
-  - qualified ranges (thickness, diameter, position, backing, polarity, process)
-  - findings list with code references
-  - remediation guidance on failure
-- Pure functions, fully unit-testable
+## 6. Files to add / edit
 
-## Phase 6 — Approval workflow + WPS auto-generation
+Add:
+- `src/routes/app.pqrs.tsx` (layout)
+- `src/routes/app.pqrs.index.tsx` (list)
+- `src/routes/app.pqrs.$pqrId.tsx` (detail + pass/fail/sign + tabs scaffold)
+- `src/lib/pqr-promotion.functions.ts` (server fn)
+- `src/lib/pqr-promotion.ts` (pure helpers: range merge, code derivation)
+- `src/components/procedures/QualificationLineageStrip.tsx`
 
-- On PQR pass + signatures: server fn creates approved `procedures` row, copies qualified ranges, links PQR, opens revision history
-- On fail: blocks promotion, surfaces failed variables and required retests
-- Notification fan-out via existing `notifications` table
+Edit:
+- `src/routes/app.procedures.index.tsx` (tabs + badges + KPIs)
+- `src/routes/app.procedures.$procedureId.tsx` (lineage strip, approval guard)
+- `src/routes/app.pwps.$pwpsId.tsx` (add "Promote to WPS" button when qualified)
+- `src/components/AppLayout.tsx` (sidebar PQR entry)
 
-## Phase 7 — Operational intelligence
+## 7. Out of scope (kept for later phases)
 
-- Background evaluation (server fn): when PQR expires / fails / is withdrawn, compute affected WPSs, welds, projects → write `notifications` + dashboard alerts
-- Reuse `OperationalAlertStrip` pattern
+- Full PQR Coupons / NDT / Mechanical builders — this turn ships the **detail shell + Pass/Fail/Sign + promotion**; deep test editors come in the next phase.
+- PQR qualification engine variable-by-variable evaluation (the auto-promotion just copies qualified_ranges JSON as-is for now).
+- PDF export of the qualified WPS lineage report.
 
-## Phase 8 — Dashboards + PDFs
-
-- `/app/pqr/dashboard` — KPIs (qualification status, pass/fail trend, expiring, bottlenecks, engineering risk)
-- Industrial A4 PDF documents for pWPS, PQR, WPS via the existing `ReportShell` (revision block, signatures, QR, multi-page tables, NDT/mechanical appendices, branding)
-
----
-
-## Technical approach
-
-- **Stack:** TanStack Start server functions for all writes, RLS on every new table, `is_editor()` for mutations, `super_admin` for promote-to-WPS
-- **State machines:** colocated in `src/lib/*-workflow.ts` mirroring `weld-workflow.ts`
-- **Engine isolation:** pure TS in `src/lib/pqr-engine.ts` + `qualification-intelligence.ts` — no DB, fully testable
-- **UI reuse:** `WpsBuilderWorkspace`, `DynamicSectionTables`, `SignaturePad`, `ReportShell`, `QrCodeBlock` already cover ~60% of the surface
-
----
-
-## Scope & sequencing question
-
-This is roughly **8–12 build turns** of work. To keep momentum I propose shipping **Phase 1 + Phase 2** first (data model + pWPS module with status workflow, no engine yet) so you can immediately enter pWPS records and we validate the schema before layering the engine on top.
-
-**Please confirm:**
-1. Start with Phase 1+2 (recommended), or jump to a different phase?
-2. Code families to support first: ASME IX only, or ASME IX + ISO 15614/9606 from day one?
-3. Should the existing `qualifications` (WPQ) tables be reused/extended, or kept separate from the new PQR tables?
+Reply **"go"** to implement, or tell me what to adjust.
