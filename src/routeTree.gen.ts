@@ -27,6 +27,7 @@ import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
+import { Route as AppPwpsRouteImport } from './routes/app.pwps'
 import { Route as AppProjectsRouteImport } from './routes/app.projects'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
 import { Route as AppNcrsRouteImport } from './routes/app.ncrs'
@@ -37,6 +38,7 @@ import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
+import { Route as AppPwpsIndexRouteImport } from './routes/app.pwps.index'
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
 import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
@@ -48,6 +50,7 @@ import { Route as AppQualificationsTrashRouteImport } from './routes/app.qualifi
 import { Route as AppQualificationsNewRouteImport } from './routes/app.qualifications.new'
 import { Route as AppQualificationsDashboardRouteImport } from './routes/app.qualifications.dashboard'
 import { Route as AppQualificationsQualIdRouteImport } from './routes/app.qualifications.$qualId'
+import { Route as AppPwpsPwpsIdRouteImport } from './routes/app.pwps.$pwpsId'
 import { Route as AppProceduresDashboardRouteImport } from './routes/app.procedures.dashboard'
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
@@ -144,6 +147,11 @@ const AppQualificationsRoute = AppQualificationsRouteImport.update({
   path: '/qualifications',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPwpsRoute = AppPwpsRouteImport.update({
+  id: '/pwps',
+  path: '/pwps',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProjectsRoute = AppProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -193,6 +201,11 @@ const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppQualificationsRoute,
+} as any)
+const AppPwpsIndexRoute = AppPwpsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppPwpsRoute,
 } as any)
 const AppProceduresIndexRoute = AppProceduresIndexRouteImport.update({
   id: '/',
@@ -251,6 +264,11 @@ const AppQualificationsQualIdRoute = AppQualificationsQualIdRouteImport.update({
   path: '/$qualId',
   getParentRoute: () => AppQualificationsRoute,
 } as any)
+const AppPwpsPwpsIdRoute = AppPwpsPwpsIdRouteImport.update({
+  id: '/$pwpsId',
+  path: '/$pwpsId',
+  getParentRoute: () => AppPwpsRoute,
+} as any)
 const AppProceduresDashboardRoute = AppProceduresDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -301,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
+  '/app/pwps': typeof AppPwpsRouteWithChildren
   '/app/qualifications': typeof AppQualificationsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
@@ -312,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
+  '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -323,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
+  '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -355,6 +376,7 @@ export interface FileRoutesByTo {
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
+  '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -366,6 +388,7 @@ export interface FileRoutesByTo {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/procedures': typeof AppProceduresIndexRoute
+  '/app/pwps': typeof AppPwpsIndexRoute
   '/app/qualifications': typeof AppQualificationsIndexRoute
 }
 export interface FileRoutesById {
@@ -391,6 +414,7 @@ export interface FileRoutesById {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
+  '/app/pwps': typeof AppPwpsRouteWithChildren
   '/app/qualifications': typeof AppQualificationsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
@@ -402,6 +426,7 @@ export interface FileRoutesById {
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
+  '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -413,6 +438,7 @@ export interface FileRoutesById {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
+  '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
 }
 export interface FileRouteTypes {
@@ -439,6 +465,7 @@ export interface FileRouteTypes {
     | '/app/ncrs'
     | '/app/procedures'
     | '/app/projects'
+    | '/app/pwps'
     | '/app/qualifications'
     | '/app/reports'
     | '/app/settings'
@@ -450,6 +477,7 @@ export interface FileRouteTypes {
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
+    | '/app/pwps/$pwpsId'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -461,6 +489,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/procedures/'
+    | '/app/pwps/'
     | '/app/qualifications/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -493,6 +522,7 @@ export interface FileRouteTypes {
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
+    | '/app/pwps/$pwpsId'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -504,6 +534,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/procedures'
+    | '/app/pwps'
     | '/app/qualifications'
   id:
     | '__root__'
@@ -528,6 +559,7 @@ export interface FileRouteTypes {
     | '/app/ncrs'
     | '/app/procedures'
     | '/app/projects'
+    | '/app/pwps'
     | '/app/qualifications'
     | '/app/reports'
     | '/app/settings'
@@ -539,6 +571,7 @@ export interface FileRouteTypes {
     | '/app/ncrs/$ncrId'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
+    | '/app/pwps/$pwpsId'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -550,6 +583,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/procedures/'
+    | '/app/pwps/'
     | '/app/qualifications/'
   fileRoutesById: FileRoutesById
 }
@@ -700,6 +734,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppQualificationsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/pwps': {
+      id: '/app/pwps'
+      path: '/pwps'
+      fullPath: '/app/pwps'
+      preLoaderRoute: typeof AppPwpsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/projects': {
       id: '/app/projects'
       path: '/projects'
@@ -769,6 +810,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/qualifications/'
       preLoaderRoute: typeof AppQualificationsIndexRouteImport
       parentRoute: typeof AppQualificationsRoute
+    }
+    '/app/pwps/': {
+      id: '/app/pwps/'
+      path: '/'
+      fullPath: '/app/pwps/'
+      preLoaderRoute: typeof AppPwpsIndexRouteImport
+      parentRoute: typeof AppPwpsRoute
     }
     '/app/procedures/': {
       id: '/app/procedures/'
@@ -846,6 +894,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/qualifications/$qualId'
       preLoaderRoute: typeof AppQualificationsQualIdRouteImport
       parentRoute: typeof AppQualificationsRoute
+    }
+    '/app/pwps/$pwpsId': {
+      id: '/app/pwps/$pwpsId'
+      path: '/$pwpsId'
+      fullPath: '/app/pwps/$pwpsId'
+      preLoaderRoute: typeof AppPwpsPwpsIdRouteImport
+      parentRoute: typeof AppPwpsRoute
     }
     '/app/procedures/dashboard': {
       id: '/app/procedures/dashboard'
@@ -936,6 +991,19 @@ const AppProceduresRouteWithChildren = AppProceduresRoute._addFileChildren(
   AppProceduresRouteChildren,
 )
 
+interface AppPwpsRouteChildren {
+  AppPwpsPwpsIdRoute: typeof AppPwpsPwpsIdRoute
+  AppPwpsIndexRoute: typeof AppPwpsIndexRoute
+}
+
+const AppPwpsRouteChildren: AppPwpsRouteChildren = {
+  AppPwpsPwpsIdRoute: AppPwpsPwpsIdRoute,
+  AppPwpsIndexRoute: AppPwpsIndexRoute,
+}
+
+const AppPwpsRouteWithChildren =
+  AppPwpsRoute._addFileChildren(AppPwpsRouteChildren)
+
 interface AppQualificationsRouteChildren {
   AppQualificationsQualIdRoute: typeof AppQualificationsQualIdRoute
   AppQualificationsDashboardRoute: typeof AppQualificationsDashboardRoute
@@ -989,6 +1057,7 @@ interface AppRouteChildren {
   AppNcrsRoute: typeof AppNcrsRouteWithChildren
   AppProceduresRoute: typeof AppProceduresRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRoute
+  AppPwpsRoute: typeof AppPwpsRouteWithChildren
   AppQualificationsRoute: typeof AppQualificationsRouteWithChildren
   AppReportsRoute: typeof AppReportsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
@@ -1007,6 +1076,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppNcrsRoute: AppNcrsRouteWithChildren,
   AppProceduresRoute: AppProceduresRouteWithChildren,
   AppProjectsRoute: AppProjectsRoute,
+  AppPwpsRoute: AppPwpsRouteWithChildren,
   AppQualificationsRoute: AppQualificationsRouteWithChildren,
   AppReportsRoute: AppReportsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
@@ -1038,13 +1108,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
