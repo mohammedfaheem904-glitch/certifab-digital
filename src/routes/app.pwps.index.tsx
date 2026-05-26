@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ModulePage } from "@/components/ModulePage";
 import { NewRecordDialog } from "@/components/NewRecordDialog";
@@ -218,5 +218,3 @@ function F({ label, children }: { label: string; children: React.ReactNode }) {
   );
 }
 
-// suppress unused query client warning if added later
-void useQueryClient;

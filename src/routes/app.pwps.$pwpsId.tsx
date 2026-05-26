@@ -1,0 +1,333 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { ArrowLeft, Loader2, Save, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import {
+  allowedPwpsTransitions,
+  PWPS_STAGES,
+  PWPS_STATUS_TONE,
+  pwpsStageIndex,
+  type PwpsStatus,
+} from "@/lib/pwps-workflow";
+
+type Pwps = {
+  id: string;
+  company_id: string;
+  pwps_no: string;
+  title: string | null;
+  revision: string;
+  status: PwpsStatus;
+  code_family: string;
+  standard: string | null;
+  process: string | null;
+  joint_type: string | null;
+  groove_type: string | null;
+  position: string | null;
+  base_material: string | null;
+  p_number: string | null;
+  group_number: string | null;
+  thickness_min_mm: number | null;
+  thickness_max_mm: number | null;
+  diameter_min_mm: number | null;
+  diameter_max_mm: number | null;
+  filler_material: string | null;
+  filler_classification: string | null;
+  shielding_gas: string | null;
+  backing: string | null;
+  preheat_min_c: number | null;
+  interpass_max_c: number | null;
+  pwht: string | null;
+  voltage_min: number | null;
+  voltage_max: number | null;
+  current_min: number | null;
+  current_max: number | null;
+  travel_speed_min: number | null;
+  travel_speed_max: number | null;
+  heat_input_min: number | null;
+  heat_input_max: number | null;
+  polarity: string | null;
+  technique_notes: string | null;
+  notes: string | null;
+  converted_to_procedure_id: string | null;
+  qualified_at: string | null;
+  rejected_at: string | null;
+};
+
+export const Route = createFileRoute("/app/pwps/$pwpsId")({
+  component: PwpsDetailPage,
+});
+
+function PwpsDetailPage() {
+  const { pwpsId } = Route.useParams();
+  const nav = useNavigate();
+  const qc = useQueryClient();
+  const { roles } = useAuth();
+  const isEditor = roles.some((r) =>
+    ["super_admin", "qa_qc_manager", "welding_engineer", "inspector"].includes(r),
+  );
+
+  const { data, isLoading } = useQuery<Pwps | null>({
+    queryKey: ["pwps", pwpsId],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("pwps" as any) as any)
+        .select("*")
+        .eq("id", pwpsId)
+        .maybeSingle();
+      if (error) throw error;
+      return data as Pwps | null;
+    },
+  });
+
+  const [draft, setDraft] = useState<Partial<Pwps>>({});
+  const [saving, setSaving] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+
+  const merged = useMemo(() => ({ ...(data ?? {}), ...draft }) as Pwps, [data, draft]);
+  const set = (k: keyof Pwps, v: any) => setDraft((d) => ({ ...d, [k]: v }));
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[60vh] grid place-items-center text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin me-2 inline" /> Loading pWPS…
+      </div>
+    );
+  }
+  if (!data) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-sm text-muted-foreground">pWPS not found.</p>
+        <Button variant="outline" className="mt-4" onClick={() => nav({ to: "/app/pwps" })}>
+          Back to list
+        </Button>
+      </div>
+    );
+  }
+
+  const transitions = allowedPwpsTransitions(merged.status);
+  const stageIdx = pwpsStageIndex(merged.status);
+
+  const handleSave = async () => {
+    if (!Object.keys(draft).length) {
+      toast.info("Nothing to save.");
+      return;
+    }
+    setSaving(true);
+    const { error } = await (supabase.from("pwps" as any) as any).update(draft).eq("id", pwpsId);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("pWPS saved.");
+    setDraft({});
+    qc.invalidateQueries({ queryKey: ["pwps", pwpsId] });
+    qc.invalidateQueries({ queryKey: ["pwps"] });
+  };
+
+  const handleTransition = async (to: PwpsStatus, _label: string) => {
+    setTransitioning(true);
+    const payload: Record<string, any> = { status: to };
+    if (to === "Qualified") payload.qualified_at = new Date().toISOString();
+    if (to === "Rejected") payload.rejected_at = new Date().toISOString();
+    const { error } = await (supabase.from("pwps" as any) as any).update(payload).eq("id", pwpsId);
+    setTransitioning(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Status → ${to}`);
+    qc.invalidateQueries({ queryKey: ["pwps", pwpsId] });
+    qc.invalidateQueries({ queryKey: ["pwps"] });
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <Button variant="ghost" size="sm" onClick={() => nav({ to: "/app/pwps" })} className="mb-2 -ms-2">
+            <ArrowLeft className="size-4 me-1" /> Back to pWPS
+          </Button>
+          <h1 className="text-2xl font-semibold tracking-tight">{data.pwps_no}</h1>
+          {data.title && <p className="text-sm text-muted-foreground mt-1">{data.title}</p>}
+          <div className="flex items-center gap-2 mt-2">
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs",
+                PWPS_STATUS_TONE[merged.status],
+              )}
+            >
+              {merged.status}
+            </span>
+            <span className="text-xs text-muted-foreground">{data.revision}</span>
+            <span className="text-xs text-muted-foreground">· {data.code_family}</span>
+          </div>
+        </div>
+        {isEditor && (
+          <Button onClick={handleSave} disabled={saving || !Object.keys(draft).length}>
+            {saving ? <Loader2 className="size-4 animate-spin me-1" /> : <Save className="size-4 me-1" />}
+            Save changes
+          </Button>
+        )}
+      </div>
+
+      {/* Workflow stepper */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <ShieldCheck className="size-4" /> Qualification workflow
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <ol className="flex flex-wrap items-center gap-2 text-xs">
+            {PWPS_STAGES.map((stage, i) => {
+              const done = i < stageIdx;
+              const current = i === stageIdx;
+              return (
+                <li key={stage} className="flex items-center gap-2">
+                  <span
+                    className={cn(
+                      "inline-flex items-center justify-center w-6 h-6 rounded-full border text-[10px] font-medium",
+                      done && "bg-success/20 border-success/40 text-success",
+                      current && "bg-primary/20 border-primary/40 text-primary",
+                      !done && !current && "bg-muted text-muted-foreground border-border",
+                    )}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className={cn(current ? "font-medium" : "text-muted-foreground")}>{stage}</span>
+                  {i < PWPS_STAGES.length - 1 && <span className="text-muted-foreground/60">→</span>}
+                </li>
+              );
+            })}
+          </ol>
+          {isEditor && transitions.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+              {transitions.map((t) => (
+                <Button
+                  key={t.to}
+                  size="sm"
+                  variant={t.variant ?? "default"}
+                  disabled={transitioning}
+                  onClick={() => handleTransition(t.to, t.label)}
+                  title={t.requires}
+                >
+                  {t.label}
+                </Button>
+              ))}
+            </div>
+          )}
+          {merged.status === "Converted" && data.converted_to_procedure_id && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                nav({
+                  to: "/app/procedures/$procedureId",
+                  params: { procedureId: data.converted_to_procedure_id! },
+                })
+              }
+            >
+              Open resulting WPS →
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Variables */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <Section title="Identification">
+          <Field label="Title">
+            <Input value={merged.title ?? ""} onChange={(e) => set("title", e.target.value)} disabled={!isEditor} />
+          </Field>
+          <Field label="Code family">
+            <Input value={merged.code_family ?? ""} onChange={(e) => set("code_family", e.target.value)} disabled={!isEditor} />
+          </Field>
+          <Field label="Standard">
+            <Input value={merged.standard ?? ""} onChange={(e) => set("standard", e.target.value)} disabled={!isEditor} />
+          </Field>
+          <Field label="Revision">
+            <Input value={merged.revision ?? ""} onChange={(e) => set("revision", e.target.value)} disabled={!isEditor} />
+          </Field>
+        </Section>
+
+        <Section title="Process & joint">
+          <Field label="Process"><Input value={merged.process ?? ""} onChange={(e) => set("process", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Joint type"><Input value={merged.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Groove type"><Input value={merged.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Position"><Input value={merged.position ?? ""} onChange={(e) => set("position", e.target.value)} disabled={!isEditor} /></Field>
+        </Section>
+
+        <Section title="Base material">
+          <Field label="Base material"><Input value={merged.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="P-Number"><Input value={merged.p_number ?? ""} onChange={(e) => set("p_number", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Group No."><Input value={merged.group_number ?? ""} onChange={(e) => set("group_number", e.target.value)} disabled={!isEditor} /></Field>
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Thickness min (mm)"><Input type="number" step="0.1" value={merged.thickness_min_mm ?? ""} onChange={(e) => set("thickness_min_mm", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Thickness max (mm)"><Input type="number" step="0.1" value={merged.thickness_max_mm ?? ""} onChange={(e) => set("thickness_max_mm", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Diameter min (mm)"><Input type="number" step="0.1" value={merged.diameter_min_mm ?? ""} onChange={(e) => set("diameter_min_mm", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Diameter max (mm)"><Input type="number" step="0.1" value={merged.diameter_max_mm ?? ""} onChange={(e) => set("diameter_max_mm", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+          </div>
+        </Section>
+
+        <Section title="Filler & gas">
+          <Field label="Filler material"><Input value={merged.filler_material ?? ""} onChange={(e) => set("filler_material", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Filler classification"><Input value={merged.filler_classification ?? ""} onChange={(e) => set("filler_classification", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Shielding gas"><Input value={merged.shielding_gas ?? ""} onChange={(e) => set("shielding_gas", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Backing"><Input value={merged.backing ?? ""} onChange={(e) => set("backing", e.target.value)} disabled={!isEditor} /></Field>
+        </Section>
+
+        <Section title="Electrical & thermal">
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Voltage min"><Input type="number" value={merged.voltage_min ?? ""} onChange={(e) => set("voltage_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Voltage max"><Input type="number" value={merged.voltage_max ?? ""} onChange={(e) => set("voltage_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Current min"><Input type="number" value={merged.current_min ?? ""} onChange={(e) => set("current_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Current max"><Input type="number" value={merged.current_max ?? ""} onChange={(e) => set("current_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Travel min"><Input type="number" value={merged.travel_speed_min ?? ""} onChange={(e) => set("travel_speed_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Travel max"><Input type="number" value={merged.travel_speed_max ?? ""} onChange={(e) => set("travel_speed_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Heat input min (kJ/mm)"><Input type="number" step="0.01" value={merged.heat_input_min ?? ""} onChange={(e) => set("heat_input_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Heat input max (kJ/mm)"><Input type="number" step="0.01" value={merged.heat_input_max ?? ""} onChange={(e) => set("heat_input_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Polarity"><Input value={merged.polarity ?? ""} onChange={(e) => set("polarity", e.target.value)} disabled={!isEditor} /></Field>
+            <Field label="Preheat min (°C)"><Input type="number" value={merged.preheat_min_c ?? ""} onChange={(e) => set("preheat_min_c", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Interpass max (°C)"><Input type="number" value={merged.interpass_max_c ?? ""} onChange={(e) => set("interpass_max_c", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="PWHT"><Input value={merged.pwht ?? ""} onChange={(e) => set("pwht", e.target.value)} disabled={!isEditor} /></Field>
+          </div>
+        </Section>
+
+        <Section title="Technique & notes">
+          <Field label="Technique notes">
+            <Textarea rows={4} value={merged.technique_notes ?? ""} onChange={(e) => set("technique_notes", e.target.value)} disabled={!isEditor} />
+          </Field>
+          <Field label="General notes">
+            <Textarea rows={3} value={merged.notes ?? ""} onChange={(e) => set("notes", e.target.value)} disabled={!isEditor} />
+          </Field>
+        </Section>
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">{children}</CardContent>
+    </Card>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs">{label}</Label>
+      {children}
+    </div>
+  );
+}
