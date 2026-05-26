@@ -274,6 +274,9 @@ function ProcedureDetailPage() {
 
   return (
     <div className="space-y-6">
+      {(proc.pwps_id || proc.pqr_id) && (
+        <QualificationLineageStrip pwpsId={proc.pwps_id} pqrId={proc.pqr_id} />
+      )}
       <div className="flex flex-wrap items-end justify-between gap-3 print:hidden">
         <div>
           <Button variant="ghost" size="sm" onClick={() => nav({ to: "/app/procedures" })} className="mb-2 -ms-2">
