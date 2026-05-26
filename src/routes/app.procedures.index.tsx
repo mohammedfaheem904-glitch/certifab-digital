@@ -148,20 +148,42 @@ function ProceduresPage() {
       }
 
     >
-      <div className="p-3 border-b border-border">
-        <Input placeholder="Search by code, standard, process, status…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm bg-background/60" />
+      <div className="p-3 border-b border-border flex flex-wrap items-center gap-3">
+        <div className="inline-flex rounded-md border border-border bg-muted/30 p-0.5 text-xs">
+          {(
+            [
+              { k: "all", label: `All (${all.length})` },
+              { k: "qualified", label: `Qualified (${qualifiedAll.length})` },
+              { k: "legacy", label: `Legacy (${legacyAll.length})` },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.k}
+              onClick={() => setTab(t.k)}
+              className={`px-3 py-1.5 rounded ${tab === t.k ? "bg-background shadow-sm font-medium" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {pendingApproval > 0 && (
+          <span className="text-xs px-2 py-1 rounded border border-warning/30 bg-warning/10 text-warning">
+            {pendingApproval} qualified draft{pendingApproval > 1 ? "s" : ""} pending approval
+          </span>
+        )}
+        <Input placeholder="Search by code, standard, process, PQR…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm bg-background/60 ms-auto" />
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
             <tr>
-              <Th>Code</Th><Th>Standard</Th><Th>Process</Th><Th>Thickness</Th><Th>Revision</Th><Th>Status</Th>
+              <Th>Code</Th><Th>Standard</Th><Th>Process</Th><Th>Thickness</Th><Th>Revision</Th><Th>Status</Th><Th>Source</Th>
               <th className="text-end font-medium px-5 py-2.5">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {isLoading && <Empty colSpan={7}><Loader2 className="size-4 animate-spin inline" /> Loading…</Empty>}
-            {!isLoading && filtered.length === 0 && <Empty colSpan={7}>No procedures yet — try “Seed demo data” in the header.</Empty>}
+            {isLoading && <Empty colSpan={8}><Loader2 className="size-4 animate-spin inline" /> Loading…</Empty>}
+            {!isLoading && filtered.length === 0 && <Empty colSpan={8}>No procedures in this tab.</Empty>}
             {filtered.map((p) => (
               <tr
                 key={p.id}
@@ -174,6 +196,15 @@ function ProceduresPage() {
                 <td className="px-5 py-3">{p.thickness_range}</td>
                 <td className="px-5 py-3 text-muted-foreground">{p.revision}</td>
                 <td className="px-5 py-3"><StatusBadge status={p.status} /></td>
+                <td className="px-5 py-3 text-xs">
+                  {p.pqr_id ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-success/30 bg-success/10 text-success">
+                      Qualified by {p.pqr_no ?? "PQR"}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Manual</span>
+                  )}
+                </td>
                 <td className="px-5 py-3 text-end">
                   <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                     <Tooltip>
