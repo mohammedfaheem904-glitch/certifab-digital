@@ -52,6 +52,7 @@ import { Route as AppQualificationsTrashRouteImport } from './routes/app.qualifi
 import { Route as AppQualificationsNewRouteImport } from './routes/app.qualifications.new'
 import { Route as AppQualificationsDashboardRouteImport } from './routes/app.qualifications.dashboard'
 import { Route as AppQualificationsQualIdRouteImport } from './routes/app.qualifications.$qualId'
+import { Route as AppPwpsTrashRouteImport } from './routes/app.pwps.trash'
 import { Route as AppPwpsPwpsIdRouteImport } from './routes/app.pwps.$pwpsId'
 import { Route as AppProceduresDashboardRouteImport } from './routes/app.procedures.dashboard'
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
@@ -277,6 +278,11 @@ const AppQualificationsQualIdRoute = AppQualificationsQualIdRouteImport.update({
   path: '/$qualId',
   getParentRoute: () => AppQualificationsRoute,
 } as any)
+const AppPwpsTrashRoute = AppPwpsTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AppPwpsRoute,
+} as any)
 const AppPwpsPwpsIdRoute = AppPwpsPwpsIdRouteImport.update({
   id: '/$pwpsId',
   path: '/$pwpsId',
@@ -352,6 +358,7 @@ export interface FileRoutesByFullPath {
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
+  '/app/pwps/trash': typeof AppPwpsTrashRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -399,6 +406,7 @@ export interface FileRoutesByTo {
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
+  '/app/pwps/trash': typeof AppPwpsTrashRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -452,6 +460,7 @@ export interface FileRoutesById {
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
+  '/app/pwps/trash': typeof AppPwpsTrashRoute
   '/app/qualifications/$qualId': typeof AppQualificationsQualIdRoute
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
@@ -506,6 +515,7 @@ export interface FileRouteTypes {
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
+    | '/app/pwps/trash'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -553,6 +563,7 @@ export interface FileRouteTypes {
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
+    | '/app/pwps/trash'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -605,6 +616,7 @@ export interface FileRouteTypes {
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
+    | '/app/pwps/trash'
     | '/app/qualifications/$qualId'
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
@@ -943,6 +955,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppQualificationsQualIdRouteImport
       parentRoute: typeof AppQualificationsRoute
     }
+    '/app/pwps/trash': {
+      id: '/app/pwps/trash'
+      path: '/trash'
+      fullPath: '/app/pwps/trash'
+      preLoaderRoute: typeof AppPwpsTrashRouteImport
+      parentRoute: typeof AppPwpsRoute
+    }
     '/app/pwps/$pwpsId': {
       id: '/app/pwps/$pwpsId'
       path: '/$pwpsId'
@@ -1061,11 +1080,13 @@ const AppProceduresRouteWithChildren = AppProceduresRoute._addFileChildren(
 
 interface AppPwpsRouteChildren {
   AppPwpsPwpsIdRoute: typeof AppPwpsPwpsIdRoute
+  AppPwpsTrashRoute: typeof AppPwpsTrashRoute
   AppPwpsIndexRoute: typeof AppPwpsIndexRoute
 }
 
 const AppPwpsRouteChildren: AppPwpsRouteChildren = {
   AppPwpsPwpsIdRoute: AppPwpsPwpsIdRoute,
+  AppPwpsTrashRoute: AppPwpsTrashRoute,
   AppPwpsIndexRoute: AppPwpsIndexRoute,
 }
 
