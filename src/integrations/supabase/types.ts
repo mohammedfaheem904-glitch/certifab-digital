@@ -3067,9 +3067,13 @@ export type Database = {
       is_company_member: { Args: { _company_id: string }; Returns: boolean }
       is_editor: { Args: { _user_id: string }; Returns: boolean }
       is_internal_company: { Args: { _company_id: string }; Returns: boolean }
+      restore_pqr: { Args: { _id: string }; Returns: undefined }
       restore_procedure: { Args: { _id: string }; Returns: undefined }
+      restore_pwps: { Args: { _id: string }; Returns: undefined }
       restore_qualification: { Args: { _id: string }; Returns: undefined }
+      soft_delete_pqr: { Args: { _id: string }; Returns: undefined }
       soft_delete_procedure: { Args: { _id: string }; Returns: undefined }
+      soft_delete_pwps: { Args: { _id: string }; Returns: undefined }
       soft_delete_qualification: { Args: { _id: string }; Returns: undefined }
     }
     Enums: {
