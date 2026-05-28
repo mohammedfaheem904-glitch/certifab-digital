@@ -56,6 +56,7 @@ import { Route as AppPwpsTrashRouteImport } from './routes/app.pwps.trash'
 import { Route as AppPwpsPwpsIdRouteImport } from './routes/app.pwps.$pwpsId'
 import { Route as AppProceduresDashboardRouteImport } from './routes/app.procedures.dashboard'
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
+import { Route as AppPqrsTrashRouteImport } from './routes/app.pqrs.trash'
 import { Route as AppPqrsPqrIdRouteImport } from './routes/app.pqrs.$pqrId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
@@ -299,6 +300,11 @@ const AppProceduresProcedureIdRoute =
     path: '/$procedureId',
     getParentRoute: () => AppProceduresRoute,
   } as any)
+const AppPqrsTrashRoute = AppPqrsTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AppPqrsRoute,
+} as any)
 const AppPqrsPqrIdRoute = AppPqrsPqrIdRouteImport.update({
   id: '/$pqrId',
   path: '/$pqrId',
@@ -355,6 +361,7 @@ export interface FileRoutesByFullPath {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
+  '/app/pqrs/trash': typeof AppPqrsTrashRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
@@ -403,6 +410,7 @@ export interface FileRoutesByTo {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
+  '/app/pqrs/trash': typeof AppPqrsTrashRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
@@ -457,6 +465,7 @@ export interface FileRoutesById {
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
+  '/app/pqrs/trash': typeof AppPqrsTrashRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
@@ -512,6 +521,7 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
+    | '/app/pqrs/trash'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
@@ -560,6 +570,7 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
+    | '/app/pqrs/trash'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
@@ -613,6 +624,7 @@ export interface FileRouteTypes {
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
+    | '/app/pqrs/trash'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
     | '/app/pwps/$pwpsId'
@@ -983,6 +995,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProceduresProcedureIdRouteImport
       parentRoute: typeof AppProceduresRoute
     }
+    '/app/pqrs/trash': {
+      id: '/app/pqrs/trash'
+      path: '/trash'
+      fullPath: '/app/pqrs/trash'
+      preLoaderRoute: typeof AppPqrsTrashRouteImport
+      parentRoute: typeof AppPqrsRoute
+    }
     '/app/pqrs/$pqrId': {
       id: '/app/pqrs/$pqrId'
       path: '/$pqrId'
@@ -1051,11 +1070,13 @@ const AppNcrsRouteWithChildren =
 
 interface AppPqrsRouteChildren {
   AppPqrsPqrIdRoute: typeof AppPqrsPqrIdRoute
+  AppPqrsTrashRoute: typeof AppPqrsTrashRoute
   AppPqrsIndexRoute: typeof AppPqrsIndexRoute
 }
 
 const AppPqrsRouteChildren: AppPqrsRouteChildren = {
   AppPqrsPqrIdRoute: AppPqrsPqrIdRoute,
+  AppPqrsTrashRoute: AppPqrsTrashRoute,
   AppPqrsIndexRoute: AppPqrsIndexRoute,
 }
 
