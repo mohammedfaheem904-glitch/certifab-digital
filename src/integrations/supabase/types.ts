@@ -2193,6 +2193,8 @@ export type Database = {
           blocked_reason: string | null
           company_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           drawing_ref: string | null
           filler_metal: string | null
           heat_input: string | null
@@ -2226,6 +2228,8 @@ export type Database = {
           blocked_reason?: string | null
           company_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           drawing_ref?: string | null
           filler_metal?: string | null
           heat_input?: string | null
@@ -2259,6 +2263,8 @@ export type Database = {
           blocked_reason?: string | null
           company_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           drawing_ref?: string | null
           filler_metal?: string | null
           heat_input?: string | null
@@ -3071,10 +3077,12 @@ export type Database = {
       restore_procedure: { Args: { _id: string }; Returns: undefined }
       restore_pwps: { Args: { _id: string }; Returns: undefined }
       restore_qualification: { Args: { _id: string }; Returns: undefined }
+      restore_weld: { Args: { _id: string }; Returns: undefined }
       soft_delete_pqr: { Args: { _id: string }; Returns: undefined }
       soft_delete_procedure: { Args: { _id: string }; Returns: undefined }
       soft_delete_pwps: { Args: { _id: string }; Returns: undefined }
       soft_delete_qualification: { Args: { _id: string }; Returns: undefined }
+      soft_delete_weld: { Args: { _id: string }; Returns: undefined }
     }
     Enums: {
       app_role:
