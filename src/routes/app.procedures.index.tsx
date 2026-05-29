@@ -212,6 +212,44 @@ function ProceduresPage() {
         )}
         <Input placeholder="Search by code, standard, process, PQR…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm bg-background/60 ms-auto" />
       </div>
+      <div className="px-3 py-2 border-b border-border flex flex-wrap items-center gap-2">
+        <FilterSelect label="Status" value={statusFilter} onChange={setStatusFilter} options={statusOptions} />
+        <FilterSelect label="Process" value={processFilter} onChange={setProcessFilter} options={processOptions} />
+        <FilterSelect label="Standard" value={standardFilter} onChange={setStandardFilter} options={standardOptions} />
+        <Select value={sourceFilter} onValueChange={setSourceFilter}>
+          <SelectTrigger className="h-8 w-[160px] text-xs bg-background/60"><SelectValue placeholder="Source" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All sources</SelectItem>
+            <SelectItem value="qualified">Qualified by PQR</SelectItem>
+            <SelectItem value="manual">Manual</SelectItem>
+          </SelectContent>
+        </Select>
+        {positionOptions.length > 0 && (
+          <FilterSelect label="Position" value={positionFilter} onChange={setPositionFilter} options={positionOptions} />
+        )}
+        {activeFilters.length > 0 && (
+          <>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {activeFilters.map((f) => (
+                <button
+                  key={f.key}
+                  onClick={f.clear}
+                  className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border border-border bg-muted/40 hover:bg-muted"
+                >
+                  {f.label}
+                  <X className="size-3" />
+                </button>
+              ))}
+            </div>
+            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={clearAllFilters}>
+              Clear filters
+            </Button>
+          </>
+        )}
+        <span className="text-xs text-muted-foreground ms-auto">
+          Showing {filtered.length} of {scoped.length}
+        </span>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
