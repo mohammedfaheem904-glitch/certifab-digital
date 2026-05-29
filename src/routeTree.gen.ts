@@ -46,6 +46,8 @@ import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
 import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qualification.$token'
 import { Route as VerifyInstrumentTokenRouteImport } from './routes/verify.instrument.$token'
+import { Route as AppWeldsTrashRouteImport } from './routes/app.welds.trash'
+import { Route as AppWeldsDashboardRouteImport } from './routes/app.welds.dashboard'
 import { Route as AppWeldsWeldIdRouteImport } from './routes/app.welds.$weldId'
 import { Route as AppReportsSlugRouteImport } from './routes/app.reports.$slug'
 import { Route as AppQualificationsTrashRouteImport } from './routes/app.qualifications.trash'
@@ -250,6 +252,16 @@ const VerifyInstrumentTokenRoute = VerifyInstrumentTokenRouteImport.update({
   path: '/verify/instrument/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppWeldsTrashRoute = AppWeldsTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AppWeldsRoute,
+} as any)
+const AppWeldsDashboardRoute = AppWeldsDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppWeldsRoute,
+} as any)
 const AppWeldsWeldIdRoute = AppWeldsWeldIdRouteImport.update({
   id: '/$weldId',
   path: '/$weldId',
@@ -386,6 +398,8 @@ export interface FileRoutesByFullPath {
   '/app/qualifications/trash': typeof AppQualificationsTrashRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
+  '/app/welds/dashboard': typeof AppWeldsDashboardRoute
+  '/app/welds/trash': typeof AppWeldsTrashRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
@@ -437,6 +451,8 @@ export interface FileRoutesByTo {
   '/app/qualifications/trash': typeof AppQualificationsTrashRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
+  '/app/welds/dashboard': typeof AppWeldsDashboardRoute
+  '/app/welds/trash': typeof AppWeldsTrashRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
@@ -494,6 +510,8 @@ export interface FileRoutesById {
   '/app/qualifications/trash': typeof AppQualificationsTrashRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
+  '/app/welds/dashboard': typeof AppWeldsDashboardRoute
+  '/app/welds/trash': typeof AppWeldsTrashRoute
   '/verify/instrument/$token': typeof VerifyInstrumentTokenRoute
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
@@ -552,6 +570,8 @@ export interface FileRouteTypes {
     | '/app/qualifications/trash'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
+    | '/app/welds/dashboard'
+    | '/app/welds/trash'
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
@@ -603,6 +623,8 @@ export interface FileRouteTypes {
     | '/app/qualifications/trash'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
+    | '/app/welds/dashboard'
+    | '/app/welds/trash'
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
@@ -659,6 +681,8 @@ export interface FileRouteTypes {
     | '/app/qualifications/trash'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
+    | '/app/welds/dashboard'
+    | '/app/welds/trash'
     | '/verify/instrument/$token'
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
@@ -949,6 +973,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyInstrumentTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/welds/trash': {
+      id: '/app/welds/trash'
+      path: '/trash'
+      fullPath: '/app/welds/trash'
+      preLoaderRoute: typeof AppWeldsTrashRouteImport
+      parentRoute: typeof AppWeldsRoute
+    }
+    '/app/welds/dashboard': {
+      id: '/app/welds/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/welds/dashboard'
+      preLoaderRoute: typeof AppWeldsDashboardRouteImport
+      parentRoute: typeof AppWeldsRoute
+    }
     '/app/welds/$weldId': {
       id: '/app/welds/$weldId'
       path: '/$weldId'
@@ -1189,10 +1227,14 @@ const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
 
 interface AppWeldsRouteChildren {
   AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
+  AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
+  AppWeldsTrashRoute: typeof AppWeldsTrashRoute
 }
 
 const AppWeldsRouteChildren: AppWeldsRouteChildren = {
   AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
+  AppWeldsDashboardRoute: AppWeldsDashboardRoute,
+  AppWeldsTrashRoute: AppWeldsTrashRoute,
 }
 
 const AppWeldsRouteWithChildren = AppWeldsRoute._addFileChildren(
