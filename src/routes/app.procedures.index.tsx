@@ -6,11 +6,12 @@ import { useCompanyRows } from "@/lib/use-company-rows";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronRight, Eye, Trash2, BarChart3, Download } from "lucide-react";
+import { Loader2, ChevronRight, Eye, Trash2, BarChart3, Download, X } from "lucide-react";
 import { bulkExportProceduresCsv, bulkExportProceduresXlsx } from "@/lib/wps-export";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +39,7 @@ type Row = {
   standard: string;
   process: string;
   thickness_range: string | null;
+  position: string | null;
   revision: string;
   status: string;
   pqr_id: string | null;
@@ -60,18 +62,55 @@ function ProceduresPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [processFilter, setProcessFilter] = useState<string>("all");
+  const [standardFilter, setStandardFilter] = useState<string>("all");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
+  const [positionFilter, setPositionFilter] = useState<string>("all");
+
   const all = data ?? [];
   const qualifiedAll = all.filter((p) => !!p.pqr_id);
   const legacyAll = all.filter((p) => !p.pqr_id);
   const pendingApproval = qualifiedAll.filter((p) => p.status === "Draft").length;
 
+  const uniq = (arr: (string | null | undefined)[]) =>
+    Array.from(new Set(arr.filter((v): v is string => !!v && String(v).trim() !== ""))).sort((a, b) =>
+      a.localeCompare(b),
+    );
+  const statusOptions = useMemo(() => uniq(all.map((p) => p.status)), [all]);
+  const processOptions = useMemo(() => uniq(all.map((p) => p.process)), [all]);
+  const standardOptions = useMemo(() => uniq(all.map((p) => p.standard)), [all]);
+  const positionOptions = useMemo(() => uniq(all.map((p) => p.position)), [all]);
+
   const scoped = tab === "qualified" ? qualifiedAll : tab === "legacy" ? legacyAll : all;
   const filtered = scoped.filter((p) => {
+    if (statusFilter !== "all" && p.status !== statusFilter) return false;
+    if (processFilter !== "all" && p.process !== processFilter) return false;
+    if (standardFilter !== "all" && p.standard !== standardFilter) return false;
+    if (positionFilter !== "all" && p.position !== positionFilter) return false;
+    if (sourceFilter === "qualified" && !p.pqr_id) return false;
+    if (sourceFilter === "manual" && !!p.pqr_id) return false;
     if (!q.trim()) return true;
     const s = q.toLowerCase();
     return [p.code, p.standard, p.process, p.revision, p.status, p.pqr_no]
       .filter(Boolean).some((x) => String(x).toLowerCase().includes(s));
   });
+
+  const activeFilters: { key: string; label: string; clear: () => void }[] = [
+    statusFilter !== "all" && { key: "status", label: `Status: ${statusFilter}`, clear: () => setStatusFilter("all") },
+    processFilter !== "all" && { key: "process", label: `Process: ${processFilter}`, clear: () => setProcessFilter("all") },
+    standardFilter !== "all" && { key: "standard", label: `Standard: ${standardFilter}`, clear: () => setStandardFilter("all") },
+    sourceFilter !== "all" && { key: "source", label: `Source: ${sourceFilter === "qualified" ? "Qualified by PQR" : "Manual"}`, clear: () => setSourceFilter("all") },
+    positionFilter !== "all" && { key: "position", label: `Position: ${positionFilter}`, clear: () => setPositionFilter("all") },
+  ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
+
+  const clearAllFilters = () => {
+    setStatusFilter("all");
+    setProcessFilter("all");
+    setStandardFilter("all");
+    setSourceFilter("all");
+    setPositionFilter("all");
+  };
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -172,6 +211,44 @@ function ProceduresPage() {
           </span>
         )}
         <Input placeholder="Search by code, standard, process, PQR…" value={q} onChange={(e) => setQ(e.target.value)} className="max-w-sm bg-background/60 ms-auto" />
+      </div>
+      <div className="px-3 py-2 border-b border-border flex flex-wrap items-center gap-2">
+        <FilterSelect label="Status" value={statusFilter} onChange={setStatusFilter} options={statusOptions} />
+        <FilterSelect label="Process" value={processFilter} onChange={setProcessFilter} options={processOptions} />
+        <FilterSelect label="Standard" value={standardFilter} onChange={setStandardFilter} options={standardOptions} />
+        <Select value={sourceFilter} onValueChange={setSourceFilter}>
+          <SelectTrigger className="h-8 w-[160px] text-xs bg-background/60"><SelectValue placeholder="Source" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All sources</SelectItem>
+            <SelectItem value="qualified">Qualified by PQR</SelectItem>
+            <SelectItem value="manual">Manual</SelectItem>
+          </SelectContent>
+        </Select>
+        {positionOptions.length > 0 && (
+          <FilterSelect label="Position" value={positionFilter} onChange={setPositionFilter} options={positionOptions} />
+        )}
+        {activeFilters.length > 0 && (
+          <>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {activeFilters.map((f) => (
+                <button
+                  key={f.key}
+                  onClick={f.clear}
+                  className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border border-border bg-muted/40 hover:bg-muted"
+                >
+                  {f.label}
+                  <X className="size-3" />
+                </button>
+              ))}
+            </div>
+            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={clearAllFilters}>
+              Clear filters
+            </Button>
+          </>
+        )}
+        <span className="text-xs text-muted-foreground ms-auto">
+          Showing {filtered.length} of {scoped.length}
+        </span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -287,5 +364,32 @@ function Empty({ colSpan, children }: { colSpan: number; children: React.ReactNo
 function F({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5"><Label className="text-xs">{label}</Label>{children}</div>
+  );
+}
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="h-8 w-[160px] text-xs bg-background/60">
+        <SelectValue placeholder={label} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All {label.toLowerCase()}</SelectItem>
+        {options.map((o) => (
+          <SelectItem key={o} value={o}>
+            {o}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
