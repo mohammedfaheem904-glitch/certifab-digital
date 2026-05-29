@@ -62,18 +62,55 @@ function ProceduresPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [processFilter, setProcessFilter] = useState<string>("all");
+  const [standardFilter, setStandardFilter] = useState<string>("all");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
+  const [positionFilter, setPositionFilter] = useState<string>("all");
+
   const all = data ?? [];
   const qualifiedAll = all.filter((p) => !!p.pqr_id);
   const legacyAll = all.filter((p) => !p.pqr_id);
   const pendingApproval = qualifiedAll.filter((p) => p.status === "Draft").length;
 
+  const uniq = (arr: (string | null | undefined)[]) =>
+    Array.from(new Set(arr.filter((v): v is string => !!v && String(v).trim() !== ""))).sort((a, b) =>
+      a.localeCompare(b),
+    );
+  const statusOptions = useMemo(() => uniq(all.map((p) => p.status)), [all]);
+  const processOptions = useMemo(() => uniq(all.map((p) => p.process)), [all]);
+  const standardOptions = useMemo(() => uniq(all.map((p) => p.standard)), [all]);
+  const positionOptions = useMemo(() => uniq(all.map((p) => p.position)), [all]);
+
   const scoped = tab === "qualified" ? qualifiedAll : tab === "legacy" ? legacyAll : all;
   const filtered = scoped.filter((p) => {
+    if (statusFilter !== "all" && p.status !== statusFilter) return false;
+    if (processFilter !== "all" && p.process !== processFilter) return false;
+    if (standardFilter !== "all" && p.standard !== standardFilter) return false;
+    if (positionFilter !== "all" && p.position !== positionFilter) return false;
+    if (sourceFilter === "qualified" && !p.pqr_id) return false;
+    if (sourceFilter === "manual" && !!p.pqr_id) return false;
     if (!q.trim()) return true;
     const s = q.toLowerCase();
     return [p.code, p.standard, p.process, p.revision, p.status, p.pqr_no]
       .filter(Boolean).some((x) => String(x).toLowerCase().includes(s));
   });
+
+  const activeFilters: { key: string; label: string; clear: () => void }[] = [
+    statusFilter !== "all" && { key: "status", label: `Status: ${statusFilter}`, clear: () => setStatusFilter("all") },
+    processFilter !== "all" && { key: "process", label: `Process: ${processFilter}`, clear: () => setProcessFilter("all") },
+    standardFilter !== "all" && { key: "standard", label: `Standard: ${standardFilter}`, clear: () => setStandardFilter("all") },
+    sourceFilter !== "all" && { key: "source", label: `Source: ${sourceFilter === "qualified" ? "Qualified by PQR" : "Manual"}`, clear: () => setSourceFilter("all") },
+    positionFilter !== "all" && { key: "position", label: `Position: ${positionFilter}`, clear: () => setPositionFilter("all") },
+  ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
+
+  const clearAllFilters = () => {
+    setStatusFilter("all");
+    setProcessFilter("all");
+    setStandardFilter("all");
+    setSourceFilter("all");
+    setPositionFilter("all");
+  };
 
   const handleDelete = async () => {
     if (!deleteId) return;
