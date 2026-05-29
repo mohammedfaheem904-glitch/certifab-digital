@@ -6,11 +6,12 @@ import { useCompanyRows } from "@/lib/use-company-rows";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronRight, Eye, Trash2, BarChart3, Download } from "lucide-react";
+import { Loader2, ChevronRight, Eye, Trash2, BarChart3, Download, X } from "lucide-react";
 import { bulkExportProceduresCsv, bulkExportProceduresXlsx } from "@/lib/wps-export";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";

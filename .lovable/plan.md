@@ -1,85 +1,39 @@
-# Add Dashboard, Bulk Export, Trash, and Filtration to pWPS & PQR
+## Goal
+Extend the existing Procedures (WPS) list page (`src/routes/app.procedures.index.tsx`) with a proper filtration system, alongside the current search + tab UI.
 
-Mirror the patterns already used by the Qualifications (WPQ) module so both Preliminary WPS and PQR modules feel consistent with the rest of the app.
+## Filters to add
+Rendered as a row of compact `Select` dropdowns above/next to the search input:
 
-## 1. Dashboard pages
+1. **Status** — Draft, In Review, Approved, Qualified, Rejected, Superseded (derived from distinct `status` values in current rows, with a stable known set as fallback).
+2. **Process** — distinct `process` values (GTAW, SMAW, GMAW, FCAW, SAW, …) derived from the loaded rows.
+3. **Standard / Code family** — distinct `standard` values (ASME IX, EN ISO 15614, AWS D1.1, AS/NZS, JIS, …).
+4. **Source** — `Qualified by PQR` vs `Manual` (mirrors the existing "Source" column: based on whether `pqr_id` is set).
+5. **Position** (bonus, "etc.") — distinct `position` values when present.
 
-New routes:
-- `src/routes/app.pwps.dashboard.tsx` — `/app/pwps/dashboard`
-- `src/routes/app.pqrs.dashboard.tsx` — `/app/pqrs/dashboard`
+Each dropdown includes an "All" option and only shows values that actually exist in the dataset (built from `useCompanyRows` result). Selecting a value narrows the list; combined with the existing search box and tab (All / Qualified / Legacy), filters compose with AND logic.
 
-Each dashboard shows:
-- KPI strip: Total, Draft, In Review / Pending Validation, Qualified / Passed, Rejected / Failed, Converted (pWPS) or Resulting WPS created (PQR).
-- Status distribution (pie/donut).
-- Code family / Process distribution (pie).
-- Activity trend (bar) — records created per month over the last 12 months.
-- "Needs attention" table — pWPS sitting in review > N days, PQR with `Pending` overall result, etc.
-- Link back to the list and a primary "New pWPS" / "New PQR" CTA.
+## UX details
+- Toolbar layout (in the existing `p-3 border-b` header strip):
+  - Row 1: Tab pills + pending-approval chip (unchanged) + Search input (unchanged, moved to wrap).
+  - Row 2: Filter dropdowns + "Active filters" chips + "Clear filters" ghost button (only visible when any filter is active).
+- Active filter chips show `Status: Draft ×` style and remove that single filter on click.
+- "Clear filters" resets all dropdowns (does not clear the search box or tab — those remain independent, matching the existing pattern used in pWPS/PQR).
+- Result counter on the right of the toolbar: `Showing X of Y`.
+- Bulk Export "visible" option keeps working — it already uses `filtered`, so it automatically respects the new filters.
 
-Reuse `useCompanyRows`, `recharts`, and the `Kpi` card pattern from `app.qualifications.dashboard.tsx`.
+## Implementation notes (technical)
+- Pure frontend change in `src/routes/app.procedures.index.tsx`. No schema or RPC changes.
+- Use existing `@/components/ui/select` (`Select`, `SelectTrigger`, `SelectContent`, `SelectItem`, `SelectValue`) — already imported elsewhere in the project.
+- State: add `statusFilter`, `processFilter`, `standardFilter`, `sourceFilter`, `positionFilter` (each `string`, default `"all"`).
+- Derive option lists via `useMemo` from `data ?? []`, sorted alphabetically, de-duplicated, dropping null/empty.
+- Extend the existing `filtered` computation to AND-combine the new filters with the tab scope and the search string.
+- For `sourceFilter`: `"qualified"` → `!!p.pqr_id`; `"manual"` → `!p.pqr_id`.
+- Keep `Row` type as-is; if Position filter is added, extend `Row` to include `position: string | null` and add it to the optional select (the underlying table already has it — see the NewRecordDialog `position` field).
 
-## 2. Filtration system
+## Out of scope
+- No changes to the pWPS/PQR pages (they already have their own filter system from Phase 8).
+- No URL/search-param persistence for filters in this pass (kept as local component state, matching the current search/tab pattern on this page). Can be added later via `validateSearch` if desired.
+- No backend filtering — dataset is already loaded client-side via `useCompanyRows`.
 
-Extend the list pages (`app.pwps.index.tsx`, `app.pqrs.index.tsx`):
-- Keep the existing text search.
-- Add dropdown filters in a filter bar:
-  - pWPS: Status, Code family, Process, Position.
-  - PQR: Status, Overall Result, Code family, Linked pWPS.
-- Filters combine (AND) with search; state lives in URL search params via TanStack Router `validateSearch` so filters are shareable and survive refresh.
-- "Clear filters" button when any filter is active.
-- Show active filter chips above the table.
-
-## 3. Bulk Export
-
-On both list pages:
-- Add a checkbox column (header + per-row) with a `selected` Set state.
-- Toolbar bar appears when any row is selected: "N selected", "Export CSV", "Export XLSX", "Move to Trash" (editors only), "Clear".
-- Export uses existing `exportCsv` / `exportExcel` from `src/lib/export.ts` and exports the currently filtered + selected rows with a flat column set (number, title, status, code, process, dates, etc.).
-- If nothing is selected, the toolbar offers "Export all filtered" as a fallback action under a small dropdown.
-
-## 4. Trash with "move to trash" icon
-
-Soft-delete already exists at the schema level (`deleted_at`, `deleted_by` on `pwps` and `pqrs`), but there are no RPCs yet.
-
-Database migration (new file) adds 4 SECURITY DEFINER functions mirroring `soft_delete_qualification` / `restore_qualification`:
-- `soft_delete_pwps(_id uuid)` — editor-only, tenant-scoped, sets `deleted_at`/`deleted_by`, writes an audit_logs row.
-- `restore_pwps(_id uuid)` — super_admin-only, clears `deleted_at`/`deleted_by`, writes an audit_logs row.
-- `soft_delete_pqr(_id uuid)` — editor-only.
-- `restore_pqr(_id uuid)` — super_admin-only.
-
-UI changes:
-- Add a trash icon button in each list row's Actions column (`Move to trash`) that calls the soft-delete RPC after a confirm, then invalidates the list query.
-- Bulk "Move to Trash" action runs the RPC for every selected id in parallel.
-- New routes:
-  - `src/routes/app.pwps.trash.tsx` — `/app/pwps/trash`
-  - `src/routes/app.pqrs.trash.tsx` — `/app/pqrs/trash`
-  - Both mirror `app.qualifications.trash.tsx`: super_admin only, lists `deleted_at IS NOT NULL` rows, with Restore and permanent Delete buttons.
-- Add a "Trash" link in the list-page header next to the dashboard link.
-
-## 5. Navigation wiring
-
-On the existing pWPS and PQR list pages, add a small toolbar in the page header (next to the `New pWPS` / `New PQR` button):
-- "Dashboard" → `/app/pwps/dashboard` or `/app/pqrs/dashboard`
-- "Trash" → `/app/pwps/trash` or `/app/pqrs/trash` (visible only to super_admin)
-
-## Technical notes
-
-- New files only — no edits to `routeTree.gen.ts` (regenerated automatically).
-- All queries continue to use `company_id = current_company_id()` via existing RLS; no policy changes needed.
-- Realtime invalidation already handled by `useCompanyRows` when `realtime: true`.
-- Permanent delete in trash uses the existing `editors delete pwps` / `editors delete pqrs` RLS policies (no new policy needed; super_admin is an editor).
-
-## Files
-
-Created:
-- `src/routes/app.pwps.dashboard.tsx`
-- `src/routes/app.pwps.trash.tsx`
-- `src/routes/app.pqrs.dashboard.tsx`
-- `src/routes/app.pqrs.trash.tsx`
-- `supabase/migrations/<timestamp>_pwps_pqr_soft_delete_rpcs.sql`
-- `src/components/common/BulkActionsBar.tsx` (shared selection toolbar)
-- `src/components/common/FilterBar.tsx` (shared filter dropdowns + chips)
-
-Edited:
-- `src/routes/app.pwps.index.tsx` — filters, selection, bulk actions, trash icon, header links.
-- `src/routes/app.pqrs.index.tsx` — same.
+## Files changed
+- `src/routes/app.procedures.index.tsx` — add filter state, dropdowns, active-chip row, extend `filtered` logic.
