@@ -39,6 +39,7 @@ type Row = {
   standard: string;
   process: string;
   thickness_range: string | null;
+  position: string | null;
   revision: string;
   status: string;
   pqr_id: string | null;
