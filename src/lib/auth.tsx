@@ -10,13 +10,18 @@ export type AppRole =
   | "welder"
   | "client_viewer";
 
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
 export type Profile = {
   id: string;
   company_id: string | null;
   display_name: string | null;
   job_title: string | null;
   avatar_url: string | null;
+  approval_status: ApprovalStatus;
+  rejection_reason: string | null;
 };
+
 
 type AuthState = {
   loading: boolean;
