@@ -10,13 +10,18 @@ export type AppRole =
   | "welder"
   | "client_viewer";
 
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
 export type Profile = {
   id: string;
   company_id: string | null;
   display_name: string | null;
   job_title: string | null;
   avatar_url: string | null;
+  approval_status: ApprovalStatus;
+  rejection_reason: string | null;
 };
+
 
 type AuthState = {
   loading: boolean;
@@ -57,10 +62,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadProfile = async (uid: string) => {
     const { data: p } = await supabase
       .from("profiles")
-      .select("id, company_id, display_name, job_title, avatar_url")
+      .select("id, company_id, display_name, job_title, avatar_url, approval_status, rejection_reason")
       .eq("id", uid)
       .maybeSingle();
-    setProfile(p ?? null);
+    setProfile((p as Profile | null) ?? null);
+
 
     const { data: rs } = await supabase
       .from("user_roles")

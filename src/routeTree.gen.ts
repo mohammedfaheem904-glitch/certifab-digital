@@ -64,6 +64,7 @@ import { Route as AppPqrsDashboardRouteImport } from './routes/app.pqrs.dashboar
 import { Route as AppPqrsPqrIdRouteImport } from './routes/app.pqrs.$pqrId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
+import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
 import { Route as AppAdminCompaniesRouteImport } from './routes/app.admin.companies'
 
 const SignupRoute = SignupRouteImport.update({
@@ -345,6 +346,11 @@ const AppInstrumentsInstrumentIdRoute =
     path: '/$instrumentId',
     getParentRoute: () => AppInstrumentsRoute,
   } as any)
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 const AppAdminCompaniesRoute = AppAdminCompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
@@ -382,6 +388,7 @@ export interface FileRoutesByFullPath {
   '/app/welds': typeof AppWeldsRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
@@ -435,6 +442,7 @@ export interface FileRoutesByTo {
   '/app/welds': typeof AppWeldsRouteWithChildren
   '/app': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
@@ -494,6 +502,7 @@ export interface FileRoutesById {
   '/app/welds': typeof AppWeldsRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
+  '/app/admin/users': typeof AppAdminUsersRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
@@ -554,6 +563,7 @@ export interface FileRouteTypes {
     | '/app/welds'
     | '/app/'
     | '/app/admin/companies'
+    | '/app/admin/users'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
@@ -607,6 +617,7 @@ export interface FileRouteTypes {
     | '/app/welds'
     | '/app'
     | '/app/admin/companies'
+    | '/app/admin/users'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
@@ -665,6 +676,7 @@ export interface FileRouteTypes {
     | '/app/welds'
     | '/app/'
     | '/app/admin/companies'
+    | '/app/admin/users'
     | '/app/instruments/$instrumentId'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
@@ -1099,6 +1111,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsInstrumentIdRouteImport
       parentRoute: typeof AppInstrumentsRoute
     }
+    '/app/admin/users': {
+      id: '/app/admin/users'
+      path: '/users'
+      fullPath: '/app/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
     '/app/admin/companies': {
       id: '/app/admin/companies'
       path: '/companies'
@@ -1111,10 +1130,12 @@ declare module '@tanstack/react-router' {
 
 interface AppAdminRouteChildren {
   AppAdminCompaniesRoute: typeof AppAdminCompaniesRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
 }
 
 const AppAdminRouteChildren: AppAdminRouteChildren = {
   AppAdminCompaniesRoute: AppAdminCompaniesRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
 }
 
 const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
@@ -1304,13 +1325,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

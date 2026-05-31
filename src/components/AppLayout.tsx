@@ -104,9 +104,11 @@ export function AppLayout() {
     ...(isSuperAdmin
       ? [
           { to: "/app/admin", label: "Admin Console", icon: ShieldCheck },
+          { to: "/app/admin/users", label: "User Approvals", icon: Users },
           { to: "/app/admin/companies", label: "Companies", icon: Building2 },
         ]
       : []),
+
   ];
 
   const NavList = ({ onNavigate }: { onNavigate?: () => void }) => (
