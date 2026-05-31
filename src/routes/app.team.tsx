@@ -45,8 +45,23 @@ export const Route = createFileRoute("/app/team")({
 type Member = { id: string; display_name: string | null; job_title: string | null; roles: AppRole[]; email: string | null };
 
 function TeamPage() {
-  const { profile, roles } = useAuth();
+  const { profile, roles, loading } = useAuth();
   const qc = useQueryClient();
+
+  if (loading || !profile) {
+    return (
+      <div className="flex items-center justify-center py-20 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin me-2" /> Loading team…
+      </div>
+    );
+  }
+  if (!profile.company_id) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+        Your account is not attached to a workspace yet.
+      </div>
+    );
+  }
   const isAdmin = roles.includes("super_admin");
 
   const { data, isLoading } = useQuery<Member[]>({
