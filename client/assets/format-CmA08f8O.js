@@ -1,0 +1,1 @@
+function o(e){const n=typeof e=="string"?new Date(e):e,t=(Date.now()-n.getTime())/1e3;return t<60?"just now":t<3600?`${Math.floor(t/60)}m ago`:t<86400?`${Math.floor(t/3600)}h ago`:t<86400*7?`${Math.floor(t/86400)}d ago`:n.toLocaleDateString()}function r(e){if(!e)return null;const n=new Date(e).getTime()-Date.now();return Math.ceil(n/(1e3*60*60*24))}export{r as d,o as f};
