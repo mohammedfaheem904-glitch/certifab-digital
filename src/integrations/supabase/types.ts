@@ -1310,6 +1310,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approval_status: Database["public"]["Enums"]["approval_status"]
+          approved_at: string | null
+          approved_by: string | null
           avatar_url: string | null
           company_id: string | null
           created_at: string
@@ -1317,10 +1320,17 @@ export type Database = {
           id: string
           job_title: string | null
           language: string
+          pending_role: Database["public"]["Enums"]["app_role"] | null
           phone: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
           updated_at: string
         }
         Insert: {
+          approval_status?: Database["public"]["Enums"]["approval_status"]
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           company_id?: string | null
           created_at?: string
@@ -1328,10 +1338,17 @@ export type Database = {
           id: string
           job_title?: string | null
           language?: string
+          pending_role?: Database["public"]["Enums"]["app_role"] | null
           phone?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
           updated_at?: string
         }
         Update: {
+          approval_status?: Database["public"]["Enums"]["approval_status"]
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           company_id?: string | null
           created_at?: string
@@ -1339,7 +1356,11 @@ export type Database = {
           id?: string
           job_title?: string | null
           language?: string
+          pending_role?: Database["public"]["Enums"]["app_role"] | null
           phone?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2982,6 +3003,13 @@ export type Database = {
     }
     Functions: {
       accept_invitation: { Args: { _token: string }; Returns: string }
+      approve_user: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
       current_company_id: { Args: never; Returns: string }
       get_company_branding_by_domain: {
         Args: { _host: string }
@@ -3073,6 +3101,10 @@ export type Database = {
       is_company_member: { Args: { _company_id: string }; Returns: boolean }
       is_editor: { Args: { _user_id: string }; Returns: boolean }
       is_internal_company: { Args: { _company_id: string }; Returns: boolean }
+      reject_user: {
+        Args: { _reason: string; _user_id: string }
+        Returns: undefined
+      }
       restore_pqr: { Args: { _id: string }; Returns: undefined }
       restore_procedure: { Args: { _id: string }; Returns: undefined }
       restore_pwps: { Args: { _id: string }; Returns: undefined }
@@ -3098,6 +3130,7 @@ export type Database = {
         | "approved"
         | "rejected"
         | "revoked"
+      approval_status: "pending" | "approved" | "rejected"
       equipment_status:
         | "Operational"
         | "Maintenance"
@@ -3309,6 +3342,7 @@ export const Constants = {
         "rejected",
         "revoked",
       ],
+      approval_status: ["pending", "approved", "rejected"],
       equipment_status: [
         "Operational",
         "Maintenance",
