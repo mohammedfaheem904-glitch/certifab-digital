@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/app/admin")({
+export const Route = createFileRoute("/app/admin/")({
   component: AdminConsole,
 });
 

@@ -1,12 +1,16 @@
-## Fix: Team & Roles crash — "Cannot read properties of null (reading 'company_id')"
+## Problem
 
-### Root cause
-`src/routes/app.team.tsx` dereferences `profile!.company_id` in several places (the `useQuery` body, the `PendingInvites` render, the `InviteDialog` quota check), but `profile` can be `null` while auth is still loading or when the profile row hasn't been hydrated yet. React renders the component before `profile` is available, triggering the TypeError.
+Navigating to **User Approvals** (`/app/admin/users`) shows the Admin Console dashboard instead of the User Management page, so the Pending tab and Approve/Reject buttons are never reachable.
 
-### Change (single file: `src/routes/app.team.tsx`)
-1. Pull `loading` from `useAuth()` alongside `profile` / `roles`.
-2. Early-return a loading state when `loading || !profile` (spinner matching other pages).
-3. Early-return a friendly empty state when `!profile.company_id` (no workspace assigned yet — shouldn't happen for approved users, but defensive).
-4. Remove the `profile!.company_id!` non-null assertions now that `profile` and `company_id` are guaranteed past the guard.
+Cause: in TanStack Router's flat-file routing, `src/routes/app.admin.tsx` is automatically the **parent layout** of `src/routes/app.admin.users.tsx`. A parent layout must render `<Outlet />` for child routes to appear — but `AdminConsole` doesn't. Result: the child page silently never renders.
 
-No DB, no auth, no route changes. Pure frontend null-safety fix scoped to the Team page.
+## Fix
+
+Convert `app.admin` from a layout-with-content into a normal index page so it stops swallowing its children.
+
+1. **Rename** `src/routes/app.admin.tsx` → `src/routes/app.admin.index.tsx`
+   - Update the route id from `createFileRoute("/app/admin")` to `createFileRoute("/app/admin/")` so `/app/admin` still renders the Admin Console.
+2. After rename, `/app/admin/users` will correctly resolve to `app.admin.users.tsx` (User Management) with no parent layout interfering.
+3. Verify the sidebar links to `/app/admin` and `/app/admin/users` still work, and that the "User Approvals" notification link opens the Pending tab.
+
+No database, RLS, or business-logic changes. No edits to the User Management page itself — it already works once it actually renders.
