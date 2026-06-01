@@ -177,8 +177,34 @@ function WpqWizard() {
                 </select>
               </F>
               <F label="Standard / Edition *"><Input value={v.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
-              <F label="WPS reference"><Input value={v.wps_number ?? ""} onChange={(e) => set("wps_number", e.target.value)} /></F>
-              <F label="PQR reference"><Input value={v.pqr_number ?? ""} onChange={(e) => set("pqr_number", e.target.value)} /></F>
+              <F label="WPS reference">
+                <select className="h-9 w-full rounded-md border bg-transparent px-2 text-sm"
+                  value={v.wps_number ?? ""} onChange={(e) => set("wps_number", e.target.value)}>
+                  <option value="">— Select WPS —</option>
+                  {wpsList.map((w: any) => {
+                    const label = w.wps_no || w.document_no;
+                    if (!label) return null;
+                    return (
+                      <option key={w.id} value={label}>
+                        {label}{w.revision ? ` (${w.revision})` : ""}{w.status ? ` — ${w.status}` : ""}
+                      </option>
+                    );
+                  })}
+                </select>
+              </F>
+              <F label="PQR reference">
+                <select className="h-9 w-full rounded-md border bg-transparent px-2 text-sm"
+                  value={v.pqr_number ?? ""} onChange={(e) => set("pqr_number", e.target.value)}>
+                  <option value="">— Select PQR —</option>
+                  {pqrList.map((p: any) => (
+                    p.pqr_no ? (
+                      <option key={p.id} value={p.pqr_no}>
+                        {p.pqr_no}{p.revision ? ` (${p.revision})` : ""}{p.status ? ` — ${p.status}` : ""}
+                      </option>
+                    ) : null
+                  ))}
+                </select>
+              </F>
             </div>
           </Section>
         )}
