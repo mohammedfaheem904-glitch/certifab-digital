@@ -37,11 +37,11 @@ import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
-import { Route as AppAdminRouteImport } from './routes/app.admin'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
 import { Route as AppPwpsIndexRouteImport } from './routes/app.pwps.index'
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
 import { Route as AppPqrsIndexRouteImport } from './routes/app.pqrs.index'
+import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
 import { Route as VerifyQualificationTokenRouteImport } from './routes/verify.qualification.$token'
@@ -207,11 +207,6 @@ const AppAuditRoute = AppAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAdminRoute = AppAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -231,6 +226,11 @@ const AppPqrsIndexRoute = AppPqrsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppPqrsRoute,
+} as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AppRoute,
 } as any)
 const VerifyWpsTokenRoute = VerifyWpsTokenRouteImport.update({
   id: '/verify/wps/$token',
@@ -347,14 +347,14 @@ const AppInstrumentsInstrumentIdRoute =
     getParentRoute: () => AppInstrumentsRoute,
   } as any)
 const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AppAdminRoute,
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAdminCompaniesRoute = AppAdminCompaniesRouteImport.update({
-  id: '/companies',
-  path: '/companies',
-  getParentRoute: () => AppAdminRoute,
+  id: '/admin/companies',
+  path: '/admin/companies',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -370,7 +370,6 @@ export interface FileRoutesByFullPath {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
-  '/app/admin': typeof AppAdminRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
@@ -411,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/admin/': typeof AppAdminIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
@@ -428,7 +428,6 @@ export interface FileRoutesByTo {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
-  '/app/admin': typeof AppAdminRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
@@ -465,6 +464,7 @@ export interface FileRoutesByTo {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/admin': typeof AppAdminIndexRoute
   '/app/pqrs': typeof AppPqrsIndexRoute
   '/app/procedures': typeof AppProceduresIndexRoute
   '/app/pwps': typeof AppPwpsIndexRoute
@@ -484,7 +484,6 @@ export interface FileRoutesById {
   '/modules': typeof ModulesRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
-  '/app/admin': typeof AppAdminRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
@@ -525,6 +524,7 @@ export interface FileRoutesById {
   '/verify/qualification/$token': typeof VerifyQualificationTokenRoute
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
+  '/app/admin/': typeof AppAdminIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
@@ -545,7 +545,6 @@ export interface FileRouteTypes {
     | '/modules'
     | '/pricing'
     | '/signup'
-    | '/app/admin'
     | '/app/audit'
     | '/app/billing'
     | '/app/equipment'
@@ -586,6 +585,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/admin/'
     | '/app/pqrs/'
     | '/app/procedures/'
     | '/app/pwps/'
@@ -603,7 +603,6 @@ export interface FileRouteTypes {
     | '/modules'
     | '/pricing'
     | '/signup'
-    | '/app/admin'
     | '/app/audit'
     | '/app/billing'
     | '/app/equipment'
@@ -640,6 +639,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/admin'
     | '/app/pqrs'
     | '/app/procedures'
     | '/app/pwps'
@@ -658,7 +658,6 @@ export interface FileRouteTypes {
     | '/modules'
     | '/pricing'
     | '/signup'
-    | '/app/admin'
     | '/app/audit'
     | '/app/billing'
     | '/app/equipment'
@@ -699,6 +698,7 @@ export interface FileRouteTypes {
     | '/verify/qualification/$token'
     | '/verify/weld/$token'
     | '/verify/wps/$token'
+    | '/app/admin/'
     | '/app/pqrs/'
     | '/app/procedures/'
     | '/app/pwps/'
@@ -922,13 +922,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/admin': {
-      id: '/app/admin'
-      path: '/admin'
-      fullPath: '/app/admin'
-      preLoaderRoute: typeof AppAdminRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/qualifications/': {
       id: '/app/qualifications/'
       path: '/'
@@ -956,6 +949,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/pqrs/'
       preLoaderRoute: typeof AppPqrsIndexRouteImport
       parentRoute: typeof AppPqrsRoute
+    }
+    '/app/admin/': {
+      id: '/app/admin/'
+      path: '/admin'
+      fullPath: '/app/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/verify/wps/$token': {
       id: '/verify/wps/$token'
@@ -1113,34 +1113,20 @@ declare module '@tanstack/react-router' {
     }
     '/app/admin/users': {
       id: '/app/admin/users'
-      path: '/users'
+      path: '/admin/users'
       fullPath: '/app/admin/users'
       preLoaderRoute: typeof AppAdminUsersRouteImport
-      parentRoute: typeof AppAdminRoute
+      parentRoute: typeof AppRoute
     }
     '/app/admin/companies': {
       id: '/app/admin/companies'
-      path: '/companies'
+      path: '/admin/companies'
       fullPath: '/app/admin/companies'
       preLoaderRoute: typeof AppAdminCompaniesRouteImport
-      parentRoute: typeof AppAdminRoute
+      parentRoute: typeof AppRoute
     }
   }
 }
-
-interface AppAdminRouteChildren {
-  AppAdminCompaniesRoute: typeof AppAdminCompaniesRoute
-  AppAdminUsersRoute: typeof AppAdminUsersRoute
-}
-
-const AppAdminRouteChildren: AppAdminRouteChildren = {
-  AppAdminCompaniesRoute: AppAdminCompaniesRoute,
-  AppAdminUsersRoute: AppAdminUsersRoute,
-}
-
-const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
-  AppAdminRouteChildren,
-)
 
 interface AppInstrumentsRouteChildren {
   AppInstrumentsInstrumentIdRoute: typeof AppInstrumentsInstrumentIdRoute
@@ -1263,7 +1249,6 @@ const AppWeldsRouteWithChildren = AppWeldsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
-  AppAdminRoute: typeof AppAdminRouteWithChildren
   AppAuditRoute: typeof AppAuditRoute
   AppBillingRoute: typeof AppBillingRoute
   AppEquipmentRoute: typeof AppEquipmentRoute
@@ -1280,10 +1265,12 @@ interface AppRouteChildren {
   AppTeamRoute: typeof AppTeamRoute
   AppWeldsRoute: typeof AppWeldsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
+  AppAdminCompaniesRoute: typeof AppAdminCompaniesRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAdminRoute: AppAdminRouteWithChildren,
   AppAuditRoute: AppAuditRoute,
   AppBillingRoute: AppBillingRoute,
   AppEquipmentRoute: AppEquipmentRoute,
@@ -1300,6 +1287,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppTeamRoute: AppTeamRoute,
   AppWeldsRoute: AppWeldsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
+  AppAdminCompaniesRoute: AppAdminCompaniesRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
