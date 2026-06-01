@@ -29,6 +29,14 @@ const DRAFT_KEY = "wpq-wizard-draft";
 function WpqWizard() {
   const { profile } = useAuth();
   const nav = useNavigate();
+  const { data: wpsList = [] } = useCompanyRows<any>("procedures", {
+    select: "id,wps_no,document_no,revision,status",
+    order: { column: "updated_at", ascending: false },
+  });
+  const { data: pqrList = [] } = useCompanyRows<any>("pqrs", {
+    select: "id,pqr_no,revision,status",
+    order: { column: "updated_at", ascending: false },
+  });
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
   const [v, setV] = useState<Record<string, any>>(() => {
