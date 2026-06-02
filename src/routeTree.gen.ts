@@ -22,7 +22,6 @@ import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppWeldsRouteImport } from './routes/app.welds'
 import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
@@ -37,6 +36,7 @@ import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
+import { Route as AppWeldsIndexRouteImport } from './routes/app.welds.index'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
 import { Route as AppPwpsIndexRouteImport } from './routes/app.pwps.index'
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
@@ -132,11 +132,6 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppWeldsRoute = AppWeldsRouteImport.update({
-  id: '/welds',
-  path: '/welds',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppTeamRoute = AppTeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -207,6 +202,11 @@ const AppAuditRoute = AppAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppRoute,
 } as any)
+const AppWeldsIndexRoute = AppWeldsIndexRouteImport.update({
+  id: '/welds/',
+  path: '/welds/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -254,19 +254,19 @@ const VerifyInstrumentTokenRoute = VerifyInstrumentTokenRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppWeldsTrashRoute = AppWeldsTrashRouteImport.update({
-  id: '/trash',
-  path: '/trash',
-  getParentRoute: () => AppWeldsRoute,
+  id: '/welds/trash',
+  path: '/welds/trash',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppWeldsDashboardRoute = AppWeldsDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AppWeldsRoute,
+  id: '/welds/dashboard',
+  path: '/welds/dashboard',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppWeldsWeldIdRoute = AppWeldsWeldIdRouteImport.update({
-  id: '/$weldId',
-  path: '/$weldId',
-  getParentRoute: () => AppWeldsRoute,
+  id: '/welds/$weldId',
+  path: '/welds/$weldId',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppReportsSlugRoute = AppReportsSlugRouteImport.update({
   id: '/$slug',
@@ -384,7 +384,6 @@ export interface FileRoutesByFullPath {
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
-  '/app/welds': typeof AppWeldsRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -415,6 +414,7 @@ export interface FileRoutesByFullPath {
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
+  '/app/welds/': typeof AppWeldsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -438,7 +438,6 @@ export interface FileRoutesByTo {
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
-  '/app/welds': typeof AppWeldsRouteWithChildren
   '/app': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -469,6 +468,7 @@ export interface FileRoutesByTo {
   '/app/procedures': typeof AppProceduresIndexRoute
   '/app/pwps': typeof AppPwpsIndexRoute
   '/app/qualifications': typeof AppQualificationsIndexRoute
+  '/app/welds': typeof AppWeldsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -498,7 +498,6 @@ export interface FileRoutesById {
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
-  '/app/welds': typeof AppWeldsRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -529,6 +528,7 @@ export interface FileRoutesById {
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
+  '/app/welds/': typeof AppWeldsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -559,7 +559,6 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/team'
-    | '/app/welds'
     | '/app/'
     | '/app/admin/companies'
     | '/app/admin/users'
@@ -590,6 +589,7 @@ export interface FileRouteTypes {
     | '/app/procedures/'
     | '/app/pwps/'
     | '/app/qualifications/'
+    | '/app/welds/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -613,7 +613,6 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/team'
-    | '/app/welds'
     | '/app'
     | '/app/admin/companies'
     | '/app/admin/users'
@@ -644,6 +643,7 @@ export interface FileRouteTypes {
     | '/app/procedures'
     | '/app/pwps'
     | '/app/qualifications'
+    | '/app/welds'
   id:
     | '__root__'
     | '/'
@@ -672,7 +672,6 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/team'
-    | '/app/welds'
     | '/app/'
     | '/app/admin/companies'
     | '/app/admin/users'
@@ -703,6 +702,7 @@ export interface FileRouteTypes {
     | '/app/procedures/'
     | '/app/pwps/'
     | '/app/qualifications/'
+    | '/app/welds/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -817,13 +817,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/welds': {
-      id: '/app/welds'
-      path: '/welds'
-      fullPath: '/app/welds'
-      preLoaderRoute: typeof AppWeldsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/team': {
       id: '/app/team'
       path: '/team'
@@ -922,6 +915,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/welds/': {
+      id: '/app/welds/'
+      path: '/welds'
+      fullPath: '/app/welds/'
+      preLoaderRoute: typeof AppWeldsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/qualifications/': {
       id: '/app/qualifications/'
       path: '/'
@@ -987,24 +987,24 @@ declare module '@tanstack/react-router' {
     }
     '/app/welds/trash': {
       id: '/app/welds/trash'
-      path: '/trash'
+      path: '/welds/trash'
       fullPath: '/app/welds/trash'
       preLoaderRoute: typeof AppWeldsTrashRouteImport
-      parentRoute: typeof AppWeldsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/welds/dashboard': {
       id: '/app/welds/dashboard'
-      path: '/dashboard'
+      path: '/welds/dashboard'
       fullPath: '/app/welds/dashboard'
       preLoaderRoute: typeof AppWeldsDashboardRouteImport
-      parentRoute: typeof AppWeldsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/welds/$weldId': {
       id: '/app/welds/$weldId'
-      path: '/$weldId'
+      path: '/welds/$weldId'
       fullPath: '/app/welds/$weldId'
       preLoaderRoute: typeof AppWeldsWeldIdRouteImport
-      parentRoute: typeof AppWeldsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/reports/$slug': {
       id: '/app/reports/$slug'
@@ -1232,22 +1232,6 @@ const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
   AppReportsRouteChildren,
 )
 
-interface AppWeldsRouteChildren {
-  AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
-  AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
-  AppWeldsTrashRoute: typeof AppWeldsTrashRoute
-}
-
-const AppWeldsRouteChildren: AppWeldsRouteChildren = {
-  AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
-  AppWeldsDashboardRoute: AppWeldsDashboardRoute,
-  AppWeldsTrashRoute: AppWeldsTrashRoute,
-}
-
-const AppWeldsRouteWithChildren = AppWeldsRoute._addFileChildren(
-  AppWeldsRouteChildren,
-)
-
 interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppBillingRoute: typeof AppBillingRoute
@@ -1263,11 +1247,14 @@ interface AppRouteChildren {
   AppReportsRoute: typeof AppReportsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
   AppTeamRoute: typeof AppTeamRoute
-  AppWeldsRoute: typeof AppWeldsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
   AppAdminCompaniesRoute: typeof AppAdminCompaniesRoute
   AppAdminUsersRoute: typeof AppAdminUsersRoute
+  AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
+  AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
+  AppWeldsTrashRoute: typeof AppWeldsTrashRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
+  AppWeldsIndexRoute: typeof AppWeldsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -1285,11 +1272,14 @@ const AppRouteChildren: AppRouteChildren = {
   AppReportsRoute: AppReportsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
   AppTeamRoute: AppTeamRoute,
-  AppWeldsRoute: AppWeldsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
   AppAdminCompaniesRoute: AppAdminCompaniesRoute,
   AppAdminUsersRoute: AppAdminUsersRoute,
+  AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
+  AppWeldsDashboardRoute: AppWeldsDashboardRoute,
+  AppWeldsTrashRoute: AppWeldsTrashRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
+  AppWeldsIndexRoute: AppWeldsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

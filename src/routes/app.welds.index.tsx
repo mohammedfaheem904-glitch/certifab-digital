@@ -50,7 +50,7 @@ const WORKFLOW_STATUSES = [
   "Rejected", "Blocked",
 ];
 
-export const Route = createFileRoute("/app/welds")({
+export const Route = createFileRoute("/app/welds/")({
   validateSearch: (s: Record<string, unknown>) => ({
     workflow: typeof s.workflow === "string" ? s.workflow : undefined,
   }),
