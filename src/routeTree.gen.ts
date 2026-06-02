@@ -37,6 +37,7 @@ import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
+import { Route as AppWeldsIndexRouteImport } from './routes/app.welds.index'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
 import { Route as AppPwpsIndexRouteImport } from './routes/app.pwps.index'
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
@@ -206,6 +207,11 @@ const AppAuditRoute = AppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
   getParentRoute: () => AppRoute,
+} as any)
+const AppWeldsIndexRoute = AppWeldsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppWeldsRoute,
 } as any)
 const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
   id: '/',
@@ -415,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
+  '/app/welds/': typeof AppWeldsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -438,7 +445,6 @@ export interface FileRoutesByTo {
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
-  '/app/welds': typeof AppWeldsRouteWithChildren
   '/app': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -469,6 +475,7 @@ export interface FileRoutesByTo {
   '/app/procedures': typeof AppProceduresIndexRoute
   '/app/pwps': typeof AppPwpsIndexRoute
   '/app/qualifications': typeof AppQualificationsIndexRoute
+  '/app/welds': typeof AppWeldsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -529,6 +536,7 @@ export interface FileRoutesById {
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
+  '/app/welds/': typeof AppWeldsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -590,6 +598,7 @@ export interface FileRouteTypes {
     | '/app/procedures/'
     | '/app/pwps/'
     | '/app/qualifications/'
+    | '/app/welds/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -613,7 +622,6 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/team'
-    | '/app/welds'
     | '/app'
     | '/app/admin/companies'
     | '/app/admin/users'
@@ -644,6 +652,7 @@ export interface FileRouteTypes {
     | '/app/procedures'
     | '/app/pwps'
     | '/app/qualifications'
+    | '/app/welds'
   id:
     | '__root__'
     | '/'
@@ -703,6 +712,7 @@ export interface FileRouteTypes {
     | '/app/procedures/'
     | '/app/pwps/'
     | '/app/qualifications/'
+    | '/app/welds/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -921,6 +931,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/audit'
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/app/welds/': {
+      id: '/app/welds/'
+      path: '/'
+      fullPath: '/app/welds/'
+      preLoaderRoute: typeof AppWeldsIndexRouteImport
+      parentRoute: typeof AppWeldsRoute
     }
     '/app/qualifications/': {
       id: '/app/qualifications/'
@@ -1236,12 +1253,14 @@ interface AppWeldsRouteChildren {
   AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
   AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
   AppWeldsTrashRoute: typeof AppWeldsTrashRoute
+  AppWeldsIndexRoute: typeof AppWeldsIndexRoute
 }
 
 const AppWeldsRouteChildren: AppWeldsRouteChildren = {
   AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
   AppWeldsDashboardRoute: AppWeldsDashboardRoute,
   AppWeldsTrashRoute: AppWeldsTrashRoute,
+  AppWeldsIndexRoute: AppWeldsIndexRoute,
 }
 
 const AppWeldsRouteWithChildren = AppWeldsRoute._addFileChildren(
