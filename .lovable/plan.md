@@ -1,16 +1,25 @@
-## Problem
+# Fix: View (eye) icon on Welds list doesn't open the record
 
-Navigating to **User Approvals** (`/app/admin/users`) shows the Admin Console dashboard instead of the User Management page, so the Pending tab and Approve/Reject buttons are never reachable.
+## Root cause
 
-Cause: in TanStack Router's flat-file routing, `src/routes/app.admin.tsx` is automatically the **parent layout** of `src/routes/app.admin.users.tsx`. A parent layout must render `<Outlet />` for child routes to appear — but `AdminConsole` doesn't. Result: the child page silently never renders.
+`src/routes/app.welds.tsx` is registered as the route for `/app/welds` and also acts as the parent for child routes like `app.welds.$weldId.tsx` and `app.welds.dashboard.tsx`. It renders the welds list directly and never renders an `<Outlet />`.
+
+Result: when the eye icon calls `nav({ to: "/app/welds/$weldId", params: { weldId: r.id } })`, the URL changes and the detail route matches, but the parent (the list) keeps rendering and the detail page never appears. The user perceives the button as broken. This is the same pattern we already fixed for `app.admin`.
 
 ## Fix
 
-Convert `app.admin` from a layout-with-content into a normal index page so it stops swallowing its children.
+Convert `app.welds.tsx` into a proper index route, identical to how `app.admin.index.tsx` was structured:
 
-1. **Rename** `src/routes/app.admin.tsx` → `src/routes/app.admin.index.tsx`
-   - Update the route id from `createFileRoute("/app/admin")` to `createFileRoute("/app/admin/")` so `/app/admin` still renders the Admin Console.
-2. After rename, `/app/admin/users` will correctly resolve to `app.admin.users.tsx` (User Management) with no parent layout interfering.
-3. Verify the sidebar links to `/app/admin` and `/app/admin/users` still work, and that the "User Approvals" notification link opens the Pending tab.
+1. Rename `src/routes/app.welds.tsx` → `src/routes/app.welds.index.tsx`.
+2. In the renamed file, change
+   `createFileRoute("/app/welds")` → `createFileRoute("/app/welds/")`
+   so it registers as the index of the `/app/welds` segment instead of a layout that swallows children.
+3. Regenerate / update `src/routeTree.gen.ts` to reflect the new index route id and remove the old `/app/welds` layout entry, so `/app/welds/$weldId`, `/app/welds/dashboard`, and `/app/welds/trash` resolve to their own files.
 
-No database, RLS, or business-logic changes. No edits to the User Management page itself — it already works once it actually renders.
+No other files need to change — the eye button's `nav(...)` call, the detail route, and all existing links keep working.
+
+## Validation
+
+- From `/app/welds`, click the eye (or external-link) icon on a row → the weld detail page renders.
+- `/app/welds/dashboard` and `/app/welds/trash` still load correctly.
+- Direct navigation to `/app/welds` still shows the list.
