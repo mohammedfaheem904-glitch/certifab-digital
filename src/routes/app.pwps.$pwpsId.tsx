@@ -283,7 +283,25 @@ function PwpsDetailPage() {
         </Section>
 
         <Section title="Process & joint">
-          <Field label="Process"><Input value={merged.process ?? ""} onChange={(e) => set("process", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Process">
+            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              value={merged.process ?? ""} onChange={(e) => set("process", e.target.value)} disabled={!isEditor}>
+              <option value="">— Select process —</option>
+              <option value="SMAW">SMAW (Shielded Metal Arc Welding)</option>
+              <option value="GMAW">GMAW (Gas Metal Arc Welding)</option>
+              <option value="FCAW">FCAW (Flux-Cored Arc Welding)</option>
+              <option value="SAW">SAW (Submerged Arc Welding)</option>
+              <option value="GTAW">GTAW (Gas Tungsten Arc Welding)</option>
+              <option value="PAW">PAW (Plasma Arc Welding)</option>
+              <option value="ESW">ESW (Electroslag Welding)</option>
+              <option value="EGW">EGW (Electrogas Welding)</option>
+              <option value="OAW">OAW (Oxyacetylene Welding)</option>
+              <option value="LBW">LBW (Laser Beam Welding)</option>
+              <option value="EBW">EBW (Electron Beam Welding)</option>
+              <option value="RW">RW (Resistance Welding)</option>
+              <option value="BRAZING">Brazing</option>
+            </select>
+          </Field>
           <Field label="Joint type"><Input value={merged.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)} disabled={!isEditor} /></Field>
           <Field label="Groove type"><Input value={merged.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)} disabled={!isEditor} /></Field>
           <Field label="Position"><Input value={merged.position ?? ""} onChange={(e) => set("position", e.target.value)} disabled={!isEditor} /></Field>

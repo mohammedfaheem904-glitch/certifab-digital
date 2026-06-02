@@ -122,7 +122,25 @@ function PwpsIndexPage() {
                 <F label="Title"><Input value={values.title ?? ""} onChange={(e) => set("title", e.target.value)} placeholder="GTAW root + SMAW fill, P-1 to P-1" /></F>
                 <F label="Code family"><Input value={values.code_family ?? "ASME IX"} onChange={(e) => set("code_family", e.target.value)} /></F>
                 <F label="Standard"><Input value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
-                <F label="Process"><Input value={values.process ?? ""} onChange={(e) => set("process", e.target.value)} placeholder="GTAW" /></F>
+                <F label="Process">
+                  <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.process ?? ""} onChange={(e) => set("process", e.target.value)}>
+                    <option value="">— Select process —</option>
+                    <option value="SMAW">SMAW (Shielded Metal Arc Welding)</option>
+                    <option value="GMAW">GMAW (Gas Metal Arc Welding)</option>
+                    <option value="FCAW">FCAW (Flux-Cored Arc Welding)</option>
+                    <option value="SAW">SAW (Submerged Arc Welding)</option>
+                    <option value="GTAW">GTAW (Gas Tungsten Arc Welding)</option>
+                    <option value="PAW">PAW (Plasma Arc Welding)</option>
+                    <option value="ESW">ESW (Electroslag Welding)</option>
+                    <option value="EGW">EGW (Electrogas Welding)</option>
+                    <option value="OAW">OAW (Oxyacetylene Welding)</option>
+                    <option value="LBW">LBW (Laser Beam Welding)</option>
+                    <option value="EBW">EBW (Electron Beam Welding)</option>
+                    <option value="RW">RW (Resistance Welding)</option>
+                    <option value="BRAZING">Brazing</option>
+                  </select>
+                </F>
                 <F label="Joint type"><Input value={values.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)} placeholder="Butt" /></F>
                 <F label="Groove type"><Input value={values.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)} placeholder="V" /></F>
                 <F label="Position"><Input value={values.position ?? ""} onChange={(e) => set("position", e.target.value)} placeholder="6G" /></F>
