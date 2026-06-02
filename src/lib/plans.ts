@@ -72,7 +72,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     id: "professional",
     name: "Professional",
     tagline: "Production-ready QA/QC for growing teams.",
-    priceMonthly: 49,
+    priceMonthly: 199,
     priceId: null,
     badgeTone: "primary",
     highlight: true,
