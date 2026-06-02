@@ -22,7 +22,6 @@ import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppWeldsRouteImport } from './routes/app.welds'
 import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
@@ -133,11 +132,6 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppWeldsRoute = AppWeldsRouteImport.update({
-  id: '/welds',
-  path: '/welds',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppTeamRoute = AppTeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -209,9 +203,9 @@ const AppAuditRoute = AppAuditRouteImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 const AppWeldsIndexRoute = AppWeldsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppWeldsRoute,
+  id: '/welds/',
+  path: '/welds/',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppQualificationsIndexRoute = AppQualificationsIndexRouteImport.update({
   id: '/',
@@ -260,19 +254,19 @@ const VerifyInstrumentTokenRoute = VerifyInstrumentTokenRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppWeldsTrashRoute = AppWeldsTrashRouteImport.update({
-  id: '/trash',
-  path: '/trash',
-  getParentRoute: () => AppWeldsRoute,
+  id: '/welds/trash',
+  path: '/welds/trash',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppWeldsDashboardRoute = AppWeldsDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AppWeldsRoute,
+  id: '/welds/dashboard',
+  path: '/welds/dashboard',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppWeldsWeldIdRoute = AppWeldsWeldIdRouteImport.update({
-  id: '/$weldId',
-  path: '/$weldId',
-  getParentRoute: () => AppWeldsRoute,
+  id: '/welds/$weldId',
+  path: '/welds/$weldId',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppReportsSlugRoute = AppReportsSlugRouteImport.update({
   id: '/$slug',
@@ -390,7 +384,6 @@ export interface FileRoutesByFullPath {
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
-  '/app/welds': typeof AppWeldsRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -505,7 +498,6 @@ export interface FileRoutesById {
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
-  '/app/welds': typeof AppWeldsRouteWithChildren
   '/app/': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
@@ -567,7 +559,6 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/team'
-    | '/app/welds'
     | '/app/'
     | '/app/admin/companies'
     | '/app/admin/users'
@@ -681,7 +672,6 @@ export interface FileRouteTypes {
     | '/app/reports'
     | '/app/settings'
     | '/app/team'
-    | '/app/welds'
     | '/app/'
     | '/app/admin/companies'
     | '/app/admin/users'
@@ -827,13 +817,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/welds': {
-      id: '/app/welds'
-      path: '/welds'
-      fullPath: '/app/welds'
-      preLoaderRoute: typeof AppWeldsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/team': {
       id: '/app/team'
       path: '/team'
@@ -934,10 +917,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/welds/': {
       id: '/app/welds/'
-      path: '/'
+      path: '/welds'
       fullPath: '/app/welds/'
       preLoaderRoute: typeof AppWeldsIndexRouteImport
-      parentRoute: typeof AppWeldsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/qualifications/': {
       id: '/app/qualifications/'
@@ -1004,24 +987,24 @@ declare module '@tanstack/react-router' {
     }
     '/app/welds/trash': {
       id: '/app/welds/trash'
-      path: '/trash'
+      path: '/welds/trash'
       fullPath: '/app/welds/trash'
       preLoaderRoute: typeof AppWeldsTrashRouteImport
-      parentRoute: typeof AppWeldsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/welds/dashboard': {
       id: '/app/welds/dashboard'
-      path: '/dashboard'
+      path: '/welds/dashboard'
       fullPath: '/app/welds/dashboard'
       preLoaderRoute: typeof AppWeldsDashboardRouteImport
-      parentRoute: typeof AppWeldsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/welds/$weldId': {
       id: '/app/welds/$weldId'
-      path: '/$weldId'
+      path: '/welds/$weldId'
       fullPath: '/app/welds/$weldId'
       preLoaderRoute: typeof AppWeldsWeldIdRouteImport
-      parentRoute: typeof AppWeldsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/reports/$slug': {
       id: '/app/reports/$slug'
@@ -1249,24 +1232,6 @@ const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
   AppReportsRouteChildren,
 )
 
-interface AppWeldsRouteChildren {
-  AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
-  AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
-  AppWeldsTrashRoute: typeof AppWeldsTrashRoute
-  AppWeldsIndexRoute: typeof AppWeldsIndexRoute
-}
-
-const AppWeldsRouteChildren: AppWeldsRouteChildren = {
-  AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
-  AppWeldsDashboardRoute: AppWeldsDashboardRoute,
-  AppWeldsTrashRoute: AppWeldsTrashRoute,
-  AppWeldsIndexRoute: AppWeldsIndexRoute,
-}
-
-const AppWeldsRouteWithChildren = AppWeldsRoute._addFileChildren(
-  AppWeldsRouteChildren,
-)
-
 interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppBillingRoute: typeof AppBillingRoute
@@ -1282,11 +1247,14 @@ interface AppRouteChildren {
   AppReportsRoute: typeof AppReportsRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
   AppTeamRoute: typeof AppTeamRoute
-  AppWeldsRoute: typeof AppWeldsRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
   AppAdminCompaniesRoute: typeof AppAdminCompaniesRoute
   AppAdminUsersRoute: typeof AppAdminUsersRoute
+  AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
+  AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
+  AppWeldsTrashRoute: typeof AppWeldsTrashRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
+  AppWeldsIndexRoute: typeof AppWeldsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -1304,11 +1272,14 @@ const AppRouteChildren: AppRouteChildren = {
   AppReportsRoute: AppReportsRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
   AppTeamRoute: AppTeamRoute,
-  AppWeldsRoute: AppWeldsRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
   AppAdminCompaniesRoute: AppAdminCompaniesRoute,
   AppAdminUsersRoute: AppAdminUsersRoute,
+  AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
+  AppWeldsDashboardRoute: AppWeldsDashboardRoute,
+  AppWeldsTrashRoute: AppWeldsTrashRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
+  AppWeldsIndexRoute: AppWeldsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -1334,3 +1305,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
