@@ -97,14 +97,14 @@ function PwpsDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] grid place-items-center text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin me-2 inline" /> Loading pWPS…
+        <Loader2 className="size-4 animate-spin me-2 inline" /> Loading WPS…
       </div>
     );
   }
   if (!data) {
     return (
       <div className="p-8 text-center">
-        <p className="text-sm text-muted-foreground">pWPS not found.</p>
+        <p className="text-sm text-muted-foreground">WPS not found.</p>
         <Button variant="outline" className="mt-4" onClick={() => nav({ to: "/app/pwps" })}>
           Back to list
         </Button>
@@ -124,7 +124,7 @@ function PwpsDetailPage() {
     const { error } = await (supabase.from("pwps" as any) as any).update(draft).eq("id", pwpsId);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("pWPS saved.");
+    toast.success("WPS saved.");
     setDraft({});
     qc.invalidateQueries({ queryKey: ["pwps", pwpsId] });
     qc.invalidateQueries({ queryKey: ["pwps"] });
@@ -144,7 +144,7 @@ function PwpsDetailPage() {
       if (pqrErr) { setTransitioning(false); return toast.error(pqrErr.message); }
       if (!pqrRow) {
         setTransitioning(false);
-        return toast.error("No Passed PQR linked to this pWPS. Pass a PQR first.");
+        return toast.error("No Passed PQR linked to this WPS. Pass a PQR first.");
       }
       try {
         const { promotePqrToWps } = await import("@/lib/pqr-promotion-runtime");
@@ -177,7 +177,7 @@ function PwpsDetailPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Button variant="ghost" size="sm" onClick={() => nav({ to: "/app/pwps" })} className="mb-2 -ms-2">
-            <ArrowLeft className="size-4 me-1" /> Back to pWPS
+            <ArrowLeft className="size-4 me-1" /> Back to WPS
           </Button>
           <h1 className="text-2xl font-semibold tracking-tight">{data.pwps_no}</h1>
           {data.title && <p className="text-sm text-muted-foreground mt-1">{data.title}</p>}

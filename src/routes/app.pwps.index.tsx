@@ -109,16 +109,16 @@ function PwpsIndexPage() {
 
   return (
     <ModulePage
-      title="Preliminary WPS (pWPS)"
+      title="Welding Procedure Specification (WPS)"
       subtitle="Candidate welding procedures undergoing qualification. A pWPS becomes a production WPS only after a PQR passes."
       action={
         <div className="flex items-center gap-2">
           <Link to="/app/pwps/dashboard"><Button variant="outline" size="sm"><LayoutDashboard className="size-4 me-1" /> Dashboard</Button></Link>
           {isAdmin && <Link to="/app/pwps/trash"><Button variant="outline" size="sm"><Trash2 className="size-4 me-1" /> Trash</Button></Link>}
-          <NewRecordDialog table="pwps" title="New Preliminary WPS" trigger="New pWPS" defaults={{ revision: "Rev 0", status: "Draft", code_family: "ASME IX" }}>
+          <NewRecordDialog table="pwps" title="New Welding Procedure Specification" trigger="New WPS" defaults={{ revision: "Rev 0", status: "Draft", code_family: "ASME IX" }}>
             {({ values, set }) => (
               <div className="grid grid-cols-2 gap-3">
-                <F label="pWPS number"><Input required value={values.pwps_no ?? ""} onChange={(e) => set("pwps_no", e.target.value)} placeholder="pWPS-GTAW-001" /></F>
+                <F label="WPS number"><Input required value={values.pwps_no ?? ""} onChange={(e) => set("pwps_no", e.target.value)} placeholder="WPS-GTAW-001" /></F>
                 <F label="Title"><Input value={values.title ?? ""} onChange={(e) => set("title", e.target.value)} placeholder="GTAW root + SMAW fill, P-1 to P-1" /></F>
                 <F label="Code family"><Input value={values.code_family ?? "ASME IX"} onChange={(e) => set("code_family", e.target.value)} /></F>
                 <F label="Standard"><Input value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
@@ -209,13 +209,13 @@ function PwpsIndexPage() {
           <thead className="text-xs text-muted-foreground bg-muted/40">
             <tr>
               <th className="px-3 py-2.5 w-8"><Checkbox checked={filtered.length > 0 && filtered.every((r) => selected.has(r.id))} onCheckedChange={(c) => toggleAll(!!c)} /></th>
-              <Th>pWPS No.</Th><Th>Title</Th><Th>Code</Th><Th>Process</Th><Th>Position</Th><Th>Revision</Th><Th>Status</Th>
+              <Th>WPS No.</Th><Th>Title</Th><Th>Code</Th><Th>Process</Th><Th>Position</Th><Th>Revision</Th><Th>Status</Th>
               <th className="text-end font-medium px-5 py-2.5">Actions</th>
             </tr>
           </thead>
           <tbody>
             {isLoading && <Empty colSpan={9}><Loader2 className="size-4 animate-spin inline" /> Loading…</Empty>}
-            {!isLoading && filtered.length === 0 && <Empty colSpan={9}>No preliminary WPS match.</Empty>}
+            {!isLoading && filtered.length === 0 && <Empty colSpan={9}>No Welding Procedure Specification match.</Empty>}
             {filtered.map((p) => (
               <tr key={p.id} className="border-t border-border/60 hover:bg-muted/20">
                 <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
@@ -232,7 +232,7 @@ function PwpsIndexPage() {
                 </td>
                 <td className="px-5 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => nav({ to: "/app/pwps/$pwpsId", params: { pwpsId: p.id } })} aria-label="Open pWPS"><Eye className="size-4" /></Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => nav({ to: "/app/pwps/$pwpsId", params: { pwpsId: p.id } })} aria-label="Open WPS"><Eye className="size-4" /></Button>
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" disabled={busy} onClick={() => moveToTrash([p.id])} aria-label="Move to trash"><Trash2 className="size-4" /></Button>
                     <ChevronRight className="size-4 ms-1 text-muted-foreground" />
                   </div>
