@@ -302,7 +302,25 @@ function PwpsDetailPage() {
               <option value="BRAZING">Brazing</option>
             </select>
           </Field>
-          <Field label="Joint type"><Input value={merged.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Joint type">
+            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              value={merged.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)} disabled={!isEditor}>
+              <option value="">— Select joint type —</option>
+              <option value="Butt Joint">Butt Joint</option>
+              <option value="Lap Joint">Lap Joint</option>
+              <option value="T-Joint">T-Joint</option>
+              <option value="Corner Joint">Corner Joint</option>
+              <option value="Edge Joint">Edge Joint</option>
+              <option value="Flare Bevel Joint">Flare Bevel Joint</option>
+              <option value="Flare V-Groove Joint">Flare V-Groove Joint</option>
+              <option value="Slot Joint">Slot Joint</option>
+              <option value="Plug Joint">Plug Joint</option>
+              <option value="Scarf Joint">Scarf Joint</option>
+              <option value="Seam Joint">Seam Joint</option>
+              <option value="Spot Joint">Spot Joint</option>
+              <option value="Other">Other</option>
+            </select>
+          </Field>
           <Field label="Groove type"><Input value={merged.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)} disabled={!isEditor} /></Field>
           <Field label="Position"><Input value={merged.position ?? ""} onChange={(e) => set("position", e.target.value)} disabled={!isEditor} /></Field>
         </Section>
