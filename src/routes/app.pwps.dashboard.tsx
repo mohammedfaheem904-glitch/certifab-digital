@@ -59,9 +59,9 @@ function PwpsDashboard() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link to="/app/pwps" className="hover:text-foreground inline-flex items-center gap-1"><ArrowLeft className="size-3.5" /> Preliminary WPS</Link>
+            <Link to="/app/pwps" className="hover:text-foreground inline-flex items-center gap-1"><ArrowLeft className="size-3.5" /> Welding Procedure Specification (WPS)</Link>
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight mt-1">pWPS Dashboard</h1>
+          <h1 className="text-2xl font-semibold tracking-tight mt-1">WPS Dashboard</h1>
           <p className="text-sm text-muted-foreground">Qualification pipeline KPIs, status distribution, and recent activity.</p>
         </div>
         <Link to="/app/pwps"><Button>Go to list</Button></Link>
@@ -126,7 +126,7 @@ function PwpsDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-xs text-muted-foreground bg-muted/40">
-              <tr><th className="text-start font-medium px-4 py-2">pWPS</th><th className="text-start font-medium px-4 py-2">Title</th><th className="text-start font-medium px-4 py-2">Process</th><th className="text-start font-medium px-4 py-2">Status</th></tr>
+              <tr><th className="text-start font-medium px-4 py-2">WPS</th><th className="text-start font-medium px-4 py-2">Title</th><th className="text-start font-medium px-4 py-2">Process</th><th className="text-start font-medium px-4 py-2">Status</th></tr>
             </thead>
             <tbody>
               {attention.map((r) => (

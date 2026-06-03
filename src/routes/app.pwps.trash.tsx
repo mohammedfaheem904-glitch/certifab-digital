@@ -48,8 +48,8 @@ function TrashPage() {
 
   if (!isAdmin) {
     return (
-      <ModulePage title="pWPS Trash" subtitle="Restricted to super admins.">
-        <div className="text-center py-20 text-muted-foreground">You don't have permission to view the pWPS trash.</div>
+      <ModulePage title="WPS Trash" subtitle="Restricted to super admins.">
+        <div className="text-center py-20 text-muted-foreground">You don't have permission to view the WPS trash.</div>
       </ModulePage>
     );
   }
@@ -76,11 +76,11 @@ function TrashPage() {
 
   return (
     <ModulePage
-      title="pWPS Trash"
-      subtitle="Soft-deleted Preliminary WPS records. Restore to bring them back into active records."
+      title="WPS Trash"
+      subtitle="Soft-deleted Welding Procedure Specification records. Restore to bring them back into active records."
       action={
         <Link to="/app/pwps">
-          <Button size="sm" variant="outline"><ArrowLeft className="size-4 me-1" /> Back to pWPS</Button>
+          <Button size="sm" variant="outline"><ArrowLeft className="size-4 me-1" /> Back to WPS</Button>
         </Link>
       }
     >
@@ -88,7 +88,7 @@ function TrashPage() {
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
             <tr>
-              <Th>pWPS No.</Th><Th>Title</Th><Th>Code</Th><Th>Process</Th><Th>Status</Th><Th>Deleted</Th>
+              <Th>WPS No.</Th><Th>Title</Th><Th>Code</Th><Th>Process</Th><Th>Status</Th><Th>Deleted</Th>
               <Th className="text-end pe-5">Actions</Th>
             </tr>
           </thead>
