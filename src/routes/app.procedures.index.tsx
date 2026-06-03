@@ -169,7 +169,25 @@ function ProceduresPage() {
               <F label="Process"><Input required value={values.process ?? ""} onChange={(e) => set("process", e.target.value)} placeholder="GTAW" /></F>
               <F label="Revision"><Input value={values.revision ?? ""} onChange={(e) => set("revision", e.target.value)} /></F>
               <F label="Thickness range"><Input value={values.thickness_range ?? ""} onChange={(e) => set("thickness_range", e.target.value)} placeholder="3–25 mm" /></F>
-              <F label="Joint type"><Input value={values.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)} placeholder="Butt" /></F>
+              <F label="Joint type">
+                <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                  value={values.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)}>
+                  <option value="">— Select joint type —</option>
+                  <option value="Butt Joint">Butt Joint</option>
+                  <option value="Lap Joint">Lap Joint</option>
+                  <option value="T-Joint">T-Joint</option>
+                  <option value="Corner Joint">Corner Joint</option>
+                  <option value="Edge Joint">Edge Joint</option>
+                  <option value="Flare Bevel Joint">Flare Bevel Joint</option>
+                  <option value="Flare V-Groove Joint">Flare V-Groove Joint</option>
+                  <option value="Slot Joint">Slot Joint</option>
+                  <option value="Plug Joint">Plug Joint</option>
+                  <option value="Scarf Joint">Scarf Joint</option>
+                  <option value="Seam Joint">Seam Joint</option>
+                  <option value="Spot Joint">Spot Joint</option>
+                  <option value="Other">Other</option>
+                </select>
+              </F>
               <F label="Position"><Input value={values.position ?? ""} onChange={(e) => set("position", e.target.value)} placeholder="6G" /></F>
               <F label="Base material"><Input value={values.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} placeholder="P-No 1 Gr 1" /></F>
               <F label="Filler material"><Input value={values.filler_material ?? ""} onChange={(e) => set("filler_material", e.target.value)} placeholder="ER70S-2" /></F>

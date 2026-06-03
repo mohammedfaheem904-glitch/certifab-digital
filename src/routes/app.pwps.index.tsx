@@ -141,7 +141,25 @@ function PwpsIndexPage() {
                     <option value="BRAZING">Brazing</option>
                   </select>
                 </F>
-                <F label="Joint type"><Input value={values.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)} placeholder="Butt" /></F>
+                <F label="Joint type">
+                  <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.joint_type ?? ""} onChange={(e) => set("joint_type", e.target.value)}>
+                    <option value="">— Select joint type —</option>
+                    <option value="Butt Joint">Butt Joint</option>
+                    <option value="Lap Joint">Lap Joint</option>
+                    <option value="T-Joint">T-Joint</option>
+                    <option value="Corner Joint">Corner Joint</option>
+                    <option value="Edge Joint">Edge Joint</option>
+                    <option value="Flare Bevel Joint">Flare Bevel Joint</option>
+                    <option value="Flare V-Groove Joint">Flare V-Groove Joint</option>
+                    <option value="Slot Joint">Slot Joint</option>
+                    <option value="Plug Joint">Plug Joint</option>
+                    <option value="Scarf Joint">Scarf Joint</option>
+                    <option value="Seam Joint">Seam Joint</option>
+                    <option value="Spot Joint">Spot Joint</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </F>
                 <F label="Groove type"><Input value={values.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)} placeholder="V" /></F>
                 <F label="Position"><Input value={values.position ?? ""} onChange={(e) => set("position", e.target.value)} placeholder="6G" /></F>
                 <F label="Base material"><Input value={values.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} placeholder="SA-106 Gr B" /></F>
