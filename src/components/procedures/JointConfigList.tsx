@@ -193,3 +193,20 @@ function Field({ label, defaultValue, disabled, onSave }: { label: string; defau
     </div>
   );
 }
+
+function SelectField({ label, defaultValue, disabled, onSave, options }: { label: string; defaultValue: any; disabled: boolean; onSave: (v: string | null) => void; options: string[] }) {
+  return (
+    <div>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <select
+        defaultValue={defaultValue ?? ""}
+        disabled={disabled}
+        className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        onBlur={(e) => { if (e.target.value !== (defaultValue ?? "")) onSave(e.target.value || null); }}
+      >
+        <option value="">— Select —</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
