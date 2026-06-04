@@ -134,7 +134,8 @@ function JointCard({ joint, canEdit, onChange }: { joint: any; canEdit: boolean;
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <Field label="Groove type" defaultValue={joint.groove_type} disabled={!canEdit} onSave={(v) => update({ groove_type: v })} />
+        <SelectField label="Groove type" defaultValue={joint.groove_type} disabled={!canEdit} onSave={(v) => update({ groove_type: v })}
+          options={["Square Groove","V-Groove","Bevel Groove","U-Groove","J-Groove","Flare-V Groove","Flare-Bevel Groove","Scarf Groove","Other"]} />
         <Field label="Joint type" defaultValue={joint.joint_type} disabled={!canEdit} onSave={(v) => update({ joint_type: v })} />
         <Field label="Progression" defaultValue={joint.welding_progression} disabled={!canEdit} onSave={(v) => update({ welding_progression: v })} />
         <Field label="Position" defaultValue={joint.position_qualified} disabled={!canEdit} onSave={(v) => update({ position_qualified: v })} />
@@ -189,6 +190,23 @@ function Field({ label, defaultValue, disabled, onSave }: { label: string; defau
         className="h-8 text-sm"
         onBlur={(e) => { if (e.target.value !== (defaultValue ?? "")) onSave(e.target.value || null); }}
       />
+    </div>
+  );
+}
+
+function SelectField({ label, defaultValue, disabled, onSave, options }: { label: string; defaultValue: any; disabled: boolean; onSave: (v: string | null) => void; options: string[] }) {
+  return (
+    <div>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <select
+        defaultValue={defaultValue ?? ""}
+        disabled={disabled}
+        className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        onBlur={(e) => { if (e.target.value !== (defaultValue ?? "")) onSave(e.target.value || null); }}
+      >
+        <option value="">— Select —</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
     </div>
   );
 }

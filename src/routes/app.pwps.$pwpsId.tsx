@@ -321,7 +321,21 @@ function PwpsDetailPage() {
               <option value="Other">Other</option>
             </select>
           </Field>
-          <Field label="Groove type"><Input value={merged.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Groove type">
+            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              value={merged.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)} disabled={!isEditor}>
+              <option value="">— Select groove type —</option>
+              <option value="Square Groove">Square Groove</option>
+              <option value="V-Groove">V-Groove</option>
+              <option value="Bevel Groove">Bevel Groove</option>
+              <option value="U-Groove">U-Groove</option>
+              <option value="J-Groove">J-Groove</option>
+              <option value="Flare-V Groove">Flare-V Groove</option>
+              <option value="Flare-Bevel Groove">Flare-Bevel Groove</option>
+              <option value="Scarf Groove">Scarf Groove</option>
+              <option value="Other">Other</option>
+            </select>
+          </Field>
           <Field label="Position"><Input value={merged.position ?? ""} onChange={(e) => set("position", e.target.value)} disabled={!isEditor} /></Field>
         </Section>
 
