@@ -429,6 +429,40 @@ function InlineField({ label, field, proc, canEdit, qc, placeholder }: {
   );
 }
 
+function InlineSelect({ label, field, proc, canEdit, qc, options }: {
+  label: string; field: string; proc: any; canEdit: boolean;
+  qc: ReturnType<typeof useQueryClient>; options: string[];
+}) {
+  const [val, setVal] = useState<string>(proc[field] ?? "");
+  const [saving, setSaving] = useState(false);
+  const save = async () => {
+    if ((proc[field] ?? "") === val) return;
+    setSaving(true);
+    const { error } = await (supabase.from("procedures") as any).update({ [field]: val || null }).eq("id", proc.id);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["procedure", proc.id] });
+  };
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs flex items-center justify-between">
+        <span>{label}</span>
+        {saving && <Loader2 className="size-3 animate-spin text-muted-foreground" />}
+      </Label>
+      <select
+        className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        value={val}
+        disabled={!canEdit}
+        onChange={(e) => setVal(e.target.value)}
+        onBlur={save}
+      >
+        <option value="">— Select —</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
+
 // -----------------------------------------------------------------------------
 // Review / Approval
 // -----------------------------------------------------------------------------
