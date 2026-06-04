@@ -53,7 +53,10 @@ export function NewRecordDialog({
       return;
     }
     setBusy(true);
-    const { error } = await (supabase.from(table as any) as any).insert({ ...values, company_id: profile.company_id });
+    const payload = Object.fromEntries(
+      Object.entries(values).filter(([k]) => !k.startsWith("_")),
+    );
+    const { error } = await (supabase.from(table as any) as any).insert({ ...payload, company_id: profile.company_id });
     setBusy(false);
     if (error) {
       toast.error(error.message);
