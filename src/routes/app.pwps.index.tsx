@@ -160,7 +160,21 @@ function PwpsIndexPage() {
                     <option value="Other">Other</option>
                   </select>
                 </F>
-                <F label="Groove type"><Input value={values.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)} placeholder="V" /></F>
+                <F label="Groove type">
+                  <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.groove_type ?? ""} onChange={(e) => set("groove_type", e.target.value)}>
+                    <option value="">— Select groove type —</option>
+                    <option value="Square Groove">Square Groove</option>
+                    <option value="V-Groove">V-Groove</option>
+                    <option value="Bevel Groove">Bevel Groove</option>
+                    <option value="U-Groove">U-Groove</option>
+                    <option value="J-Groove">J-Groove</option>
+                    <option value="Flare-V Groove">Flare-V Groove</option>
+                    <option value="Flare-Bevel Groove">Flare-Bevel Groove</option>
+                    <option value="Scarf Groove">Scarf Groove</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </F>
                 <F label="Position"><Input value={values.position ?? ""} onChange={(e) => set("position", e.target.value)} placeholder="6G" /></F>
                 <F label="Base material"><Input value={values.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} placeholder="SA-106 Gr B" /></F>
                 <F label="P-Number"><Input value={values.p_number ?? ""} onChange={(e) => set("p_number", e.target.value)} placeholder="P-1" /></F>
