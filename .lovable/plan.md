@@ -1,25 +1,39 @@
-# Fix: View (eye) icon on Welds list doesn't open the record
+# Fix: "_welder_mode column not found" when logging a weld
 
 ## Root cause
 
-`src/routes/app.welds.tsx` is registered as the route for `/app/welds` and also acts as the parent for child routes like `app.welds.$weldId.tsx` and `app.welds.dashboard.tsx`. It renders the welds list directly and never renders an `<Outlet />`.
+In `src/routes/app.welds.index.tsx` (Log Weld dialog), the Welder field uses a UI-only flag `values._welder_mode` to switch between "pick from list" and "type a custom name". That key is stored alongside real column values in the shared `NewRecordDialog` state.
 
-Result: when the eye icon calls `nav({ to: "/app/welds/$weldId", params: { weldId: r.id } })`, the URL changes and the detail route matches, but the parent (the list) keeps rendering and the detail page never appears. The user perceives the button as broken. This is the same pattern we already fixed for `app.admin`.
+`src/components/NewRecordDialog.tsx` then inserts the whole `values` object into the target table verbatim:
+
+```ts
+supabase.from(table).insert({ ...values, company_id: profile.company_id })
+```
+
+Because `welds` has no `_welder_mode` column, PostgREST returns:
+> Could not find the '_welder_mode' column of 'welds' in the schema cache
+
+This blocks saving any new weld.
 
 ## Fix
 
-Convert `app.welds.tsx` into a proper index route, identical to how `app.admin.index.tsx` was structured:
+Filter out internal/UI-only keys (any key starting with `_`) before sending the insert. This is a single, surgical change in `NewRecordDialog.tsx` and keeps the convention reusable for any future dialog that needs local UI flags.
 
-1. Rename `src/routes/app.welds.tsx` → `src/routes/app.welds.index.tsx`.
-2. In the renamed file, change
-   `createFileRoute("/app/welds")` → `createFileRoute("/app/welds/")`
-   so it registers as the index of the `/app/welds` segment instead of a layout that swallows children.
-3. Regenerate / update `src/routeTree.gen.ts` to reflect the new index route id and remove the old `/app/welds` layout entry, so `/app/welds/$weldId`, `/app/welds/dashboard`, and `/app/welds/trash` resolve to their own files.
+### Change
 
-No other files need to change — the eye button's `nav(...)` call, the detail route, and all existing links keep working.
+In `src/components/NewRecordDialog.tsx`, inside `onSubmit`, build the payload by stripping keys that start with `_`:
 
-## Validation
+```ts
+const payload = Object.fromEntries(
+  Object.entries(values).filter(([k]) => !k.startsWith("_"))
+);
+const { error } = await (supabase.from(table as any) as any)
+  .insert({ ...payload, company_id: profile.company_id });
+```
 
-- From `/app/welds`, click the eye (or external-link) icon on a row → the weld detail page renders.
-- `/app/welds/dashboard` and `/app/welds/trash` still load correctly.
-- Direct navigation to `/app/welds` still shows the list.
+No DB migration, no schema change, no other files touched.
+
+## Verification
+
+- Open Welds → Log Weld → pick a welder (or choose "Other" and type a name) → Save. Insert succeeds, no schema-cache error.
+- Existing dialogs (pWPS, WPS, etc.) are unaffected since none of them rely on `_`-prefixed keys being persisted.
