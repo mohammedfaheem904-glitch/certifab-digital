@@ -9,6 +9,20 @@ import { Loader2, Plus, Trash2, Upload, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner";
 import { useRef, useState } from "react";
 
+const positionOptions = [
+  "1G (Flat Groove)",
+  "2G (Horizontal Groove)",
+  "3G (Vertical Groove)",
+  "4G (Overhead Groove)",
+  "5G (Fixed Horizontal Pipe)",
+  "6G (Fixed 45° Pipe)",
+  "1F (Flat Fillet)",
+  "2F (Horizontal Fillet)",
+  "3F (Vertical Fillet)",
+  "4F (Overhead Fillet)",
+  "5F (Fixed Horizontal Pipe Fillet)",
+];
+
 export function JointConfigList({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
   const qc = useQueryClient();
   const { profile } = useAuth();
