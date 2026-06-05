@@ -132,7 +132,19 @@ function PwpsIndexPage() {
                     <option value="IIW">IIW (International Institute of Welding)</option>
                   </select>
                 </F>
-                <F label="Standard"><Input value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
+                <F label="Standard">
+                  <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)}>
+                    <option value="">— Select standard —</option>
+                    <option value="ASME Section IX">ASME Section IX (ASME Welding Codes)</option>
+                    <option value="AWS">AWS Structural Welding Codes</option>
+                    <option value="ISO">ISO Welding Standards</option>
+                    <option value="API">API Welding Standards</option>
+                    <option value="EN">EN / Euro Norm Welding Standards</option>
+                    <option value="ASTM/ASME Material">ASTM / ASME Material Standards</option>
+                    <option value="IIW">IIW (International Institute of Welding)</option>
+                  </select>
+                </F>
                 <F label="Process">
                   <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
                     value={values.process ?? ""} onChange={(e) => set("process", e.target.value)}>
