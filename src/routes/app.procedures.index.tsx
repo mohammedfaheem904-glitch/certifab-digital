@@ -237,7 +237,40 @@ function ProceduresPage() {
                   <option value="Oxy-Fuel Rods">Oxy-Fuel Rods</option>
                 </select>
               </F>
-              <F label="Shielding gas"><Input value={values.shielding_gas ?? ""} onChange={(e) => set("shielding_gas", e.target.value)} placeholder="Ar 100%" /></F>
+              <F label="Shielding gas">
+                <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                  value={values.shielding_gas ?? ""} onChange={(e) => set("shielding_gas", e.target.value)}>
+                  <option value="">— Select shielding gas —</option>
+                  <optgroup label="Inert gases (GTAW / GMAW non-ferrous)">
+                    <option value="Argon (Ar 100%)">Argon (Ar 100%)</option>
+                    <option value="Helium (He 100%)">Helium (He 100%)</option>
+                    <option value="Ar/He 75/25">Argon + Helium (Ar/He 75/25)</option>
+                    <option value="Ar/He 50/50">Argon + Helium (Ar/He 50/50)</option>
+                  </optgroup>
+                  <optgroup label="Active / mixed gases (GMAW / FCAW carbon & low-alloy steel)">
+                    <option value="CO2 100%">CO₂ 100%</option>
+                    <option value="Ar/CO2 75/25 (C25)">Ar + CO₂ (75/25) — C25</option>
+                    <option value="Ar/CO2 80/20">Ar + CO₂ (80/20)</option>
+                    <option value="Ar/CO2 90/10">Ar + CO₂ (90/10)</option>
+                    <option value="Ar/CO2 95/5">Ar + CO₂ (95/5)</option>
+                    <option value="Ar/O2 98/2">Ar + O₂ (98/2)</option>
+                    <option value="Ar/O2 95/5">Ar + O₂ (95/5)</option>
+                  </optgroup>
+                  <optgroup label="Tri-mix (stainless / spray transfer)">
+                    <option value="Ar/CO2/O2 tri-mix">Ar + CO₂ + O₂ (tri-mix)</option>
+                    <option value="He/Ar/CO2 tri-mix">He + Ar + CO₂ (tri-mix, stainless)</option>
+                  </optgroup>
+                  <optgroup label="Purge / backing gases">
+                    <option value="Argon purge">Argon purge</option>
+                    <option value="Nitrogen purge">Nitrogen purge</option>
+                    <option value="N2/H2 95/5 purge">N₂ + H₂ (95/5) purge</option>
+                  </optgroup>
+                  <optgroup label="Other">
+                    <option value="None (SAW/SMAW)">None (SAW / SMAW)</option>
+                    <option value="Other">Other (specify in notes)</option>
+                  </optgroup>
+                </select>
+              </F>
               <F label="Voltage min"><Input type="number" value={values.voltage_min ?? ""} onChange={(e) => set("voltage_min", parseFloat(e.target.value) || null)} /></F>
               <F label="Voltage max"><Input type="number" value={values.voltage_max ?? ""} onChange={(e) => set("voltage_max", parseFloat(e.target.value) || null)} /></F>
               <F label="Current min"><Input type="number" value={values.current_min ?? ""} onChange={(e) => set("current_min", parseFloat(e.target.value) || null)} /></F>

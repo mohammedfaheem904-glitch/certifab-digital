@@ -1,25 +1,49 @@
-# Fix: View (eye) icon on Welds list doesn't open the record
+# Shielding Gas Dropdown
 
-## Root cause
+Replace the free-text "Shielding gas" inputs with a grouped `<select>` dropdown using standard welding shielding gas options, applied in both forms that expose the field.
 
-`src/routes/app.welds.tsx` is registered as the route for `/app/welds` and also acts as the parent for child routes like `app.welds.$weldId.tsx` and `app.welds.dashboard.tsx`. It renders the welds list directly and never renders an `<Outlet />`.
+## Files to update
 
-Result: when the eye icon calls `nav({ to: "/app/welds/$weldId", params: { weldId: r.id } })`, the URL changes and the detail route matches, but the parent (the list) keeps rendering and the detail page never appears. The user perceives the button as broken. This is the same pattern we already fixed for `app.admin`.
+1. `src/routes/app.pwps.$pwpsId.tsx` (line 387) — pWPS detail edit form, "Filler & gas" section.
+2. `src/routes/app.procedures.index.tsx` (line 240) — New Procedure dialog.
 
-## Fix
+(The pWPS New Record dialog in `src/routes/app.pwps.index.tsx` does not currently include a shielding gas field — leaving as-is.)
 
-Convert `app.welds.tsx` into a proper index route, identical to how `app.admin.index.tsx` was structured:
+## Proposed dropdown options (grouped by welding process)
 
-1. Rename `src/routes/app.welds.tsx` → `src/routes/app.welds.index.tsx`.
-2. In the renamed file, change
-   `createFileRoute("/app/welds")` → `createFileRoute("/app/welds/")`
-   so it registers as the index of the `/app/welds` segment instead of a layout that swallows children.
-3. Regenerate / update `src/routeTree.gen.ts` to reflect the new index route id and remove the old `/app/welds` layout entry, so `/app/welds/$weldId`, `/app/welds/dashboard`, and `/app/welds/trash` resolve to their own files.
+**Inert gases (GTAW / GMAW non-ferrous)**
+- Argon (Ar 100%)
+- Helium (He 100%)
+- Argon + Helium (Ar/He 75/25)
+- Argon + Helium (Ar/He 50/50)
 
-No other files need to change — the eye button's `nav(...)` call, the detail route, and all existing links keep working.
+**Active / mixed gases (GMAW / FCAW carbon & low-alloy steel)**
+- CO₂ 100%
+- Ar + CO₂ (75/25) — C25
+- Ar + CO₂ (80/20)
+- Ar + CO₂ (90/10)
+- Ar + CO₂ (95/5)
+- Ar + O₂ (98/2)
+- Ar + O₂ (95/5)
 
-## Validation
+**Tri-mix (stainless / spray transfer)**
+- Ar + CO₂ + O₂ (tri-mix)
+- He + Ar + CO₂ (tri-mix, stainless)
 
-- From `/app/welds`, click the eye (or external-link) icon on a row → the weld detail page renders.
-- `/app/welds/dashboard` and `/app/welds/trash` still load correctly.
-- Direct navigation to `/app/welds` still shows the list.
+**Purge / backing gases**
+- Argon purge
+- Nitrogen purge
+- N₂ + H₂ (95/5) purge
+
+**Other**
+- None (SAW / SMAW)
+- Other (specify in notes)
+
+If you want a different list, reply with the exact options and I'll adjust before implementing.
+
+## Implementation notes
+
+- Use the same `<select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm ...">` pattern already used for Filler material / Process dropdowns in these files.
+- Use `<optgroup>` for the category headers above.
+- Value binds to `merged.shielding_gas` / `values.shielding_gas` unchanged — DB column stays `text`, no migration required.
+- No changes to types, RLS, or backend logic.
