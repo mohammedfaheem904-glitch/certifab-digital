@@ -372,6 +372,20 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
+const positionOptions = [
+  "1G (Flat Groove)",
+  "2G (Horizontal Groove)",
+  "3G (Vertical Groove)",
+  "4G (Overhead Groove)",
+  "5G (Fixed Horizontal Pipe)",
+  "6G (Fixed 45° Pipe)",
+  "1F (Flat Fillet)",
+  "2F (Horizontal Fillet)",
+  "3F (Vertical Fillet)",
+  "4F (Overhead Fillet)",
+  "5F (Fixed Horizontal Pipe Fillet)",
+];
+
 function Edit({
   label, value, onChange, type = "text", className = "",
 }: { label: string; value: any; onChange: (v: any) => void; type?: string; className?: string }) {
@@ -379,6 +393,21 @@ function Edit({
     <div className={`space-y-1.5 ${className}`}>
       <Label className="text-xs">{label}</Label>
       <Input type={type} value={value ?? ""} onChange={(e) => onChange(e.target.value)} />
+    </div>
+  );
+}
+
+function SelectEdit({
+  label, value, onChange, options, className = "",
+}: { label: string; value: any; onChange: (v: string) => void; options: string[]; className?: string }) {
+  return (
+    <div className={`space-y-1.5 ${className}`}>
+      <Label className="text-xs">{label}</Label>
+      <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+        value={value ?? ""} onChange={(e) => onChange(e.target.value)}>
+        <option value="">— Select position —</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
     </div>
   );
 }
