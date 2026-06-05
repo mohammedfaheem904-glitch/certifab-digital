@@ -89,7 +89,7 @@ export function AppLayout() {
     { to: "/app", label: t("dashboard"), icon: LayoutDashboard, exact: true, surface: "dashboard" },
     { to: "/app/pwps", label: "Welding Procedure Specification (WPS)", icon: FileText },
     { to: "/app/pqrs", label: "PQR", icon: ShieldCheck },
-    { to: "/app/procedures", label: "Procedures (WPS)", icon: FileText, surface: "procedures" },
+    { to: "/app/procedures", label: "WPS (Welding Procedure Specification)", icon: FileText, surface: "procedures" },
     { to: "/app/qualifications", label: t("qualifications"), icon: BadgeCheck, surface: "qualifications" },
     { to: "/app/welds", label: t("welds"), icon: Flame, surface: "welds" },
     { to: "/app/inspections", label: t("inspections"), icon: ClipboardCheck },

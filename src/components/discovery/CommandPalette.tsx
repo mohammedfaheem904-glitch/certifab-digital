@@ -29,7 +29,7 @@ import { FEATURES, markFeatureSeen } from "@/lib/discovery";
 
 const ROUTES = [
   { to: "/app", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/app/procedures", label: "Procedures", icon: FileText },
+  { to: "/app/procedures", label: "WPS (Welding Procedure Specification)", icon: FileText },
   { to: "/app/qualifications", label: "Welder Qualifications (WPQ)", icon: BadgeCheck },
   { to: "/app/welds", label: "Welds", icon: Flame },
   { to: "/app/inspections", label: "Inspections", icon: ClipboardCheck },

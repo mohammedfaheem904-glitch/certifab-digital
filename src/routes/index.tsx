@@ -134,7 +134,7 @@ function Landing() {
           </div>
           <div className="grid md:grid-cols-4 gap-4">
             {[
-              { icon: Layers, n: "Procedures", d: "WPS / PQR" },
+              { icon: Layers, n: "WPS (Welding Procedure Specification)", d: "WPS / PQR" },
               { icon: ClipboardCheck, n: "Qualifications", d: "WPQ continuity" },
               { icon: Activity, n: "Welds", d: "Traceability" },
               { icon: ShieldCheck, n: "Inspections", d: "NDT outcomes" },
