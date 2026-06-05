@@ -105,7 +105,23 @@ export function QualificationComplianceReport({ qualification }: Props) {
           <PF label="Process"><Input value={plan.process ?? ""} onChange={(e) => setPlan((s) => ({ ...s, process: e.target.value }))} placeholder="GTAW" /></PF>
           <PF label="Thickness (mm)"><Input type="number" value={plan.thicknessMm ?? ""} onChange={(e) => setPlan((s) => ({ ...s, thicknessMm: Number(e.target.value) || undefined }))} /></PF>
           <PF label="Pipe OD (mm)"><Input type="number" value={plan.diameterMm ?? ""} onChange={(e) => setPlan((s) => ({ ...s, diameterMm: Number(e.target.value) || undefined, isPipe: true }))} /></PF>
-          <PF label="Position"><Input value={plan.position ?? ""} onChange={(e) => setPlan((s) => ({ ...s, position: e.target.value.toUpperCase() }))} placeholder="6G" /></PF>
+          <PF label="Position">
+            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+              value={plan.position ?? ""} onChange={(e) => setPlan((s) => ({ ...s, position: e.target.value }))}>
+              <option value="">— Select position —</option>
+              <option value="1G (Flat Groove)">1G (Flat Groove)</option>
+              <option value="2G (Horizontal Groove)">2G (Horizontal Groove)</option>
+              <option value="3G (Vertical Groove)">3G (Vertical Groove)</option>
+              <option value="4G (Overhead Groove)">4G (Overhead Groove)</option>
+              <option value="5G (Fixed Horizontal Pipe)">5G (Fixed Horizontal Pipe)</option>
+              <option value="6G (Fixed 45° Pipe)">6G (Fixed 45° Pipe)</option>
+              <option value="1F (Flat Fillet)">1F (Flat Fillet)</option>
+              <option value="2F (Horizontal Fillet)">2F (Horizontal Fillet)</option>
+              <option value="3F (Vertical Fillet)">3F (Vertical Fillet)</option>
+              <option value="4F (Overhead Fillet)">4F (Overhead Fillet)</option>
+              <option value="5F (Fixed Horizontal Pipe Fillet)">5F (Fixed Horizontal Pipe Fillet)</option>
+            </select>
+          </PF>
           <PF label="P-Number"><Input type="number" value={plan.pNumber ?? ""} onChange={(e) => setPlan((s) => ({ ...s, pNumber: Number(e.target.value) || undefined }))} /></PF>
           <PF label="Backing">
             <select className="h-9 w-full rounded-md border bg-transparent px-2 text-sm"

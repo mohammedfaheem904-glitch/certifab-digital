@@ -175,7 +175,23 @@ function PwpsIndexPage() {
                     <option value="Other">Other</option>
                   </select>
                 </F>
-                <F label="Position"><Input value={values.position ?? ""} onChange={(e) => set("position", e.target.value)} placeholder="6G" /></F>
+                <F label="Position">
+                  <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.position ?? ""} onChange={(e) => set("position", e.target.value)}>
+                    <option value="">— Select position —</option>
+                    <option value="1G (Flat Groove)">1G (Flat Groove)</option>
+                    <option value="2G (Horizontal Groove)">2G (Horizontal Groove)</option>
+                    <option value="3G (Vertical Groove)">3G (Vertical Groove)</option>
+                    <option value="4G (Overhead Groove)">4G (Overhead Groove)</option>
+                    <option value="5G (Fixed Horizontal Pipe)">5G (Fixed Horizontal Pipe)</option>
+                    <option value="6G (Fixed 45° Pipe)">6G (Fixed 45° Pipe)</option>
+                    <option value="1F (Flat Fillet)">1F (Flat Fillet)</option>
+                    <option value="2F (Horizontal Fillet)">2F (Horizontal Fillet)</option>
+                    <option value="3F (Vertical Fillet)">3F (Vertical Fillet)</option>
+                    <option value="4F (Overhead Fillet)">4F (Overhead Fillet)</option>
+                    <option value="5F (Fixed Horizontal Pipe Fillet)">5F (Fixed Horizontal Pipe Fillet)</option>
+                  </select>
+                </F>
                 <F label="Base material"><Input value={values.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} placeholder="SA-106 Gr B" /></F>
                 <F label="P-Number"><Input value={values.p_number ?? ""} onChange={(e) => set("p_number", e.target.value)} placeholder="P-1" /></F>
                 <F label="Group No."><Input value={values.group_number ?? ""} onChange={(e) => set("group_number", e.target.value)} placeholder="1" /></F>
