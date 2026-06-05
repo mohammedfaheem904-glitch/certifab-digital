@@ -62,6 +62,10 @@ function QualificationsPage() {
     select: "id,wps_no,document_no,revision,status",
     order: { column: "updated_at", ascending: false },
   });
+  const { data: pqrList = [] } = useCompanyRows<any>("pqrs", {
+    select: "id,pqr_no,revision,status",
+    order: { column: "updated_at", ascending: false },
+  });
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
