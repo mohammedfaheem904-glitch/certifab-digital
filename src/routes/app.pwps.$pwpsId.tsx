@@ -445,7 +445,14 @@ function PwpsDetailPage() {
             <Field label="Travel max"><Input type="number" value={merged.travel_speed_max ?? ""} onChange={(e) => set("travel_speed_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
             <Field label="Heat input min (kJ/mm)"><Input type="number" step="0.01" value={merged.heat_input_min ?? ""} onChange={(e) => set("heat_input_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
             <Field label="Heat input max (kJ/mm)"><Input type="number" step="0.01" value={merged.heat_input_max ?? ""} onChange={(e) => set("heat_input_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
-            <Field label="Polarity"><Input value={merged.polarity ?? ""} onChange={(e) => set("polarity", e.target.value)} disabled={!isEditor} /></Field>
+            <Field label="Polarity">
+              <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={merged.polarity ?? ""} onChange={(e) => set("polarity", e.target.value)} disabled={!isEditor}>
+                <option value="">— Select polarity —</option>
+                <option value="AC">AC</option>
+                <option value="DCEN (Straight Polarity)">DCEN (Straight Polarity)</option>
+                <option value="DCEP (Reverse Polarity)">DCEP (Reverse Polarity)</option>
+              </select>
+            </Field>
             <Field label="Preheat min (°C)"><Input type="number" value={merged.preheat_min_c ?? ""} onChange={(e) => set("preheat_min_c", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
             <Field label="Interpass max (°C)"><Input type="number" value={merged.interpass_max_c ?? ""} onChange={(e) => set("interpass_max_c", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
             <Field label="PWHT"><Input value={merged.pwht ?? ""} onChange={(e) => set("pwht", e.target.value)} disabled={!isEditor} /></Field>
