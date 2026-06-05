@@ -158,7 +158,7 @@ function ProceduresPage() {
         <NewRecordDialog
           table="procedures"
           quota="procedures"
-          title="pWPS (Preliminary Welding Procedure Specification)"
+          title="  WPS (Welding Procedure Specification) "
           trigger="New WPS"
           defaults={{ revision: "Rev 0", status: "Draft" }}
         >
