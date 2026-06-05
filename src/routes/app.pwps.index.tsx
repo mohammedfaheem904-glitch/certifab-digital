@@ -216,7 +216,7 @@ function PwpsIndexPage() {
             <Button size="sm" variant="outline" onClick={() => exportCsv(`pwps-${selected.size > 0 ? "selected" : "filtered"}`, exportRows(toExport))} disabled={toExport.length === 0}>
               <Download className="size-3.5 me-1" /> CSV
             </Button>
-            <Button size="sm" variant="outline" onClick={() => exportExcel(`pwps-${selected.size > 0 ? "selected" : "filtered"}`, "pWPS", exportRows(toExport))} disabled={toExport.length === 0}>
+            <Button size="sm" variant="outline" onClick={() => exportExcel(`pwps-${selected.size > 0 ? "selected" : "filtered"}`, "pWPS (Preliminary Welding Procedure Specification)", exportRows(toExport))} disabled={toExport.length === 0}>
               <Download className="size-3.5 me-1" /> XLSX
             </Button>
           </div>
