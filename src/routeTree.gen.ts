@@ -42,6 +42,7 @@ import { Route as AppPwpsIndexRouteImport } from './routes/app.pwps.index'
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
 import { Route as AppPqrsIndexRouteImport } from './routes/app.pqrs.index'
 import { Route as AppInstrumentsIndexRouteImport } from './routes/app.instruments.index'
+import { Route as AppEquipmentIndexRouteImport } from './routes/app.equipment.index'
 import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
@@ -234,6 +235,11 @@ const AppInstrumentsIndexRoute = AppInstrumentsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppInstrumentsRoute,
 } as any)
+const AppEquipmentIndexRoute = AppEquipmentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppEquipmentRoute,
+} as any)
 const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -384,7 +390,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
-  '/app/equipment': typeof AppEquipmentRoute
+  '/app/equipment': typeof AppEquipmentRouteWithChildren
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
@@ -423,6 +429,7 @@ export interface FileRoutesByFullPath {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin/': typeof AppAdminIndexRoute
+  '/app/equipment/': typeof AppEquipmentIndexRoute
   '/app/instruments/': typeof AppInstrumentsIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
@@ -444,7 +451,6 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
-  '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
@@ -478,6 +484,7 @@ export interface FileRoutesByTo {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin': typeof AppAdminIndexRoute
+  '/app/equipment': typeof AppEquipmentIndexRoute
   '/app/instruments': typeof AppInstrumentsIndexRoute
   '/app/pqrs': typeof AppPqrsIndexRoute
   '/app/procedures': typeof AppProceduresIndexRoute
@@ -501,7 +508,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
-  '/app/equipment': typeof AppEquipmentRoute
+  '/app/equipment': typeof AppEquipmentRouteWithChildren
   '/app/inspections': typeof AppInspectionsRoute
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
@@ -540,6 +547,7 @@ export interface FileRoutesById {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin/': typeof AppAdminIndexRoute
+  '/app/equipment/': typeof AppEquipmentIndexRoute
   '/app/instruments/': typeof AppInstrumentsIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
@@ -603,6 +611,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/admin/'
+    | '/app/equipment/'
     | '/app/instruments/'
     | '/app/pqrs/'
     | '/app/procedures/'
@@ -624,7 +633,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/app/audit'
     | '/app/billing'
-    | '/app/equipment'
     | '/app/inspections'
     | '/app/ncrs'
     | '/app/projects'
@@ -658,6 +666,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/admin'
+    | '/app/equipment'
     | '/app/instruments'
     | '/app/pqrs'
     | '/app/procedures'
@@ -719,6 +728,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/admin/'
+    | '/app/equipment/'
     | '/app/instruments/'
     | '/app/pqrs/'
     | '/app/procedures/'
@@ -979,6 +989,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsIndexRouteImport
       parentRoute: typeof AppInstrumentsRoute
     }
+    '/app/equipment/': {
+      id: '/app/equipment/'
+      path: '/'
+      fullPath: '/app/equipment/'
+      preLoaderRoute: typeof AppEquipmentIndexRouteImport
+      parentRoute: typeof AppEquipmentRoute
+    }
     '/app/admin/': {
       id: '/app/admin/'
       path: '/admin'
@@ -1164,6 +1181,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppEquipmentRouteChildren {
+  AppEquipmentIndexRoute: typeof AppEquipmentIndexRoute
+}
+
+const AppEquipmentRouteChildren: AppEquipmentRouteChildren = {
+  AppEquipmentIndexRoute: AppEquipmentIndexRoute,
+}
+
+const AppEquipmentRouteWithChildren = AppEquipmentRoute._addFileChildren(
+  AppEquipmentRouteChildren,
+)
+
 interface AppInstrumentsRouteChildren {
   AppInstrumentsInstrumentIdRoute: typeof AppInstrumentsInstrumentIdRoute
   AppInstrumentsTrashRoute: typeof AppInstrumentsTrashRoute
@@ -1275,7 +1304,7 @@ const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
 interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppBillingRoute: typeof AppBillingRoute
-  AppEquipmentRoute: typeof AppEquipmentRoute
+  AppEquipmentRoute: typeof AppEquipmentRouteWithChildren
   AppInspectionsRoute: typeof AppInspectionsRoute
   AppInstrumentsRoute: typeof AppInstrumentsRouteWithChildren
   AppNcrsRoute: typeof AppNcrsRouteWithChildren
@@ -1300,7 +1329,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppBillingRoute: AppBillingRoute,
-  AppEquipmentRoute: AppEquipmentRoute,
+  AppEquipmentRoute: AppEquipmentRouteWithChildren,
   AppInspectionsRoute: AppInspectionsRoute,
   AppInstrumentsRoute: AppInstrumentsRouteWithChildren,
   AppNcrsRoute: AppNcrsRouteWithChildren,
