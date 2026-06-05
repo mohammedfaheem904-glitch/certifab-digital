@@ -455,7 +455,22 @@ function PwpsDetailPage() {
             </Field>
             <Field label="Preheat min (°C)"><Input type="number" value={merged.preheat_min_c ?? ""} onChange={(e) => set("preheat_min_c", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
             <Field label="Interpass max (°C)"><Input type="number" value={merged.interpass_max_c ?? ""} onChange={(e) => set("interpass_max_c", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
-            <Field label="PWHT"><Input value={merged.pwht ?? ""} onChange={(e) => set("pwht", e.target.value)} disabled={!isEditor} /></Field>
+            <Field label="PWHT">
+              <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                value={merged.pwht ?? ""} onChange={(e) => set("pwht", e.target.value)} disabled={!isEditor}>
+                <option value="">— Select PWHT —</option>
+                <option value="None">None</option>
+                <option value="Stress Relieving">Stress Relieving</option>
+                <option value="Solution Annealing">Solution Annealing</option>
+                <option value="Normalizing">Normalizing</option>
+                <option value="Normalizing and Tempering">Normalizing and Tempering</option>
+                <option value="Tempering">Tempering</option>
+                <option value="Hydrogen Bake-Out">Hydrogen Bake-Out</option>
+                <option value="Age Hardening">Age Hardening</option>
+                <option value="Precipitation Hardening">Precipitation Hardening</option>
+                <option value="Other">Other</option>
+              </select>
+            </Field>
           </div>
         </Section>
 
