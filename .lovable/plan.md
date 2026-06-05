@@ -1,49 +1,52 @@
-# Shielding Gas Dropdown
+# Full pWPS → WPS inheritance on PQR promotion
 
-Replace the free-text "Shielding gas" inputs with a grouped `<select>` dropdown using standard welding shielding gas options, applied in both forms that expose the field.
+## Goal
+When a passed PQR is promoted, the resulting WPS (in `procedures`) must inherit the complete pWPS dataset so engineers don't re-enter anything. Today only ~15 scalar fields are copied; everything else (extra scalars + every relational detail section) is left blank.
 
-## Files to update
+## Gaps today
+`buildWpsPayload` (`src/lib/pqr-promotion.ts`) skips pWPS scalar fields that have direct equivalents on `procedures`:
+- `joint_type`, `groove_type` (already copied), but missing `pipe_or_plate`, `welding_progression`, `electrode_type` derivation
+- pWPS `polarity`, `backing`, `p_number`, `group_number`, `filler_classification`, `code_family`, `title`, `notes`, `diameter_min/max_mm`, `thickness_min/max_mm` (only stringified into `thickness_range`), `project_id`, `qualified_at`
 
-1. `src/routes/app.pwps.$pwpsId.tsx` (line 387) — pWPS detail edit form, "Filler & gas" section.
-2. `src/routes/app.procedures.index.tsx` (line 240) — New Procedure dialog.
+And **none** of the WPS relational detail tables are seeded:
+- `wps_base_metals`, `wps_filler_metals`, `wps_positions`, `wps_preheat_entries`, `wps_shielding_gases`, `wps_pwht`, `wps_electrical_characteristics`, `wps_techniques`, `wps_notes`
 
-(The pWPS New Record dialog in `src/routes/app.pwps.index.tsx` does not currently include a shielding gas field — leaving as-is.)
+Because pWPS is a flat record (no child tables of its own), inheritance has to translate each pWPS scalar group into a single seed row in the matching WPS child table.
 
-## Proposed dropdown options (grouped by welding process)
+## Changes
 
-**Inert gases (GTAW / GMAW non-ferrous)**
-- Argon (Ar 100%)
-- Helium (He 100%)
-- Argon + Helium (Ar/He 75/25)
-- Argon + Helium (Ar/He 50/50)
+### 1. `src/lib/pqr-promotion.ts` — expand scalar copy
+Extend `buildWpsPayload` to additionally map (using PQR `qualified_ranges` overrides where they exist):
+- `welding_progression` ← pwps progression (from `position` modifier if present, otherwise null)
+- `back_gouging` ← pwps `backing` when it implies back gouging, else copy verbatim into a new `notes` line
+- `electrode_type` ← pwps `filler_classification`
+- `notes` ← merge auto-generated provenance line with `pwps.notes`
+- Keep existing thickness_range string but also pass through min/max for child-table seeding
 
-**Active / mixed gases (GMAW / FCAW carbon & low-alloy steel)**
-- CO₂ 100%
-- Ar + CO₂ (75/25) — C25
-- Ar + CO₂ (80/20)
-- Ar + CO₂ (90/10)
-- Ar + CO₂ (95/5)
-- Ar + O₂ (98/2)
-- Ar + O₂ (95/5)
+### 2. `src/lib/pqr-promotion-runtime.ts` — seed WPS child tables
+After inserting the `procedures` row, insert one seed row per detail table from the pWPS scalars + PQR qualified ranges. All inserts run in `Promise.all` after the procedure id is known and are best-effort (log + continue on individual failure so the WPS still exists).
 
-**Tri-mix (stainless / spray transfer)**
-- Ar + CO₂ + O₂ (tri-mix)
-- He + Ar + CO₂ (tri-mix, stainless)
+Seed mapping:
+| Child table | Source fields |
+|---|---|
+| `wps_base_metals` | `base_material`, `p_number`, `group_number`, `thickness_min/max_mm` (PQR overrides), `diameter_min/max_mm` |
+| `wps_filler_metals` | `process`, `filler_material`, `filler_classification` (→ aws_classification) |
+| `wps_positions` | `position`, `position` as `qualified_range`, progression from pwps |
+| `wps_preheat_entries` | `preheat_min_c`, `interpass_max_c` |
+| `wps_shielding_gases` | `process`, `shielding_gas` (→ gas_type) |
+| `wps_pwht` | `pwht` (→ applicability/notes; numeric temp left null) |
+| `wps_electrical_characteristics` | `process`, `polarity`, `current_min/max`, `voltage_min/max`, `travel_speed_min/max`, `heat_input_min/max` (PQR overrides) |
+| `wps_techniques` | `process`, `technique_notes`, back_gouging from pwps backing |
+| `wps_notes` | one row with `category: 'engineering'`, body = pwps.notes (only if present) |
 
-**Purge / backing gases**
-- Argon purge
-- Nitrogen purge
-- N₂ + H₂ (95/5) purge
+Each insert includes `company_id` and `procedure_id` so existing RLS passes for editors.
 
-**Other**
-- None (SAW / SMAW)
-- Other (specify in notes)
+### 3. Idempotency
+Already-promoted PQRs (with `resulting_wps_id`) continue to short-circuit — no re-seeding, no duplicate child rows.
 
-If you want a different list, reply with the exact options and I'll adjust before implementing.
+### 4. No schema migration
+All target tables and columns already exist. No DB changes required.
 
-## Implementation notes
-
-- Use the same `<select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm ...">` pattern already used for Filler material / Process dropdowns in these files.
-- Use `<optgroup>` for the category headers above.
-- Value binds to `merged.shielding_gas` / `values.shielding_gas` unchanged — DB column stays `text`, no migration required.
-- No changes to types, RLS, or backend logic.
+## Out of scope
+- Editing the new WPS detail rows on screen still happens through the existing `RelationalTable` UIs — no UI changes here.
+- pWPS does not have its own relational sub-tables; if/when it gains them, this code can be extended to copy rows instead of synthesizing them.
