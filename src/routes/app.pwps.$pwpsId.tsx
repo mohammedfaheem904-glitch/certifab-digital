@@ -177,7 +177,7 @@ function PwpsDetailPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Button variant="ghost" size="sm" onClick={() => nav({ to: "/app/pwps" })} className="mb-2 -ms-2">
-            <ArrowLeft className="size-4 me-1" /> Back to WPS
+            <ArrowLeft className="size-4 me-1" /> Back to pWPS (Preliminary Welding Procedure Specification)
           </Button>
           <h1 className="text-2xl font-semibold tracking-tight">{data.pwps_no}</h1>
           {data.title && <p className="text-sm text-muted-foreground mt-1">{data.title}</p>}
