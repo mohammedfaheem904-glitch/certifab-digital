@@ -1,57 +1,63 @@
-## Goal
-Upgrade the **Fleet & Equipment** chapter to match the QA/QC Instruments experience.
 
-## 1. Database migration (`equipment` table)
-Add columns:
-- `name text` (defaults to `model` if blank)
-- `category text not null default 'Other'`
-- `serial_number text`
-- `manufacturer text`
-- `notes text`
-- `qr_token text` (auto generated, like instruments)
-- `deleted_at timestamptz`, `deleted_by uuid`
+# Make the repo Hostinger-deployable (static SPA)
 
-Add sibling table `equipment_calibrations` mirroring `instrument_calibrations` (equipment_id, calibrated_on, next_due, performed_by, certificate_path, notes) with GRANTs + RLS (members read, editors insert/delete, company-scoped).
+## Audit findings
 
-Update RLS on `equipment`:
-- `members read equipment` → require `deleted_at IS NULL`
-- New policy `super_admin reads deleted equipment`
+- **No server functions in use.** `rg createServerFn` returns 0 hits. Only Supabase server helpers exist (`client.server.ts`, `auth-middleware.ts`, `auth-attacher.ts`) and they are never imported by route/component code.
+- **No server routes** under `src/routes/api/`.
+- All data access already runs through the browser Supabase client with RLS — safe to ship as a pure SPA.
+- Current build pipeline: `vite build` → TanStack Start plugin → SSR bundle for Cloudflare Workers (`.output/`, `wrangler.jsonc`, `src/server.ts`). This is **incompatible** with Hostinger shared hosting (no Node/Workers runtime).
+- Existing `.github/workflows/deploy-production.yml` already attempts to copy `dist/` to a `production` branch with SPA `.htaccess` fallback — but `dist/` is not what the current Vite config emits in TanStack Start mode, so the deploy is silently broken.
+- Lovable Cloud (Supabase) stays as the backend — `VITE_SUPABASE_*` keys are publishable and safe in client bundles.
 
-Add RPCs `soft_delete_equipment(id)` and `restore_equipment(id)` (SECURITY DEFINER, company-scoped, editor / super_admin checks).
+## Changes
 
-Reuse existing `instrument-certificates` storage bucket (or add an `equipment-certificates` bucket if separation preferred — will reuse to keep scope tight).
+### 1. Switch to pure SPA build
+- Replace `@lovable.dev/vite-tanstack-config` build pipeline with a standard Vite + React SPA config, keeping TanStack Router (file-based routing works in SPA mode too via `@tanstack/router-plugin/vite`).
+- Rewrite `vite.config.ts`:
+  - `@vitejs/plugin-react`
+  - `@tanstack/router-plugin/vite` (SPA mode — generates `routeTree.gen.ts`)
+  - `@tailwindcss/vite`
+  - `vite-tsconfig-paths`
+  - `build.outDir: 'dist'`
+- Replace `src/router.tsx` SSR-aware setup with a plain `createRouter` + `RouterProvider` SPA entry.
+- Add `index.html` at project root with `<div id="root">` and `<script type="module" src="/src/main.tsx">`.
+- Create `src/main.tsx` (ReactDOM root + RouterProvider + AuthProvider chain that currently lives in `__root.tsx`).
+- Strip SSR-only pieces from `src/routes/__root.tsx`: remove `HeadContent`, `Scripts`, `shellComponent`, `createRootRouteWithContext`'s SSR `head()` → migrate page titles to per-route `useEffect(() => { document.title = ... }, [])` (or react-helmet-async if user prefers later).
 
-## 2. Route restructure
-Convert `src/routes/app.equipment.tsx` into a layout-only route rendering `<Outlet />`, then add:
-- `src/routes/app.equipment.index.tsx` — list page (current UI rebuilt with new features)
-- `src/routes/app.equipment.dashboard.tsx` — stats dashboard (mirrors `app.instruments` dashboard pattern: totals, active, due-soon, overdue, by-category chart, upcoming calibrations table)
-- `src/routes/app.equipment.$equipmentId.tsx` — details page (asset info, calibration history list with certificate links, QR token)
-- `src/routes/app.equipment.trash.tsx` — soft-deleted list with Restore + permanent delete (super_admin only)
+### 2. Remove Cloudflare / Workers infrastructure
+- Delete: `wrangler.jsonc`, `src/server.ts`, `src/start.ts`, `src/lib/error-page.ts`, `src/lib/error-capture.ts`.
+- Remove deps: `@cloudflare/vite-plugin`, `@tanstack/react-start`, `@tanstack/router-plugin` stays (needed for routing), `nitro`, `@lovable.dev/vite-tanstack-config`.
+- Add deps: `@tanstack/router-plugin`, `@tanstack/react-router` already present.
+- Keep `@lovable.dev/cloud-auth-js` only if user uses Google OAuth broker; otherwise drop. (Will verify in build step.)
+- Delete unused server-only Supabase helpers: `src/integrations/supabase/client.server.ts`, `auth-middleware.ts`, `auth-attacher.ts` (none are imported).
 
-## 3. Index page features
-- **Search** input across asset_id / name / model / serial / manufacturer
-- **Filters**: Category, Status, Calibration Due (Overdue / 30d / 90d / OK / None) — same chips as Instruments
-- **Bulk select** via row checkboxes → "Export selected (xlsx)" and "Move to trash" actions
-- **Per-row icons**: Eye (navigate to details), Trash (soft delete)
-- **Stats strip**: Active / Due soon / Overdue counts + link to Dashboard and Trash
-- Real-time updates via existing `useCompanyRows({ realtime: true })`
+### 3. Environment & config
+- Add `.env.example` listing the three required client vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`.
+- Add `README.md` section: clone → `npm install` → copy `.env.example` to `.env` → `npm run build` → upload `dist/` to Hostinger `public_html/`.
+- Ensure `tsconfig.json` and `tsconfig.node.json` are valid for SPA mode (`moduleResolution: "bundler"`).
 
-## 4. Register Machine dialog (enhanced)
-Fields:
-- Asset ID, Name, Category (select from CATEGORIES list), Model, Manufacturer, Serial number, Calibration due, Status, Notes
-- **Quantity** (1–50): inserts N rows, suffixing Asset ID `-01`, `-02`, …
-- **Calibration certificate** file input (PDF/image): uploads to storage and creates an `equipment_calibrations` record per inserted equipment row
+### 4. GitHub Actions cleanup
+- Keep `.github/workflows/deploy-production.yml`. It already:
+  - Installs with `bun install --frozen-lockfile`
+  - Runs `bun run build`
+  - Detects `dist/`
+  - Writes Hostinger-compatible `.htaccess` (SPA fallback)
+  - Pushes to `production` branch
+- Verify it still works after the SPA switch (it will, since `dist/` is now the actual output).
+- Delete the second workflow `.github/workflows/deploy.yml` (GitHub Pages deploy uses `npm ci` against a `bun.lock` repo — currently broken and conflicts).
 
-## 5. Navigation
-Add sidebar/links to `/app/equipment/dashboard` and `/app/equipment/trash` from the list page header (matches Instruments layout).
+### 5. Validation
+- Run `rm -rf node_modules dist .output && npm install && npm run build`.
+- Confirm `dist/index.html`, `dist/assets/*.js`, `dist/assets/*.css` exist.
+- Spot-check `dist/index.html` references hashed assets with absolute `/assets/...` paths (Hostinger root deploy compatible).
+- Run `npm run preview` and verify `/`, `/app`, `/login`, `/verify/instrument/:token` all load and refresh-without-404.
 
-## 6. Out of scope
-- No changes to other chapters
-- No new permissions roles beyond existing editor / super_admin
-- Reusing instrument styling/components — no new shadcn primitives needed
+## Out of scope
+- No feature changes, no UI changes, no database changes.
+- No migration off Lovable Cloud / Supabase.
+- No Lovable badge or branding removal beyond what's needed for build.
+- No CI deploy directly to Hostinger via FTP — the existing `production` branch + Hostinger Git deployment flow stays.
 
-## Technical notes
-- Soft-delete RPCs return updated row; client invalidates `["equipment", company_id]`
-- Bulk trash uses RPC in a loop (small batches) for audit logging via `equipment` triggers if present; otherwise direct UPDATE with `deleted_at = now()`
-- Certificate uploads use signed URLs via existing `src/lib/storage.ts`
-- Excel export reuses `src/lib/export.ts#exportExcel`
+## Risk
+- After this, the project no longer runs in Lovable's preview the same way (Lovable's editor expects TanStack Start). The app continues to function in dev (`npm run dev` → Vite SPA), and Lovable Cloud (Supabase) still works because client keys are publishable. If you need Lovable preview to keep working too, say so before I implement — that would require a hybrid setup.
