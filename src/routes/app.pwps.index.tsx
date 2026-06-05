@@ -136,13 +136,18 @@ function PwpsIndexPage() {
                   <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
                     value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)}>
                     <option value="">— Select standard —</option>
-                    <option value="ASME Section IX">ASME Section IX (ASME Welding Codes)</option>
-                    <option value="AWS">AWS Structural Welding Codes</option>
-                    <option value="ISO">ISO Welding Standards</option>
-                    <option value="API">API Welding Standards</option>
-                    <option value="EN">EN / Euro Norm Welding Standards</option>
-                    <option value="ASTM/ASME Material">ASTM / ASME Material Standards</option>
-                    <option value="IIW">IIW (International Institute of Welding)</option>
+                    <option value="ASME Section VIII">ASME Section VIII → Pressure Vessels</option>
+                    <option value="ASME Section I">ASME Section I → Power Boilers</option>
+                    <option value="ASME B31.1">ASME B31.1 → Power Piping</option>
+                    <option value="ASME B31.3">ASME B31.3 → Process Piping</option>
+                    <option value="ASME B31.4/B31.8">ASME B31.4 / B31.8 → Pipeline systems</option>
+                    <option value="AWS D1.1">AWS D1.1 → Structural steel welding</option>
+                    <option value="AWS D1.2">AWS D1.2 → Aluminum welding</option>
+                    <option value="AWS D1.3">AWS D1.3 → Sheet steel</option>
+                    <option value="AWS D1.5">AWS D1.5 → Bridge welding</option>
+                    <option value="AWS D1.6">AWS D1.6 → Stainless steel</option>
+                    <option value="ISO 15609">ISO 15609 → Welding Procedure Specification (WPS content)</option>
+                    <option value="ISO 15614">ISO 15614 → Welding Procedure Qualification (PQR/WPQR)</option>
                   </select>
                 </F>
                 <F label="Process">
