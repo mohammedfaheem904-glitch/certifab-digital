@@ -129,7 +129,7 @@ function ProceduresPage() {
   return (
     <TooltipProvider delayDuration={200}>
     <ModulePage
-      title="Procedures"
+      title="WPS (Welding Procedure Specification)"
       subtitle="Create, revise and approve WPS across ASME, EN ISO, AWS, AS/NZS and JIS."
       action={
         <div className="flex gap-2">
