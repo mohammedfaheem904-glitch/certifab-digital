@@ -58,6 +58,10 @@ function QualificationsPage() {
   const { data, isLoading } = useCompanyRows<Row>("qualifications", {
     order: { column: "expiry_date", ascending: true },
   });
+  const { data: wpsList = [] } = useCompanyRows<any>("procedures", {
+    select: "id,wps_no,document_no,revision,status",
+    order: { column: "updated_at", ascending: false },
+  });
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
