@@ -75,7 +75,7 @@ function WeldDetail() {
   if (!weld.data) return (
     <div className="text-center py-20">
       <div className="text-lg font-semibold">Weld not found</div>
-      <Button variant="link" onClick={() => nav({ to: "/app/welds" })}>Back to welds</Button>
+      <Button variant="link" onClick={() => nav({ to: "/app/welds", search: {} })}>Back to welds</Button>
     </div>
   );
 
