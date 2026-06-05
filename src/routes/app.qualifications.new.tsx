@@ -231,7 +231,23 @@ function WpqWizard() {
           <Section title="Test coupon & qualification range">
             <div className="grid sm:grid-cols-2 gap-3">
               <F label="Coupon type"><Input value={v.test_coupon_type ?? ""} onChange={(e) => set("test_coupon_type", e.target.value)} placeholder="Pipe 6 in. Sch 80" /></F>
-              <F label="Position"><Input value={v.position_qualified ?? ""} onChange={(e) => set("position_qualified", e.target.value)} placeholder="6G" /></F>
+              <F label="Position">
+                <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                  value={v.position_qualified ?? ""} onChange={(e) => set("position_qualified", e.target.value)}>
+                  <option value="">— Select position —</option>
+                  <option value="1G (Flat Groove)">1G (Flat Groove)</option>
+                  <option value="2G (Horizontal Groove)">2G (Horizontal Groove)</option>
+                  <option value="3G (Vertical Groove)">3G (Vertical Groove)</option>
+                  <option value="4G (Overhead Groove)">4G (Overhead Groove)</option>
+                  <option value="5G (Fixed Horizontal Pipe)">5G (Fixed Horizontal Pipe)</option>
+                  <option value="6G (Fixed 45° Pipe)">6G (Fixed 45° Pipe)</option>
+                  <option value="1F (Flat Fillet)">1F (Flat Fillet)</option>
+                  <option value="2F (Horizontal Fillet)">2F (Horizontal Fillet)</option>
+                  <option value="3F (Vertical Fillet)">3F (Vertical Fillet)</option>
+                  <option value="4F (Overhead Fillet)">4F (Overhead Fillet)</option>
+                  <option value="5F (Fixed Horizontal Pipe Fillet)">5F (Fixed Horizontal Pipe Fillet)</option>
+                </select>
+              </F>
               <F label="Coupon thickness (mm)"><Input type="number" step="0.1" value={v.test_thickness_mm ?? ""} onChange={(e) => set("test_thickness_mm", e.target.value)} /></F>
               <F label="Coupon diameter (mm)"><Input type="number" step="0.1" value={v.test_diameter_mm ?? ""} onChange={(e) => set("test_diameter_mm", e.target.value)} /></F>
               <F label="Qualification date"><Input type="date" value={v.qualification_date ?? ""} onChange={(e) => set("qualification_date", e.target.value)} /></F>
