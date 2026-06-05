@@ -41,6 +41,7 @@ import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifi
 import { Route as AppPwpsIndexRouteImport } from './routes/app.pwps.index'
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
 import { Route as AppPqrsIndexRouteImport } from './routes/app.pqrs.index'
+import { Route as AppInstrumentsIndexRouteImport } from './routes/app.instruments.index'
 import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
 import { Route as VerifyWeldTokenRouteImport } from './routes/verify.weld.$token'
@@ -227,6 +228,11 @@ const AppPqrsIndexRoute = AppPqrsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppPqrsRoute,
+} as any)
+const AppInstrumentsIndexRoute = AppInstrumentsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppInstrumentsRoute,
 } as any)
 const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
   id: '/admin/',
@@ -417,6 +423,7 @@ export interface FileRoutesByFullPath {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin/': typeof AppAdminIndexRoute
+  '/app/instruments/': typeof AppInstrumentsIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
@@ -439,7 +446,6 @@ export interface FileRoutesByTo {
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRoute
   '/app/inspections': typeof AppInspectionsRoute
-  '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/projects': typeof AppProjectsRoute
   '/app/reports': typeof AppReportsRouteWithChildren
@@ -472,6 +478,7 @@ export interface FileRoutesByTo {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin': typeof AppAdminIndexRoute
+  '/app/instruments': typeof AppInstrumentsIndexRoute
   '/app/pqrs': typeof AppPqrsIndexRoute
   '/app/procedures': typeof AppProceduresIndexRoute
   '/app/pwps': typeof AppPwpsIndexRoute
@@ -533,6 +540,7 @@ export interface FileRoutesById {
   '/verify/weld/$token': typeof VerifyWeldTokenRoute
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin/': typeof AppAdminIndexRoute
+  '/app/instruments/': typeof AppInstrumentsIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
@@ -595,6 +603,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/admin/'
+    | '/app/instruments/'
     | '/app/pqrs/'
     | '/app/procedures/'
     | '/app/pwps/'
@@ -617,7 +626,6 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/equipment'
     | '/app/inspections'
-    | '/app/instruments'
     | '/app/ncrs'
     | '/app/projects'
     | '/app/reports'
@@ -650,6 +658,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/admin'
+    | '/app/instruments'
     | '/app/pqrs'
     | '/app/procedures'
     | '/app/pwps'
@@ -710,6 +719,7 @@ export interface FileRouteTypes {
     | '/verify/weld/$token'
     | '/verify/wps/$token'
     | '/app/admin/'
+    | '/app/instruments/'
     | '/app/pqrs/'
     | '/app/procedures/'
     | '/app/pwps/'
@@ -962,6 +972,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPqrsIndexRouteImport
       parentRoute: typeof AppPqrsRoute
     }
+    '/app/instruments/': {
+      id: '/app/instruments/'
+      path: '/'
+      fullPath: '/app/instruments/'
+      preLoaderRoute: typeof AppInstrumentsIndexRouteImport
+      parentRoute: typeof AppInstrumentsRoute
+    }
     '/app/admin/': {
       id: '/app/admin/'
       path: '/admin'
@@ -1150,11 +1167,13 @@ declare module '@tanstack/react-router' {
 interface AppInstrumentsRouteChildren {
   AppInstrumentsInstrumentIdRoute: typeof AppInstrumentsInstrumentIdRoute
   AppInstrumentsTrashRoute: typeof AppInstrumentsTrashRoute
+  AppInstrumentsIndexRoute: typeof AppInstrumentsIndexRoute
 }
 
 const AppInstrumentsRouteChildren: AppInstrumentsRouteChildren = {
   AppInstrumentsInstrumentIdRoute: AppInstrumentsInstrumentIdRoute,
   AppInstrumentsTrashRoute: AppInstrumentsTrashRoute,
+  AppInstrumentsIndexRoute: AppInstrumentsIndexRoute,
 }
 
 const AppInstrumentsRouteWithChildren = AppInstrumentsRoute._addFileChildren(
