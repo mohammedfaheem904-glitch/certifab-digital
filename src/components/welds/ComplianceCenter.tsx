@@ -121,7 +121,21 @@ export function ComplianceCenter({ weld }: Props) {
             <Input type="number" value={params.diameterMm ?? ""} onChange={(e) => setParams((s) => ({ ...s, diameterMm: Number(e.target.value) || undefined, isPipe: !!Number(e.target.value) }))} />
           </PF>
           <PF label="Position">
-            <Input value={params.position ?? ""} onChange={(e) => setParams((s) => ({ ...s, position: e.target.value.toUpperCase() }))} placeholder="6G" />
+            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+              value={params.position ?? ""} onChange={(e) => setParams((s) => ({ ...s, position: e.target.value }))}>
+              <option value="">— Select position —</option>
+              <option value="1G (Flat Groove)">1G (Flat Groove)</option>
+              <option value="2G (Horizontal Groove)">2G (Horizontal Groove)</option>
+              <option value="3G (Vertical Groove)">3G (Vertical Groove)</option>
+              <option value="4G (Overhead Groove)">4G (Overhead Groove)</option>
+              <option value="5G (Fixed Horizontal Pipe)">5G (Fixed Horizontal Pipe)</option>
+              <option value="6G (Fixed 45° Pipe)">6G (Fixed 45° Pipe)</option>
+              <option value="1F (Flat Fillet)">1F (Flat Fillet)</option>
+              <option value="2F (Horizontal Fillet)">2F (Horizontal Fillet)</option>
+              <option value="3F (Vertical Fillet)">3F (Vertical Fillet)</option>
+              <option value="4F (Overhead Fillet)">4F (Overhead Fillet)</option>
+              <option value="5F (Fixed Horizontal Pipe Fillet)">5F (Fixed Horizontal Pipe Fillet)</option>
+            </select>
           </PF>
           <PF label="P-Number">
             <Input type="number" value={params.pNumber ?? ""} onChange={(e) => setParams((s) => ({ ...s, pNumber: Number(e.target.value) || undefined }))} />

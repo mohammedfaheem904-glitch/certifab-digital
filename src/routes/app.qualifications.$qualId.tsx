@@ -214,7 +214,7 @@ function QualDetail() {
             <Edit label="WPQ number" value={merged.wpq_number} onChange={(v) => setF("wpq_number", v)} />
             <Edit label="Stamp number" value={merged.stamp_number} onChange={(v) => setF("stamp_number", v)} />
             <Edit label="Process" value={merged.process} onChange={(v) => setF("process", v)} />
-            <Edit label="Position" value={merged.position_qualified} onChange={(v) => setF("position_qualified", v)} />
+            <SelectEdit label="Position" value={merged.position_qualified} onChange={(v) => setF("position_qualified", v)} options={positionOptions} />
             <Edit label="Standard" value={merged.standard} onChange={(v) => setF("standard", v)} />
             <Edit label="Code family" value={merged.code_family} onChange={(v) => setF("code_family", v)} />
             <Edit label="Test coupon" value={merged.test_coupon_type} onChange={(v) => setF("test_coupon_type", v)} />
