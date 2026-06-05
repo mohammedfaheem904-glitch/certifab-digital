@@ -222,7 +222,7 @@ function Dashboard() {
 
       {/* Lists */}
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2" title="Recent welds" right={<Link to="/app/welds" className="text-xs text-primary hover:underline">View all</Link>}>
+        <Card className="lg:col-span-2" title="Recent welds" right={<Link to="/app/welds" search={{}} className="text-xs text-primary hover:underline">View all</Link>}>
           <div className="overflow-x-auto -mx-5">
             <table className="w-full text-sm">
               <thead className="text-xs text-muted-foreground bg-muted/40">
@@ -333,7 +333,7 @@ function Dashboard() {
 
       {/* Workflow bottlenecks + cross-entity activity feed */}
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2" title="Workflow bottlenecks" right={<Link to="/app/welds" className="text-xs text-primary hover:underline">All welds</Link>}>
+        <Card className="lg:col-span-2" title="Workflow bottlenecks" right={<Link to="/app/welds" search={{}} className="text-xs text-primary hover:underline">All welds</Link>}>
           <WorkflowBottlenecks />
         </Card>
         <Card title="Recent activity" right={<Link to="/app/audit" className="text-xs text-primary hover:underline">Full audit log</Link>}>

@@ -106,14 +106,14 @@ function WeldsDashboard() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link to="/app/welds" className="hover:text-foreground inline-flex items-center gap-1">
+            <Link to="/app/welds" search={{}} className="hover:text-foreground inline-flex items-center gap-1">
               <ArrowLeft className="size-3.5" /> Weld Log
             </Link>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight mt-1">Welds Dashboard</h1>
           <p className="text-sm text-muted-foreground">Pipeline KPIs, workflow distribution, top welders & WPS.</p>
         </div>
-        <Link to="/app/welds"><Button>Go to log</Button></Link>
+        <Link to="/app/welds" search={{}}><Button>Go to log</Button></Link>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
