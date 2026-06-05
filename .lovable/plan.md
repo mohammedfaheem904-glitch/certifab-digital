@@ -1,52 +1,50 @@
-# Full pWPS → WPS inheritance on PQR promotion
 
-## Goal
-When a passed PQR is promoted, the resulting WPS (in `procedures`) must inherit the complete pWPS dataset so engineers don't re-enter anything. Today only ~15 scalar fields are copied; everything else (extra scalars + every relational detail section) is left blank.
-
-## Gaps today
-`buildWpsPayload` (`src/lib/pqr-promotion.ts`) skips pWPS scalar fields that have direct equivalents on `procedures`:
-- `joint_type`, `groove_type` (already copied), but missing `pipe_or_plate`, `welding_progression`, `electrode_type` derivation
-- pWPS `polarity`, `backing`, `p_number`, `group_number`, `filler_classification`, `code_family`, `title`, `notes`, `diameter_min/max_mm`, `thickness_min/max_mm` (only stringified into `thickness_range`), `project_id`, `qualified_at`
-
-And **none** of the WPS relational detail tables are seeded:
-- `wps_base_metals`, `wps_filler_metals`, `wps_positions`, `wps_preheat_entries`, `wps_shielding_gases`, `wps_pwht`, `wps_electrical_characteristics`, `wps_techniques`, `wps_notes`
-
-Because pWPS is a flat record (no child tables of its own), inheritance has to translate each pWPS scalar group into a single seed row in the matching WPS child table.
+## Scope
+Enhance the **QA/QC Instruments** chapter (`/app/instruments`) with six features.
 
 ## Changes
 
-### 1. `src/lib/pqr-promotion.ts` — expand scalar copy
-Extend `buildWpsPayload` to additionally map (using PQR `qualified_ranges` overrides where they exist):
-- `welding_progression` ← pwps progression (from `position` modifier if present, otherwise null)
-- `back_gouging` ← pwps `backing` when it implies back gouging, else copy verbatim into a new `notes` line
-- `electrode_type` ← pwps `filler_classification`
-- `notes` ← merge auto-generated provenance line with `pwps.notes`
-- Keep existing thickness_range string but also pass through min/max for child-table seeding
+### 1. Database migration (small)
+Add to `public.instruments`:
+- `deleted_at timestamptz null`
+- `deleted_by uuid null`
 
-### 2. `src/lib/pqr-promotion-runtime.ts` — seed WPS child tables
-After inserting the `procedures` row, insert one seed row per detail table from the pWPS scalars + PQR qualified ranges. All inserts run in `Promise.all` after the procedure id is known and are best-effort (log + continue on individual failure so the WPS still exists).
+Update the `members read instruments` RLS policy to require `deleted_at IS NULL` (mirrors the `pwps` / `procedures` pattern), and add a `super_admin reads deleted instruments` policy so trash is visible to admins only (same pattern used elsewhere). No new tables.
 
-Seed mapping:
-| Child table | Source fields |
-|---|---|
-| `wps_base_metals` | `base_material`, `p_number`, `group_number`, `thickness_min/max_mm` (PQR overrides), `diameter_min/max_mm` |
-| `wps_filler_metals` | `process`, `filler_material`, `filler_classification` (→ aws_classification) |
-| `wps_positions` | `position`, `position` as `qualified_range`, progression from pwps |
-| `wps_preheat_entries` | `preheat_min_c`, `interpass_max_c` |
-| `wps_shielding_gases` | `process`, `shielding_gas` (→ gas_type) |
-| `wps_pwht` | `pwht` (→ applicability/notes; numeric temp left null) |
-| `wps_electrical_characteristics` | `process`, `polarity`, `current_min/max`, `voltage_min/max`, `travel_speed_min/max`, `heat_input_min/max` (PQR overrides) |
-| `wps_techniques` | `process`, `technique_notes`, back_gouging from pwps backing |
-| `wps_notes` | one row with `category: 'engineering'`, body = pwps.notes (only if present) |
+### 2. Register Instrument dialog (`app.instruments.tsx`)
+- Add **Quantity** field (numeric, default 1). When > 1, the insert is repeated N times, appending `-1`, `-2`, … to the entered Asset ID so each row stays unique.
+- Add **Calibration certificate** file input (PDF/image). After the instrument insert, upload the file to the `instrument-files` bucket at `{company_id}/{instrumentId}/cert-initial-{filename}` and create an `instrument_calibrations` row referencing it (uses today as `calibrated_on` and the entered `calibration_due` as `next_due`). If quantity > 1, the same certificate is attached to each created instrument.
 
-Each insert includes `company_id` and `procedure_id` so existing RLS passes for editors.
+### 3. Filter bar (`app.instruments.tsx`)
+Replace the current single category dropdown with a filter row:
+- Category (existing)
+- Status (Active / Maintenance / Retired — from `instrument_status` enum)
+- Calibration due window (All / Overdue / Due in 30d / Due in 90d / OK)
+- Keep the search input
+- "Reset filters" button
 
-### 3. Idempotency
-Already-promoted PQRs (with `resulting_wps_id`) continue to short-circuit — no re-seeding, no duplicate child rows.
+### 4. Bulk export + bulk actions
+- Add a checkbox column to the instruments table plus a header "select all (filtered)" checkbox.
+- When any row is selected, show an action bar with **Export selected** (Excel via existing `exportExcel`) and **Move to Trash**.
+- Keep an "Export all (filtered)" button next to the filter bar for the no-selection case.
 
-### 4. No schema migration
-All target tables and columns already exist. No DB changes required.
+### 5. Per-row actions
+Add an actions column with:
+- 👁 **Eye icon** → navigates to `/app/instruments/$instrumentId` (the existing detail route).
+- 🗑 **Trash icon** → soft-deletes the row (sets `deleted_at = now()`, `deleted_by = auth.uid()`), with a confirm toast.
+
+### 6. Trash route (`app.instruments.trash.tsx`, new)
+Mirrors `app.pwps.trash.tsx`:
+- Lists instruments where `deleted_at IS NOT NULL` (visible to super_admin via the new RLS policy).
+- Per-row **Restore** (clears `deleted_at`/`deleted_by`) and **Delete permanently** (hard delete).
+- Add a "Trash" link in the page header of `app.instruments.tsx`.
+
+## Files touched
+- migration: add soft-delete columns + RLS update on `instruments`
+- `src/routes/app.instruments.tsx` — register dialog, filters, bulk actions, row actions, trash link
+- `src/routes/app.instruments.$instrumentId.tsx` — no change required (eye icon links to it)
+- `src/routes/app.instruments.trash.tsx` — new
 
 ## Out of scope
-- Editing the new WPS detail rows on screen still happens through the existing `RelationalTable` UIs — no UI changes here.
-- pWPS does not have its own relational sub-tables; if/when it gains them, this code can be extended to copy rows instead of synthesizing them.
+- Editing existing instruments inline (separate request).
+- Bulk edit of category/status.

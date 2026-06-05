@@ -63,6 +63,7 @@ import { Route as AppPqrsTrashRouteImport } from './routes/app.pqrs.trash'
 import { Route as AppPqrsDashboardRouteImport } from './routes/app.pqrs.dashboard'
 import { Route as AppPqrsPqrIdRouteImport } from './routes/app.pqrs.$pqrId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
+import { Route as AppInstrumentsTrashRouteImport } from './routes/app.instruments.trash'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
 import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
 import { Route as AppAdminCompaniesRouteImport } from './routes/app.admin.companies'
@@ -340,6 +341,11 @@ const AppNcrsNcrIdRoute = AppNcrsNcrIdRouteImport.update({
   path: '/$ncrId',
   getParentRoute: () => AppNcrsRoute,
 } as any)
+const AppInstrumentsTrashRoute = AppInstrumentsTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AppInstrumentsRoute,
+} as any)
 const AppInstrumentsInstrumentIdRoute =
   AppInstrumentsInstrumentIdRouteImport.update({
     id: '/$instrumentId',
@@ -388,6 +394,7 @@ export interface FileRoutesByFullPath {
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
+  '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
   '/app/pqrs/dashboard': typeof AppPqrsDashboardRoute
@@ -442,6 +449,7 @@ export interface FileRoutesByTo {
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
+  '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
   '/app/pqrs/dashboard': typeof AppPqrsDashboardRoute
@@ -502,6 +510,7 @@ export interface FileRoutesById {
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
+  '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
   '/app/pqrs/$pqrId': typeof AppPqrsPqrIdRoute
   '/app/pqrs/dashboard': typeof AppPqrsDashboardRoute
@@ -563,6 +572,7 @@ export interface FileRouteTypes {
     | '/app/admin/companies'
     | '/app/admin/users'
     | '/app/instruments/$instrumentId'
+    | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
     | '/app/pqrs/dashboard'
@@ -617,6 +627,7 @@ export interface FileRouteTypes {
     | '/app/admin/companies'
     | '/app/admin/users'
     | '/app/instruments/$instrumentId'
+    | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
     | '/app/pqrs/dashboard'
@@ -676,6 +687,7 @@ export interface FileRouteTypes {
     | '/app/admin/companies'
     | '/app/admin/users'
     | '/app/instruments/$instrumentId'
+    | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
     | '/app/pqrs/$pqrId'
     | '/app/pqrs/dashboard'
@@ -1104,6 +1116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNcrsNcrIdRouteImport
       parentRoute: typeof AppNcrsRoute
     }
+    '/app/instruments/trash': {
+      id: '/app/instruments/trash'
+      path: '/trash'
+      fullPath: '/app/instruments/trash'
+      preLoaderRoute: typeof AppInstrumentsTrashRouteImport
+      parentRoute: typeof AppInstrumentsRoute
+    }
     '/app/instruments/$instrumentId': {
       id: '/app/instruments/$instrumentId'
       path: '/$instrumentId'
@@ -1130,10 +1149,12 @@ declare module '@tanstack/react-router' {
 
 interface AppInstrumentsRouteChildren {
   AppInstrumentsInstrumentIdRoute: typeof AppInstrumentsInstrumentIdRoute
+  AppInstrumentsTrashRoute: typeof AppInstrumentsTrashRoute
 }
 
 const AppInstrumentsRouteChildren: AppInstrumentsRouteChildren = {
   AppInstrumentsInstrumentIdRoute: AppInstrumentsInstrumentIdRoute,
+  AppInstrumentsTrashRoute: AppInstrumentsTrashRoute,
 }
 
 const AppInstrumentsRouteWithChildren = AppInstrumentsRoute._addFileChildren(
@@ -1305,13 +1326,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
