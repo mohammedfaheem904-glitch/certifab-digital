@@ -102,30 +102,54 @@ export type Database = {
         Row: {
           asset_id: string
           calibration_due: string | null
+          category: string
           company_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
+          manufacturer: string | null
           model: string
+          name: string | null
+          notes: string | null
+          qr_token: string
+          serial_number: string | null
           status: Database["public"]["Enums"]["equipment_status"]
           updated_at: string
         }
         Insert: {
           asset_id: string
           calibration_due?: string | null
+          category?: string
           company_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
+          manufacturer?: string | null
           model: string
+          name?: string | null
+          notes?: string | null
+          qr_token?: string
+          serial_number?: string | null
           status?: Database["public"]["Enums"]["equipment_status"]
           updated_at?: string
         }
         Update: {
           asset_id?: string
           calibration_due?: string | null
+          category?: string
           company_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
+          manufacturer?: string | null
           model?: string
+          name?: string | null
+          notes?: string | null
+          qr_token?: string
+          serial_number?: string | null
           status?: Database["public"]["Enums"]["equipment_status"]
           updated_at?: string
         }
@@ -138,6 +162,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      equipment_calibrations: {
+        Row: {
+          calibrated_on: string
+          certificate_path: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          equipment_id: string
+          id: string
+          next_due: string | null
+          notes: string | null
+          performed_by: string | null
+        }
+        Insert: {
+          calibrated_on: string
+          certificate_path?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          equipment_id: string
+          id?: string
+          next_due?: string | null
+          notes?: string | null
+          performed_by?: string | null
+        }
+        Update: {
+          calibrated_on?: string
+          certificate_path?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          equipment_id?: string
+          id?: string
+          next_due?: string | null
+          notes?: string | null
+          performed_by?: string | null
+        }
+        Relationships: []
       }
       heat_inputs: {
         Row: {
@@ -3111,12 +3174,14 @@ export type Database = {
         Args: { _reason: string; _user_id: string }
         Returns: undefined
       }
+      restore_equipment: { Args: { _id: string }; Returns: undefined }
       restore_instrument: { Args: { _id: string }; Returns: undefined }
       restore_pqr: { Args: { _id: string }; Returns: undefined }
       restore_procedure: { Args: { _id: string }; Returns: undefined }
       restore_pwps: { Args: { _id: string }; Returns: undefined }
       restore_qualification: { Args: { _id: string }; Returns: undefined }
       restore_weld: { Args: { _id: string }; Returns: undefined }
+      soft_delete_equipment: { Args: { _id: string }; Returns: undefined }
       soft_delete_instrument: { Args: { _id: string }; Returns: undefined }
       soft_delete_pqr: { Args: { _id: string }; Returns: undefined }
       soft_delete_procedure: { Args: { _id: string }; Returns: undefined }
