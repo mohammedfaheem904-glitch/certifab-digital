@@ -166,7 +166,25 @@ function ProceduresPage() {
             <div className="grid grid-cols-2 gap-3">
               <F label="Code"><Input required value={values.code ?? ""} onChange={(e) => set("code", e.target.value)} placeholder="WPS-GTAW-042" /></F>
               <F label="Standard"><Input required value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX" /></F>
-              <F label="Process"><Input required value={values.process ?? ""} onChange={(e) => set("process", e.target.value)} placeholder="GTAW" /></F>
+              <F label="Process">
+                <select required className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                  value={values.process ?? ""} onChange={(e) => set("process", e.target.value)}>
+                  <option value="">— Select process —</option>
+                  <option value="SMAW">SMAW (Shielded Metal Arc Welding)</option>
+                  <option value="GMAW">GMAW (Gas Metal Arc Welding)</option>
+                  <option value="FCAW">FCAW (Flux-Cored Arc Welding)</option>
+                  <option value="SAW">SAW (Submerged Arc Welding)</option>
+                  <option value="GTAW">GTAW (Gas Tungsten Arc Welding)</option>
+                  <option value="PAW">PAW (Plasma Arc Welding)</option>
+                  <option value="ESW">ESW (Electroslag Welding)</option>
+                  <option value="EGW">EGW (Electrogas Welding)</option>
+                  <option value="OAW">OAW (Oxyacetylene Welding)</option>
+                  <option value="LBW">LBW (Laser Beam Welding)</option>
+                  <option value="EBW">EBW (Electron Beam Welding)</option>
+                  <option value="RW">RW (Resistance Welding)</option>
+                  <option value="BRAZING">Brazing</option>
+                </select>
+              </F>
               <F label="Revision"><Input value={values.revision ?? ""} onChange={(e) => set("revision", e.target.value)} /></F>
               <F label="Thickness range"><Input value={values.thickness_range ?? ""} onChange={(e) => set("thickness_range", e.target.value)} placeholder="3–25 mm" /></F>
               <F label="Joint type">
