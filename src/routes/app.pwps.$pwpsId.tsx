@@ -370,7 +370,19 @@ function PwpsDetailPage() {
         </Section>
 
         <Section title="Filler & gas">
-          <Field label="Filler material"><Input value={merged.filler_material ?? ""} onChange={(e) => set("filler_material", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Filler material">
+            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              value={merged.filler_material ?? ""} onChange={(e) => set("filler_material", e.target.value)} disabled={!isEditor}>
+              <option value="">— Select filler material —</option>
+              <option value="Carbon Steel Electrodes">Carbon Steel Electrodes</option>
+              <option value="Stainless Steel Electrodes">Stainless Steel Electrodes</option>
+              <option value="Aluminum Fillers">Aluminum Fillers</option>
+              <option value="Nickel Alloy Fillers">Nickel Alloy Fillers</option>
+              <option value="Low Alloy / Cr-Mo Steel Fillers">Low Alloy / Cr-Mo Steel Fillers</option>
+              <option value="Submerged Arc Welding (SAW) Wires">Submerged Arc Welding (SAW) Wires</option>
+              <option value="Oxy-Fuel Rods">Oxy-Fuel Rods</option>
+            </select>
+          </Field>
           <Field label="Filler classification"><Input value={merged.filler_classification ?? ""} onChange={(e) => set("filler_classification", e.target.value)} disabled={!isEditor} /></Field>
           <Field label="Shielding gas"><Input value={merged.shielding_gas ?? ""} onChange={(e) => set("shielding_gas", e.target.value)} disabled={!isEditor} /></Field>
           <Field label="Backing"><Input value={merged.backing ?? ""} onChange={(e) => set("backing", e.target.value)} disabled={!isEditor} /></Field>

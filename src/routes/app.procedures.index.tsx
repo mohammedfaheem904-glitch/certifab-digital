@@ -224,7 +224,19 @@ function ProceduresPage() {
                 </select>
               </F>
               <F label="Base material"><Input value={values.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} placeholder="P-No 1 Gr 1" /></F>
-              <F label="Filler material"><Input value={values.filler_material ?? ""} onChange={(e) => set("filler_material", e.target.value)} placeholder="ER70S-2" /></F>
+              <F label="Filler material">
+                <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                  value={values.filler_material ?? ""} onChange={(e) => set("filler_material", e.target.value)}>
+                  <option value="">— Select filler material —</option>
+                  <option value="Carbon Steel Electrodes">Carbon Steel Electrodes</option>
+                  <option value="Stainless Steel Electrodes">Stainless Steel Electrodes</option>
+                  <option value="Aluminum Fillers">Aluminum Fillers</option>
+                  <option value="Nickel Alloy Fillers">Nickel Alloy Fillers</option>
+                  <option value="Low Alloy / Cr-Mo Steel Fillers">Low Alloy / Cr-Mo Steel Fillers</option>
+                  <option value="Submerged Arc Welding (SAW) Wires">Submerged Arc Welding (SAW) Wires</option>
+                  <option value="Oxy-Fuel Rods">Oxy-Fuel Rods</option>
+                </select>
+              </F>
               <F label="Shielding gas"><Input value={values.shielding_gas ?? ""} onChange={(e) => set("shielding_gas", e.target.value)} placeholder="Ar 100%" /></F>
               <F label="Voltage min"><Input type="number" value={values.voltage_min ?? ""} onChange={(e) => set("voltage_min", parseFloat(e.target.value) || null)} /></F>
               <F label="Voltage max"><Input type="number" value={values.voltage_max ?? ""} onChange={(e) => set("voltage_max", parseFloat(e.target.value) || null)} /></F>
