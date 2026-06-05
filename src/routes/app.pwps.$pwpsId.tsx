@@ -97,14 +97,14 @@ function PwpsDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] grid place-items-center text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin me-2 inline" /> Loading WPS…
+        <Loader2 className="size-4 animate-spin me-2 inline" /> Loading pWPS…
       </div>
     );
   }
   if (!data) {
     return (
       <div className="p-8 text-center">
-        <p className="text-sm text-muted-foreground">WPS not found.</p>
+        <p className="text-sm text-muted-foreground">pWPS not found.</p>
         <Button variant="outline" className="mt-4" onClick={() => nav({ to: "/app/pwps" })}>
           Back to list
         </Button>
@@ -124,7 +124,7 @@ function PwpsDetailPage() {
     const { error } = await (supabase.from("pwps" as any) as any).update(draft).eq("id", pwpsId);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("WPS saved.");
+    toast.success("pWPS saved.");
     setDraft({});
     qc.invalidateQueries({ queryKey: ["pwps", pwpsId] });
     qc.invalidateQueries({ queryKey: ["pwps"] });

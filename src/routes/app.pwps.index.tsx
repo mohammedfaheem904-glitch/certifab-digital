@@ -118,7 +118,7 @@ function PwpsIndexPage() {
           <NewRecordDialog table="pwps" title="New pWPS (Preliminary Welding Procedure Specification)" trigger="New pWPS" defaults={{ revision: "Rev 0", status: "Draft", code_family: "ASME IX" }}>
             {({ values, set }) => (
               <div className="grid grid-cols-2 gap-3">
-                <F label="WPS number"><Input required value={values.pwps_no ?? ""} onChange={(e) => set("pwps_no", e.target.value)} placeholder="WPS-GTAW-001" /></F>
+                <F label="pWPS number"><Input required value={values.pwps_no ?? ""} onChange={(e) => set("pwps_no", e.target.value)} placeholder="pWPS-GTAW-001" /></F>
                 <F label="Title"><Input value={values.title ?? ""} onChange={(e) => set("title", e.target.value)} placeholder="GTAW root + SMAW fill, P-1 to P-1" /></F>
                 <F label="Code family"><Input value={values.code_family ?? "ASME IX"} onChange={(e) => set("code_family", e.target.value)} /></F>
                 <F label="Standard"><Input value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
@@ -239,7 +239,7 @@ function PwpsIndexPage() {
           <thead className="text-xs text-muted-foreground bg-muted/40">
             <tr>
               <th className="px-3 py-2.5 w-8"><Checkbox checked={filtered.length > 0 && filtered.every((r) => selected.has(r.id))} onCheckedChange={(c) => toggleAll(!!c)} /></th>
-              <Th>WPS No.</Th><Th>Title</Th><Th>Code</Th><Th>Process</Th><Th>Position</Th><Th>Revision</Th><Th>Status</Th>
+              <Th>pWPS No.</Th><Th>Title</Th><Th>Code</Th><Th>Process</Th><Th>Position</Th><Th>Revision</Th><Th>Status</Th>
               <th className="text-end font-medium px-5 py-2.5">Actions</th>
             </tr>
           </thead>
