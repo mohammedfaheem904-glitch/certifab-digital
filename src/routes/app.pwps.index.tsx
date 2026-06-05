@@ -115,7 +115,7 @@ function PwpsIndexPage() {
         <div className="flex items-center gap-2">
           <Link to="/app/pwps/dashboard"><Button variant="outline" size="sm"><LayoutDashboard className="size-4 me-1" /> Dashboard</Button></Link>
           {isAdmin && <Link to="/app/pwps/trash"><Button variant="outline" size="sm"><Trash2 className="size-4 me-1" /> Trash</Button></Link>}
-          <NewRecordDialog table="pwps" title="New pWPS (Preliminary Welding Procedure Specification)" trigger="New pWPS" defaults={{ revision: "Rev 0", status: "Draft", code_family: "ASME IX" }}>
+          <NewRecordDialog table="pwps" title="New pWPS (Preliminary Welding Procedure Specification)" trigger="New WPS" defaults={{ revision: "Rev 0", status: "Draft", code_family: "ASME IX" }}>
             {({ values, set }) => (
               <div className="grid grid-cols-2 gap-3">
                 <F label="pWPS number"><Input required value={values.pwps_no ?? ""} onChange={(e) => set("pwps_no", e.target.value)} placeholder="pWPS-GTAW-001" /></F>
