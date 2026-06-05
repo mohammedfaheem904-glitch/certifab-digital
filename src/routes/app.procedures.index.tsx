@@ -159,7 +159,7 @@ function ProceduresPage() {
           table="procedures"
           quota="procedures"
           title="pWPS (Preliminary Welding Procedure Specification)"
-          trigger="New pWPS"
+          trigger="New WPS"
           defaults={{ revision: "Rev 0", status: "Draft" }}
         >
           {({ values, set }) => (
