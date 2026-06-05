@@ -167,7 +167,19 @@ function QualificationsPage() {
                   <Input value={values.stamp_number ?? ""} onChange={(e) => set("stamp_number", e.target.value)} />
                 </F>
                 <F label="WPS Number">
-                  <Input value={values.wps_number ?? ""} onChange={(e) => set("wps_number", e.target.value)} />
+                  <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.wps_number ?? ""} onChange={(e) => set("wps_number", e.target.value)}>
+                    <option value="">— Select WPS —</option>
+                    {wpsList.map((w: any) => {
+                      const label = w.wps_no || w.document_no;
+                      if (!label) return null;
+                      return (
+                        <option key={w.id} value={label}>
+                          {label}{w.revision ? ` (${w.revision})` : ""}{w.status ? ` — ${w.status}` : ""}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </F>
                 <F label="PQR Number">
                   <Input value={values.pqr_number ?? ""} onChange={(e) => set("pqr_number", e.target.value)} />
