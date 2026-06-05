@@ -164,7 +164,7 @@ function ProceduresPage() {
         >
           {({ values, set }) => (
             <div className="grid grid-cols-2 gap-3">
-              <F label="Code"><Input required value={values.code ?? ""} onChange={(e) => set("code", e.target.value)} placeholder="WPS-GTAW-042" /></F>
+              <F label="WPS Number"><Input required value={values.code ?? ""} onChange={(e) => set("code", e.target.value)} placeholder="WPS-GTAW-042" /></F>
               <F label="Standard"><Input required value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX" /></F>
               <F label="Process">
                 <select required className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
@@ -306,7 +306,7 @@ function ProceduresPage() {
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
             <tr>
-              <Th>Code</Th><Th>Standard</Th><Th>Process</Th><Th>Thickness</Th><Th>Revision</Th><Th>Status</Th><Th>Source</Th>
+              <Th>WPS Number</Th><Th>Standard</Th><Th>Process</Th><Th>Thickness</Th><Th>Revision</Th><Th>Status</Th><Th>Source</Th>
               <th className="text-end font-medium px-5 py-2.5">Actions</th>
             </tr>
           </thead>
