@@ -109,13 +109,13 @@ function PwpsIndexPage() {
 
   return (
     <ModulePage
-      title="Welding Procedure Specification (WPS)"
+      title="pWPS"
       subtitle="Candidate welding procedures undergoing qualification. A pWPS becomes a production WPS only after a PQR passes."
       action={
         <div className="flex items-center gap-2">
           <Link to="/app/pwps/dashboard"><Button variant="outline" size="sm"><LayoutDashboard className="size-4 me-1" /> Dashboard</Button></Link>
           {isAdmin && <Link to="/app/pwps/trash"><Button variant="outline" size="sm"><Trash2 className="size-4 me-1" /> Trash</Button></Link>}
-          <NewRecordDialog table="pwps" title="New Welding Procedure Specification" trigger="New WPS" defaults={{ revision: "Rev 0", status: "Draft", code_family: "ASME IX" }}>
+          <NewRecordDialog table="pwps" title="New pWPS" trigger="New pWPS" defaults={{ revision: "Rev 0", status: "Draft", code_family: "ASME IX" }}>
             {({ values, set }) => (
               <div className="grid grid-cols-2 gap-3">
                 <F label="WPS number"><Input required value={values.pwps_no ?? ""} onChange={(e) => set("pwps_no", e.target.value)} placeholder="WPS-GTAW-001" /></F>
@@ -245,7 +245,7 @@ function PwpsIndexPage() {
           </thead>
           <tbody>
             {isLoading && <Empty colSpan={9}><Loader2 className="size-4 animate-spin inline" /> Loading…</Empty>}
-            {!isLoading && filtered.length === 0 && <Empty colSpan={9}>No Welding Procedure Specification match.</Empty>}
+            {!isLoading && filtered.length === 0 && <Empty colSpan={9}>No pWPS match.</Empty>}
             {filtered.map((p) => (
               <tr key={p.id} className="border-t border-border/60 hover:bg-muted/20">
                 <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
@@ -262,7 +262,7 @@ function PwpsIndexPage() {
                 </td>
                 <td className="px-5 py-3 text-end">
                   <div className="flex items-center justify-end gap-1">
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => nav({ to: "/app/pwps/$pwpsId", params: { pwpsId: p.id } })} aria-label="Open WPS"><Eye className="size-4" /></Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => nav({ to: "/app/pwps/$pwpsId", params: { pwpsId: p.id } })} aria-label="Open pWPS"><Eye className="size-4" /></Button>
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" disabled={busy} onClick={() => moveToTrash([p.id])} aria-label="Move to trash"><Trash2 className="size-4" /></Button>
                     <ChevronRight className="size-4 ms-1 text-muted-foreground" />
                   </div>
