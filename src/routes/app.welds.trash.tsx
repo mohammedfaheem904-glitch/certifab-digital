@@ -78,7 +78,7 @@ function TrashPage() {
       title="Welds Trash"
       subtitle="Soft-deleted welds. Restore to return them to the active log."
       action={
-        <Link to="/app/welds">
+        <Link to="/app/welds" search={{ workflow: undefined }}>
           <Button size="sm" variant="outline"><ArrowLeft className="size-4 me-1" /> Back to Weld Log</Button>
         </Link>
       }

@@ -75,7 +75,7 @@ function WeldDetail() {
   if (!weld.data) return (
     <div className="text-center py-20">
       <div className="text-lg font-semibold">Weld not found</div>
-      <Button variant="link" onClick={() => nav({ to: "/app/welds" })}>Back to welds</Button>
+      <Button variant="link" onClick={() => nav({ to: "/app/welds", search: { workflow: undefined } })}>Back to welds</Button>
     </div>
   );
 
@@ -84,7 +84,7 @@ function WeldDetail() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link to="/app/welds" className="hover:text-foreground inline-flex items-center gap-1">
+        <Link to="/app/welds" search={{ workflow: undefined }} className="hover:text-foreground inline-flex items-center gap-1">
           <ArrowLeft className="size-3.5" /> Welds
         </Link>
         <span>/</span>
