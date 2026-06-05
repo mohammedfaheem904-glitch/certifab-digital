@@ -67,6 +67,7 @@ import { Route as AppPqrsPqrIdRouteImport } from './routes/app.pqrs.$pqrId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
 import { Route as AppInstrumentsTrashRouteImport } from './routes/app.instruments.trash'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
+import { Route as AppEquipmentEquipmentIdRouteImport } from './routes/app.equipment.$equipmentId'
 import { Route as AppAdminUsersRouteImport } from './routes/app.admin.users'
 import { Route as AppAdminCompaniesRouteImport } from './routes/app.admin.companies'
 
@@ -364,6 +365,11 @@ const AppInstrumentsInstrumentIdRoute =
     path: '/$instrumentId',
     getParentRoute: () => AppInstrumentsRoute,
   } as any)
+const AppEquipmentEquipmentIdRoute = AppEquipmentEquipmentIdRouteImport.update({
+  id: '/$equipmentId',
+  path: '/$equipmentId',
+  getParentRoute: () => AppEquipmentRoute,
+} as any)
 const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
   id: '/admin/users',
   path: '/admin/users',
@@ -405,6 +411,7 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/equipment/$equipmentId': typeof AppEquipmentEquipmentIdRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
@@ -460,6 +467,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/equipment/$equipmentId': typeof AppEquipmentEquipmentIdRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
@@ -523,6 +531,7 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/app/admin/companies': typeof AppAdminCompaniesRoute
   '/app/admin/users': typeof AppAdminUsersRoute
+  '/app/equipment/$equipmentId': typeof AppEquipmentEquipmentIdRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
@@ -587,6 +596,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/admin/companies'
     | '/app/admin/users'
+    | '/app/equipment/$equipmentId'
     | '/app/instruments/$instrumentId'
     | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
@@ -642,6 +652,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/admin/companies'
     | '/app/admin/users'
+    | '/app/equipment/$equipmentId'
     | '/app/instruments/$instrumentId'
     | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
@@ -704,6 +715,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/admin/companies'
     | '/app/admin/users'
+    | '/app/equipment/$equipmentId'
     | '/app/instruments/$instrumentId'
     | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
@@ -1164,6 +1176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsInstrumentIdRouteImport
       parentRoute: typeof AppInstrumentsRoute
     }
+    '/app/equipment/$equipmentId': {
+      id: '/app/equipment/$equipmentId'
+      path: '/$equipmentId'
+      fullPath: '/app/equipment/$equipmentId'
+      preLoaderRoute: typeof AppEquipmentEquipmentIdRouteImport
+      parentRoute: typeof AppEquipmentRoute
+    }
     '/app/admin/users': {
       id: '/app/admin/users'
       path: '/admin/users'
@@ -1182,10 +1201,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppEquipmentRouteChildren {
+  AppEquipmentEquipmentIdRoute: typeof AppEquipmentEquipmentIdRoute
   AppEquipmentIndexRoute: typeof AppEquipmentIndexRoute
 }
 
 const AppEquipmentRouteChildren: AppEquipmentRouteChildren = {
+  AppEquipmentEquipmentIdRoute: AppEquipmentEquipmentIdRoute,
   AppEquipmentIndexRoute: AppEquipmentIndexRoute,
 }
 
