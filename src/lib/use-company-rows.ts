@@ -12,6 +12,7 @@ type Tbl =
   | "equipment"
   | "instruments"
   | "instrument_calibrations"
+  | "equipment_calibrations"
   | "ncrs"
   | "pqrs";
 
