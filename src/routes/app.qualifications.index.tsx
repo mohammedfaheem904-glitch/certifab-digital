@@ -186,7 +186,19 @@ function QualificationsPage() {
                   </select>
                 </F>
                 <F label="PQR Number">
-                  <Input value={values.pqr_number ?? ""} onChange={(e) => set("pqr_number", e.target.value)} />
+                  <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.pqr_number ?? ""} onChange={(e) => set("pqr_number", e.target.value)}>
+                    <option value="">— Select PQR —</option>
+                    {pqrList.map((p: any) => {
+                      const label = p.pqr_no;
+                      if (!label) return null;
+                      return (
+                        <option key={p.id} value={label}>
+                          {label}{p.revision ? ` (${p.revision})` : ""}{p.status ? ` — ${p.status}` : ""}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </F>
                 <F label="Process">
                   <select required className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
