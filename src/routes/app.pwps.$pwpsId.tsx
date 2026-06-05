@@ -418,7 +418,21 @@ function PwpsDetailPage() {
               </optgroup>
             </select>
           </Field>
-          <Field label="Backing"><Input value={merged.backing ?? ""} onChange={(e) => set("backing", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Backing">
+            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+              value={merged.backing ?? ""} onChange={(e) => set("backing", e.target.value)} disabled={!isEditor}>
+              <option value="">— Select backing —</option>
+              <option value="None">None</option>
+              <option value="Ceramic Backing">Ceramic Backing</option>
+              <option value="Steel Backing Strip">Steel Backing Strip</option>
+              <option value="Copper Backing Bar">Copper Backing Bar</option>
+              <option value="Consumable Insert">Consumable Insert</option>
+              <option value="Argon Purge">Argon Purge</option>
+              <option value="Nitrogen Purge">Nitrogen Purge</option>
+              <option value="Back Gouged and Welded">Back Gouged and Welded</option>
+              <option value="Back Chipped and Welded">Back Chipped and Welded</option>
+            </select>
+          </Field>
         </Section>
 
         <Section title="Electrical & thermal">
