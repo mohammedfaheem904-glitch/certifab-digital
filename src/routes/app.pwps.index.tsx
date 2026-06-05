@@ -120,7 +120,18 @@ function PwpsIndexPage() {
               <div className="grid grid-cols-2 gap-3">
                 <F label="pWPS number"><Input required value={values.pwps_no ?? ""} onChange={(e) => set("pwps_no", e.target.value)} placeholder="pWPS-GTAW-001" /></F>
                 <F label="Title"><Input value={values.title ?? ""} onChange={(e) => set("title", e.target.value)} placeholder="GTAW root + SMAW fill, P-1 to P-1" /></F>
-                <F label="Code family"><Input value={values.code_family ?? "ASME IX"} onChange={(e) => set("code_family", e.target.value)} /></F>
+                <F label="Code family">
+                  <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.code_family ?? "ASME IX"} onChange={(e) => set("code_family", e.target.value)}>
+                    <option value="ASME IX">ASME Section IX (ASME Welding Codes)</option>
+                    <option value="AWS">AWS Structural Welding Codes</option>
+                    <option value="ISO">ISO Welding Standards</option>
+                    <option value="API">API Welding Standards</option>
+                    <option value="EN">EN / Euro Norm Welding Standards</option>
+                    <option value="ASTM/ASME Material">ASTM / ASME Material Standards</option>
+                    <option value="IIW">IIW (International Institute of Welding)</option>
+                  </select>
+                </F>
                 <F label="Standard"><Input value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
                 <F label="Process">
                   <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
