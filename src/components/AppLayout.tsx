@@ -87,7 +87,7 @@ export function AppLayout() {
   const isSuperAdmin = roles.includes("super_admin");
   const nav_items: Array<{ to: string; label: string; icon: any; exact?: boolean; surface?: Feature["surface"] }> = [
     { to: "/app", label: t("dashboard"), icon: LayoutDashboard, exact: true, surface: "dashboard" },
-    { to: "/app/pwps", label: "Welding Procedure Specification (WPS)", icon: FileText },
+    { to: "/app/pwps", label: "pWPS", icon: FileText },
     { to: "/app/pqrs", label: "PQR", icon: ShieldCheck },
     { to: "/app/procedures", label: "WPS (Welding Procedure Specification)", icon: FileText, surface: "procedures" },
     { to: "/app/qualifications", label: t("qualifications"), icon: BadgeCheck, surface: "qualifications" },
