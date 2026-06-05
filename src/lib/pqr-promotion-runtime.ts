@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { buildWpsPayload } from "./pqr-promotion";
+import { buildWpsPayload, buildChildSeeds } from "./pqr-promotion";
 
 /**
  * Promote a Passed PQR (and its linked pWPS) into a Draft WPS row in
@@ -37,6 +37,18 @@ export async function promotePqrToWps(pqrId: string): Promise<{ procedureId: str
   if (insErr) throw insErr;
 
   const procedureId = created.id as string;
+
+  // Seed WPS child/detail tables from pWPS scalars so the new WPS inherits
+  // the full dataset (best-effort — individual failures must not orphan the
+  // procedure row).
+  const seeds = buildChildSeeds({ companyId: pqr.company_id, procedureId, pwps, pqr });
+  await Promise.all(
+    Object.entries(seeds).map(async ([table, row]) => {
+      if (!row) return;
+      const { error } = await (supabase.from(table as any) as any).insert(row);
+      if (error) console.warn(`[pqr-promotion] seed ${table} failed:`, error.message);
+    }),
+  );
 
   // Backlinks (best-effort)
   await Promise.all([
