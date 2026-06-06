@@ -46,18 +46,16 @@ jobs:
           ls -la
           exit 1
 
-      - name: Add SPA fallback (.htaccess) for Hostinger
+      - name: Verify SPA fallback files are present
         run: |
-          cat > "${{ steps.outdir.outputs.dir }}/.htaccess" <<'EOF'
-          <IfModule mod_rewrite.c>
-            RewriteEngine On
-            RewriteBase /
-            RewriteRule ^index\.html$ - [L]
-            RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteCond %{REQUEST_FILENAME} !-d
-            RewriteRule . /index.html [L]
-          </IfModule>
-          EOF
+          test -f "${{ steps.outdir.outputs.dir }}/.htaccess" || { echo "Missing .htaccess in build output"; exit 1; }
+          test -f "${{ steps.outdir.outputs.dir }}/_redirects" || { echo "Missing _redirects in build output"; exit 1; }
+          test -f "${{ steps.outdir.outputs.dir }}/404.html" || { echo "Missing 404.html in build output"; exit 1; }
+          echo "SPA fallback files OK"
+
+      - name: Ensure .nojekyll (preserve dotfiles on gh-pages publish)
+        run: touch "${{ steps.outdir.outputs.dir }}/.nojekyll"
+
 
       - name: Deploy to production branch
         uses: peaceiris/actions-gh-pages@v4

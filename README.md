@@ -55,49 +55,43 @@ npm run preview
 
 ## Deployment
 
-### Hostinger (shared hosting)
+### SPA fallback (critical for direct route access)
 
-1. Run `npm run build` locally (or use the GitHub Actions workflow below).
-2. Upload **everything inside `dist/`** to your domain's `public_html/` folder via File Manager or FTP.
-3. Make sure `.htaccess` is present at the root of `public_html/` so SPA routes work on refresh:
+This is a single-page app. Without a host-level fallback, URLs like `/app`, `/login`, or `/verify/instrument/<token>` return 404 when opened directly or refreshed. The following files are committed under `public/` and are copied into `dist/` on every build:
 
-   ```apache
-   <IfModule mod_rewrite.c>
-     RewriteEngine On
-     RewriteBase /
-     RewriteRule ^index\.html$ - [L]
-     RewriteCond %{REQUEST_FILENAME} !-f
-     RewriteCond %{REQUEST_FILENAME} !-d
-     RewriteRule . /index.html [L]
-   </IfModule>
-   ```
+| File | Host | Purpose |
+| --- | --- | --- |
+| `public/.htaccess` | Apache / Hostinger / LiteSpeed | Rewrites all non-asset URLs to `/index.html` + cache headers |
+| `public/_redirects` | Netlify / Cloudflare Pages | `/* /index.html 200` SPA rewrite |
+| `public/404.html` | Generic static hosts | JS fallback that redirects to `/` preserving the path |
+| `vercel.json` (repo root) | Vercel | SPA rewrite rule |
 
-   The included GitHub Actions workflow writes this file automatically when it publishes to the `production` branch.
+Do not delete these. The CI workflow fails if `.htaccess`, `_redirects`, or `404.html` are missing from the build output.
 
-### Automated deploy via GitHub → Hostinger
+### Hostinger (GitHub auto-deploy)
 
-`.github/workflows/deploy-production.yml` builds the app on every push to `main` and pushes the static `dist/` (plus the `.htaccess` SPA fallback) to the `production` branch.
+`.github/workflows/deploy-production.yml` builds on every push to `main` and publishes `dist/` (including `.htaccess`) to the `production` branch.
 
 In Hostinger:
 1. **hPanel → Git** → connect this repository.
-2. Set the branch to `production`.
-3. Set the install path to `public_html` (or your subdomain folder).
-4. Enable **Auto Deployment**.
+2. Branch: `production`. Install path: `public_html` (or your subdomain folder).
+3. Enable **Auto Deployment**.
 
-In GitHub repository settings → **Secrets and variables → Actions**, add:
+In GitHub → **Settings → Secrets and variables → Actions**, add:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 - `VITE_SUPABASE_PROJECT_ID`
 
+If you ever inspect `public_html/` via Hostinger File Manager, enable **Show hidden files** to see `.htaccess`. If it is missing, the `production` branch is stale — re-run the Action.
+
 ### Vercel / Netlify / Cloudflare Pages
 
-These hosts auto-detect Vite. Just:
-
 1. Connect the repo.
-2. Build command: `npm run build`
-3. Output directory: `dist`
-4. Add the three `VITE_SUPABASE_*` environment variables.
-5. Add an SPA rewrite rule (`/* → /index.html` 200). Both Vercel and Netlify do this automatically for Vite projects; on Cloudflare Pages add a `_redirects` file in `public/` with `/* /index.html 200`.
+2. Build: `npm run build` • Output: `dist`
+3. Add the three `VITE_SUPABASE_*` env vars.
+4. SPA rewrites are already configured via `vercel.json` / `public/_redirects`.
+
+
 
 ---
 

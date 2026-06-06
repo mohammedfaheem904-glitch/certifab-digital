@@ -1,63 +1,63 @@
+## SPA Routing Fix for Hostinger Deployment
 
-# Make the repo Hostinger-deployable (static SPA)
+Add canonical SPA fallback configuration files to `public/` so they are copied into `dist/` by Vite on every build, then verify the GitHub Actions workflow ships them to the `production` branch consumed by Hostinger.
 
-## Audit findings
+### Files to add
 
-- **No server functions in use.** `rg createServerFn` returns 0 hits. Only Supabase server helpers exist (`client.server.ts`, `auth-middleware.ts`, `auth-attacher.ts`) and they are never imported by route/component code.
-- **No server routes** under `src/routes/api/`.
-- All data access already runs through the browser Supabase client with RLS — safe to ship as a pure SPA.
-- Current build pipeline: `vite build` → TanStack Start plugin → SSR bundle for Cloudflare Workers (`.output/`, `wrangler.jsonc`, `src/server.ts`). This is **incompatible** with Hostinger shared hosting (no Node/Workers runtime).
-- Existing `.github/workflows/deploy-production.yml` already attempts to copy `dist/` to a `production` branch with SPA `.htaccess` fallback — but `dist/` is not what the current Vite config emits in TanStack Start mode, so the deploy is silently broken.
-- Lovable Cloud (Supabase) stays as the backend — `VITE_SUPABASE_*` keys are publishable and safe in client bundles.
+1. **`public/.htaccess`** — canonical Apache rewrite for Hostinger. Routes all non-file/non-directory requests to `/index.html`. Adds long-cache headers for `/assets/*` (hashed) and `no-cache` for `index.html` so deploys take effect immediately.
 
-## Changes
+   ```apache
+   <IfModule mod_rewrite.c>
+     RewriteEngine On
+     RewriteBase /
+     RewriteRule ^index\.html$ - [L]
+     RewriteCond %{REQUEST_FILENAME} !-f
+     RewriteCond %{REQUEST_FILENAME} !-d
+     RewriteRule . /index.html [L]
+   </IfModule>
 
-### 1. Switch to pure SPA build
-- Replace `@lovable.dev/vite-tanstack-config` build pipeline with a standard Vite + React SPA config, keeping TanStack Router (file-based routing works in SPA mode too via `@tanstack/router-plugin/vite`).
-- Rewrite `vite.config.ts`:
-  - `@vitejs/plugin-react`
-  - `@tanstack/router-plugin/vite` (SPA mode — generates `routeTree.gen.ts`)
-  - `@tailwindcss/vite`
-  - `vite-tsconfig-paths`
-  - `build.outDir: 'dist'`
-- Replace `src/router.tsx` SSR-aware setup with a plain `createRouter` + `RouterProvider` SPA entry.
-- Add `index.html` at project root with `<div id="root">` and `<script type="module" src="/src/main.tsx">`.
-- Create `src/main.tsx` (ReactDOM root + RouterProvider + AuthProvider chain that currently lives in `__root.tsx`).
-- Strip SSR-only pieces from `src/routes/__root.tsx`: remove `HeadContent`, `Scripts`, `shellComponent`, `createRootRouteWithContext`'s SSR `head()` → migrate page titles to per-route `useEffect(() => { document.title = ... }, [])` (or react-helmet-async if user prefers later).
+   <IfModule mod_headers.c>
+     <FilesMatch "\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|webp|ico)$">
+       Header set Cache-Control "public, max-age=31536000, immutable"
+     </FilesMatch>
+     <FilesMatch "^index\.html$">
+       Header set Cache-Control "no-cache, no-store, must-revalidate"
+     </FilesMatch>
+   </IfModule>
+   ```
 
-### 2. Remove Cloudflare / Workers infrastructure
-- Delete: `wrangler.jsonc`, `src/server.ts`, `src/start.ts`, `src/lib/error-page.ts`, `src/lib/error-capture.ts`.
-- Remove deps: `@cloudflare/vite-plugin`, `@tanstack/react-start`, `@tanstack/router-plugin` stays (needed for routing), `nitro`, `@lovable.dev/vite-tanstack-config`.
-- Add deps: `@tanstack/router-plugin`, `@tanstack/react-router` already present.
-- Keep `@lovable.dev/cloud-auth-js` only if user uses Google OAuth broker; otherwise drop. (Will verify in build step.)
-- Delete unused server-only Supabase helpers: `src/integrations/supabase/client.server.ts`, `auth-middleware.ts`, `auth-attacher.ts` (none are imported).
+2. **`public/404.html`** — static fallback that immediately redirects to `/` preserving the original path in the hash, for hosts that don't honor `.htaccess`. Lightweight HTML with `<script>location.replace('/' + location.pathname.slice(1))</script>` plus a manual link.
 
-### 3. Environment & config
-- Add `.env.example` listing the three required client vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`.
-- Add `README.md` section: clone → `npm install` → copy `.env.example` to `.env` → `npm run build` → upload `dist/` to Hostinger `public_html/`.
-- Ensure `tsconfig.json` and `tsconfig.node.json` are valid for SPA mode (`moduleResolution: "bundler"`).
+3. **`public/_redirects`** — Netlify/Cloudflare Pages portability:
+   ```
+   /*    /index.html   200
+   ```
 
-### 4. GitHub Actions cleanup
-- Keep `.github/workflows/deploy-production.yml`. It already:
-  - Installs with `bun install --frozen-lockfile`
-  - Runs `bun run build`
-  - Detects `dist/`
-  - Writes Hostinger-compatible `.htaccess` (SPA fallback)
-  - Pushes to `production` branch
-- Verify it still works after the SPA switch (it will, since `dist/` is now the actual output).
-- Delete the second workflow `.github/workflows/deploy.yml` (GitHub Pages deploy uses `npm ci` against a `bun.lock` repo — currently broken and conflicts).
+4. **`vercel.json`** — Vercel portability:
+   ```json
+   { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+   ```
 
-### 5. Validation
-- Run `rm -rf node_modules dist .output && npm install && npm run build`.
-- Confirm `dist/index.html`, `dist/assets/*.js`, `dist/assets/*.css` exist.
-- Spot-check `dist/index.html` references hashed assets with absolute `/assets/...` paths (Hostinger root deploy compatible).
-- Run `npm run preview` and verify `/`, `/app`, `/login`, `/verify/instrument/:token` all load and refresh-without-404.
+### Workflow update
 
-## Out of scope
-- No feature changes, no UI changes, no database changes.
-- No migration off Lovable Cloud / Supabase.
-- No Lovable badge or branding removal beyond what's needed for build.
-- No CI deploy directly to Hostinger via FTP — the existing `production` branch + Hostinger Git deployment flow stays.
+Update `.github/workflows/deploy-production.yml`: remove the inline `.htaccess` generation step (now redundant since `public/.htaccess` is copied automatically into `dist/`). Keep the `peaceiris/actions-gh-pages` publish step. This ensures the committed `public/.htaccess` is the single source of truth.
 
-## Risk
-- After this, the project no longer runs in Lovable's preview the same way (Lovable's editor expects TanStack Start). The app continues to function in dev (`npm run dev` → Vite SPA), and Lovable Cloud (Supabase) still works because client keys are publishable. If you need Lovable preview to keep working too, say so before I implement — that would require a hybrid setup.
+### README update
+
+Replace the existing Hostinger section with a clear flow describing:
+- Auto-deploy via GitHub → `production` branch → Hostinger Git auto-deploy
+- That `.htaccess`, `_redirects`, `404.html` are committed under `public/` and shipped on every build
+- Note about Hostinger File Manager hiding dotfiles (toggle "Show hidden files")
+
+### Verification
+
+After implementation:
+1. Run `npm run build` and confirm `dist/.htaccess`, `dist/404.html`, `dist/_redirects` are present.
+2. Confirm `vercel.json` sits at repo root.
+3. Once pushed, the GitHub Action runs and publishes the `production` branch including `.htaccess`. Hostinger pulls the branch and the SPA fallback takes effect.
+4. Direct access to `/app`, `/login`, `/signup`, `/verify/instrument/<token>`, etc., returns `200` with the SPA shell, which then matches the route via TanStack Router.
+
+### Notes
+
+- No application code changes required — auth guards, route definitions, and `basename` are already correct.
+- No commit/push commands are run by the agent; the GitHub integration auto-syncs.
