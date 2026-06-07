@@ -19,7 +19,7 @@ const INSPECTION_TYPES = ["VT","Dimensional","Fit-Up","Welding Surveillance","Fi
 const DISCIPLINES = ["Welding","Piping","Structural","Mechanical","Electrical","Civil"];
 const ALL_STATUSES = [...INSPECTION_WORKFLOW_STAGES, "Rejected", "NCR Raised", "Re-Inspection Required"] as const;
 
-export const Route = createFileRoute("/app/inspections")({
+export const Route = createFileRoute("/app/inspections/")({
   component: InspectionsPage,
 });
 
