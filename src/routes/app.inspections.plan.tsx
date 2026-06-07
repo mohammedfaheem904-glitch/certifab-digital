@@ -171,7 +171,7 @@ function PlanDetail({ plan, refresh }: { plan: any; refresh: () => void }) {
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40">
             <tr>
-              <Th>Type</Th><Th>Line / Joint</Th><Th>Welder</Th><Th>Priority</Th><Th>Planned</Th><Th>Status</Th><Th>Inspection</Th><Th></Th>
+              <Th>Type</Th><Th>Line / Joint</Th><Th>Welder</Th><Th>Priority</Th><Th>Planned</Th><Th>Status</Th><Th>Inspection</Th><Th> </Th>
             </tr>
           </thead>
           <tbody>
