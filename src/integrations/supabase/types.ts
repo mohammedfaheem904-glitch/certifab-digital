@@ -1448,6 +1448,8 @@ export type Database = {
           code: string
           company_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           end_date: string | null
           id: string
@@ -1462,6 +1464,8 @@ export type Database = {
           code: string
           company_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           end_date?: string | null
           id?: string
@@ -1476,6 +1480,8 @@ export type Database = {
           code?: string
           company_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           end_date?: string | null
           id?: string
@@ -3178,6 +3184,7 @@ export type Database = {
       restore_instrument: { Args: { _id: string }; Returns: undefined }
       restore_pqr: { Args: { _id: string }; Returns: undefined }
       restore_procedure: { Args: { _id: string }; Returns: undefined }
+      restore_project: { Args: { _id: string }; Returns: undefined }
       restore_pwps: { Args: { _id: string }; Returns: undefined }
       restore_qualification: { Args: { _id: string }; Returns: undefined }
       restore_weld: { Args: { _id: string }; Returns: undefined }
@@ -3185,6 +3192,7 @@ export type Database = {
       soft_delete_instrument: { Args: { _id: string }; Returns: undefined }
       soft_delete_pqr: { Args: { _id: string }; Returns: undefined }
       soft_delete_procedure: { Args: { _id: string }; Returns: undefined }
+      soft_delete_project: { Args: { _id: string }; Returns: undefined }
       soft_delete_pwps: { Args: { _id: string }; Returns: undefined }
       soft_delete_qualification: { Args: { _id: string }; Returns: undefined }
       soft_delete_weld: { Args: { _id: string }; Returns: undefined }
