@@ -262,51 +262,226 @@ export type Database = {
           },
         ]
       }
-      inspections: {
+      inspection_checklist_items: {
         Row: {
+          comment: string | null
           company_id: string
           created_at: string
+          field_type: string
+          id: string
+          inspection_id: string
+          label: string
+          required: boolean
+          result: string | null
+          sort_order: number
+          updated_at: string
+          value_bool: boolean | null
+          value_number: number | null
+          value_text: string | null
+        }
+        Insert: {
+          comment?: string | null
+          company_id: string
+          created_at?: string
+          field_type?: string
+          id?: string
+          inspection_id: string
+          label: string
+          required?: boolean
+          result?: string | null
+          sort_order?: number
+          updated_at?: string
+          value_bool?: boolean | null
+          value_number?: number | null
+          value_text?: string | null
+        }
+        Update: {
+          comment?: string | null
+          company_id?: string
+          created_at?: string
+          field_type?: string
+          id?: string
+          inspection_id?: string
+          label?: string
+          required?: boolean
+          result?: string | null
+          sort_order?: number
+          updated_at?: string
+          value_bool?: boolean | null
+          value_number?: number | null
+          value_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_checklist_items_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_events: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          comment: string | null
+          company_id: string
+          created_at: string
+          id: string
+          inspection_id: string
+          kind: string
+          payload: Json | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          comment?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          inspection_id: string
+          kind: string
+          payload?: Json | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          comment?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          inspection_id?: string
+          kind?: string
+          payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_events_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspections: {
+        Row: {
+          area: string | null
+          assigned_at: string | null
+          assigned_to: string | null
+          assigned_to_name: string | null
+          client_requirement_ref: string | null
+          closed_at: string | null
+          closed_by: string | null
+          company_id: string
+          completed_at: string | null
+          created_at: string
           defect_type: string | null
+          discipline: string | null
           id: string
           inspected_at: string
+          inspection_no: string | null
           inspection_type: string
           inspector_name: string | null
+          joint_no: string | null
+          line_no: string | null
           ncr_code: string | null
+          parent_inspection_id: string | null
           project_id: string | null
+          requested_at: string | null
+          requested_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          scheduled_for: string | null
           severity: Database["public"]["Enums"]["severity_level"] | null
+          spool_no: string | null
+          started_at: string | null
           status: string
           updated_at: string
           weld_id: string | null
+          welder_id: string | null
+          welder_name: string | null
+          workflow_status: Database["public"]["Enums"]["inspection_workflow_status"]
+          wps_id: string | null
         }
         Insert: {
+          area?: string | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          client_requirement_ref?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
           company_id: string
+          completed_at?: string | null
           created_at?: string
           defect_type?: string | null
+          discipline?: string | null
           id?: string
           inspected_at?: string
+          inspection_no?: string | null
           inspection_type: string
           inspector_name?: string | null
+          joint_no?: string | null
+          line_no?: string | null
           ncr_code?: string | null
+          parent_inspection_id?: string | null
           project_id?: string | null
+          requested_at?: string | null
+          requested_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          scheduled_for?: string | null
           severity?: Database["public"]["Enums"]["severity_level"] | null
+          spool_no?: string | null
+          started_at?: string | null
           status?: string
           updated_at?: string
           weld_id?: string | null
+          welder_id?: string | null
+          welder_name?: string | null
+          workflow_status?: Database["public"]["Enums"]["inspection_workflow_status"]
+          wps_id?: string | null
         }
         Update: {
+          area?: string | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          client_requirement_ref?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
           company_id?: string
+          completed_at?: string | null
           created_at?: string
           defect_type?: string | null
+          discipline?: string | null
           id?: string
           inspected_at?: string
+          inspection_no?: string | null
           inspection_type?: string
           inspector_name?: string | null
+          joint_no?: string | null
+          line_no?: string | null
           ncr_code?: string | null
+          parent_inspection_id?: string | null
           project_id?: string | null
+          requested_at?: string | null
+          requested_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          scheduled_for?: string | null
           severity?: Database["public"]["Enums"]["severity_level"] | null
+          spool_no?: string | null
+          started_at?: string | null
           status?: string
           updated_at?: string
           weld_id?: string | null
+          welder_id?: string | null
+          welder_name?: string | null
+          workflow_status?: Database["public"]["Enums"]["inspection_workflow_status"]
+          wps_id?: string | null
         }
         Relationships: [
           {
@@ -314,6 +489,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspections_parent_inspection_id_fkey"
+            columns: ["parent_inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
             referencedColumns: ["id"]
           },
           {
@@ -3308,6 +3490,16 @@ export type Database = {
         | "Calibration Due"
         | "Out of Service"
       finding_severity: "info" | "warning" | "error" | "critical"
+      inspection_workflow_status:
+        | "Requested"
+        | "Assigned"
+        | "In Progress"
+        | "Pending Review"
+        | "Accepted"
+        | "Rejected"
+        | "NCR Raised"
+        | "Re-Inspection Required"
+        | "Closed"
       instrument_status: "Active" | "Calibration Due" | "Out of Service"
       mechanical_test_type:
         | "Tensile"
@@ -3530,6 +3722,17 @@ export const Constants = {
         "Out of Service",
       ],
       finding_severity: ["info", "warning", "error", "critical"],
+      inspection_workflow_status: [
+        "Requested",
+        "Assigned",
+        "In Progress",
+        "Pending Review",
+        "Accepted",
+        "Rejected",
+        "NCR Raised",
+        "Re-Inspection Required",
+        "Closed",
+      ],
       instrument_status: ["Active", "Calibration Due", "Out of Service"],
       mechanical_test_type: [
         "Tensile",
