@@ -118,6 +118,15 @@ function InspectionsPage() {
               <tr key={r.id} className="border-t border-border/60 hover:bg-muted/20">
                 <td className="px-5 py-3 font-medium">
                   <Link to="/app/inspections/$inspectionId" params={{ inspectionId: r.id }} className="hover:text-primary">
+            <tr><Th>Inspection</Th><Th>Type</Th><Th>Discipline</Th><Th>Line / Joint</Th><Th>Welder</Th><Th>Assignee</Th><Th>Status</Th><Th>Scheduled</Th><th className="text-end font-medium pe-5 py-2.5">Actions</th></tr>
+          </thead>
+          <tbody>
+            {isLoading && <tr><td colSpan={9} className="px-5 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /></td></tr>}
+            {!isLoading && rows.length === 0 && <tr><td colSpan={9} className="px-5 py-10 text-center text-muted-foreground">No inspections.</td></tr>}
+            {rows.map((r: any) => (
+              <tr key={r.id} className="border-t border-border/60 hover:bg-muted/20">
+                <td className="px-5 py-3 font-medium">
+                  <Link to="/app/inspections/$inspectionId" params={{ inspectionId: r.id }} className="hover:text-primary">
                     {r.inspection_no ?? r.id.slice(0, 8)}
                   </Link>
                   {r.ncr_code && <div className="text-[10px] text-muted-foreground mt-0.5">NCR {r.ncr_code}</div>}
@@ -129,6 +138,29 @@ function InspectionsPage() {
                 <td className="px-5 py-3 text-xs">{r.assigned_to_name ?? "—"}</td>
                 <td className="px-5 py-3"><WorkflowChip status={r.workflow_status} /></td>
                 <td className="px-5 py-3 text-xs text-muted-foreground">{r.scheduled_for ?? "—"}</td>
+                <td className="pe-5 py-3">
+                  <div className="flex justify-end gap-1">
+                    <Link to="/app/inspections/$inspectionId" params={{ inspectionId: r.id }}>
+                      <Button size="icon" variant="ghost" className="size-8" title="View details"><Eye className="size-4" /></Button>
+                    </Link>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-8 text-destructive hover:text-destructive"
+                      title="Move to trash"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (!confirm(`Move inspection ${r.inspection_no ?? r.id.slice(0, 8)} to trash?`)) return;
+                        const { error } = await (supabase.rpc as any)("soft_delete_inspection", { _id: r.id });
+                        if (error) return toast.error(error.message);
+                        toast.success("Moved to trash.");
+                        qc.invalidateQueries({ queryKey: ["inspections"] });
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
