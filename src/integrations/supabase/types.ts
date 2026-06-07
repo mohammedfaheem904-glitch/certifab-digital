@@ -264,6 +264,8 @@ export type Database = {
       }
       inspection_checklist_items: {
         Row: {
+          attachment_path: string | null
+          code_reference: string | null
           comment: string | null
           company_id: string
           created_at: string
@@ -273,13 +275,20 @@ export type Database = {
           label: string
           required: boolean
           result: string | null
+          section: string | null
           sort_order: number
+          template_field_id: string | null
+          tolerance_max: number | null
+          tolerance_min: number | null
+          unit: string | null
           updated_at: string
           value_bool: boolean | null
           value_number: number | null
           value_text: string | null
         }
         Insert: {
+          attachment_path?: string | null
+          code_reference?: string | null
           comment?: string | null
           company_id: string
           created_at?: string
@@ -289,13 +298,20 @@ export type Database = {
           label: string
           required?: boolean
           result?: string | null
+          section?: string | null
           sort_order?: number
+          template_field_id?: string | null
+          tolerance_max?: number | null
+          tolerance_min?: number | null
+          unit?: string | null
           updated_at?: string
           value_bool?: boolean | null
           value_number?: number | null
           value_text?: string | null
         }
         Update: {
+          attachment_path?: string | null
+          code_reference?: string | null
           comment?: string | null
           company_id?: string
           created_at?: string
@@ -305,7 +321,12 @@ export type Database = {
           label?: string
           required?: boolean
           result?: string | null
+          section?: string | null
           sort_order?: number
+          template_field_id?: string | null
+          tolerance_max?: number | null
+          tolerance_min?: number | null
+          unit?: string | null
           updated_at?: string
           value_bool?: boolean | null
           value_number?: number | null
@@ -317,6 +338,13 @@ export type Database = {
             columns: ["inspection_id"]
             isOneToOne: false
             referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_checklist_items_template_field_id_fkey"
+            columns: ["template_field_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_template_fields"
             referencedColumns: ["id"]
           },
         ]
@@ -365,6 +393,338 @@ export type Database = {
           },
         ]
       }
+      inspection_package_members: {
+        Row: {
+          added_at: string
+          company_id: string
+          id: string
+          inspection_id: string
+          package_id: string
+        }
+        Insert: {
+          added_at?: string
+          company_id: string
+          id?: string
+          inspection_id: string
+          package_id: string
+        }
+        Update: {
+          added_at?: string
+          company_id?: string
+          id?: string
+          inspection_id?: string
+          package_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_package_members_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_package_members_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_work_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_plan_items: {
+        Row: {
+          company_id: string
+          created_at: string
+          generated_inspection_id: string | null
+          id: string
+          inspection_type: string
+          joint_no: string | null
+          line_no: string | null
+          plan_id: string
+          planned_date: string | null
+          priority: string
+          spool_no: string | null
+          status: string
+          weld_id: string | null
+          welder_name: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          generated_inspection_id?: string | null
+          id?: string
+          inspection_type: string
+          joint_no?: string | null
+          line_no?: string | null
+          plan_id: string
+          planned_date?: string | null
+          priority?: string
+          spool_no?: string | null
+          status?: string
+          weld_id?: string | null
+          welder_name?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          generated_inspection_id?: string | null
+          id?: string
+          inspection_type?: string
+          joint_no?: string | null
+          line_no?: string | null
+          plan_id?: string
+          planned_date?: string | null
+          priority?: string
+          spool_no?: string | null
+          status?: string
+          weld_id?: string | null
+          welder_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_plan_items_generated_inspection_id_fkey"
+            columns: ["generated_inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_plan_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_plans: {
+        Row: {
+          area: string | null
+          assigned_to: string | null
+          assigned_to_name: string | null
+          code: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          default_inspection_type: string | null
+          description: string | null
+          discipline: string | null
+          due_date: string | null
+          id: string
+          line_no: string | null
+          name: string
+          planned_date: string | null
+          priority: string
+          project_id: string | null
+          recurrence: string | null
+          spool_no: string | null
+          status: string
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          area?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          code?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          default_inspection_type?: string | null
+          description?: string | null
+          discipline?: string | null
+          due_date?: string | null
+          id?: string
+          line_no?: string | null
+          name: string
+          planned_date?: string | null
+          priority?: string
+          project_id?: string | null
+          recurrence?: string | null
+          spool_no?: string | null
+          status?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          code?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          default_inspection_type?: string | null
+          description?: string | null
+          discipline?: string | null
+          due_date?: string | null
+          id?: string
+          line_no?: string | null
+          name?: string
+          planned_date?: string | null
+          priority?: string
+          project_id?: string | null
+          recurrence?: string | null
+          spool_no?: string | null
+          status?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      inspection_template_fields: {
+        Row: {
+          code_reference: string | null
+          company_id: string
+          created_at: string
+          field_type: string
+          helper_text: string | null
+          id: string
+          label: string
+          options: Json | null
+          required: boolean
+          section: string | null
+          sort_order: number
+          template_id: string
+          tolerance_max: number | null
+          tolerance_min: number | null
+          unit: string | null
+        }
+        Insert: {
+          code_reference?: string | null
+          company_id: string
+          created_at?: string
+          field_type?: string
+          helper_text?: string | null
+          id?: string
+          label: string
+          options?: Json | null
+          required?: boolean
+          section?: string | null
+          sort_order?: number
+          template_id: string
+          tolerance_max?: number | null
+          tolerance_min?: number | null
+          unit?: string | null
+        }
+        Update: {
+          code_reference?: string | null
+          company_id?: string
+          created_at?: string
+          field_type?: string
+          helper_text?: string | null
+          id?: string
+          label?: string
+          options?: Json | null
+          required?: boolean
+          section?: string | null
+          sort_order?: number
+          template_id?: string
+          tolerance_max?: number | null
+          tolerance_min?: number | null
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_template_fields_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_templates: {
+        Row: {
+          active: boolean
+          code_reference: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          discipline: string | null
+          id: string
+          inspection_type: string
+          is_default: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code_reference?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          discipline?: string | null
+          id?: string
+          inspection_type: string
+          is_default?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code_reference?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          discipline?: string | null
+          id?: string
+          inspection_type?: string
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      inspection_work_packages: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          package_no: string
+          package_type: string
+          project_id: string | null
+          status: string
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          package_no: string
+          package_type?: string
+          project_id?: string | null
+          status?: string
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          package_no?: string
+          package_type?: string
+          project_id?: string | null
+          status?: string
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inspections: {
         Row: {
           area: string | null
@@ -379,6 +739,7 @@ export type Database = {
           created_at: string
           defect_type: string | null
           discipline: string | null
+          due_date: string | null
           id: string
           inspected_at: string
           inspection_no: string | null
@@ -388,6 +749,8 @@ export type Database = {
           line_no: string | null
           ncr_code: string | null
           parent_inspection_id: string | null
+          plan_item_id: string | null
+          priority: string | null
           project_id: string | null
           requested_at: string | null
           requested_by: string | null
@@ -398,6 +761,7 @@ export type Database = {
           spool_no: string | null
           started_at: string | null
           status: string
+          template_id: string | null
           updated_at: string
           weld_id: string | null
           welder_id: string | null
@@ -418,6 +782,7 @@ export type Database = {
           created_at?: string
           defect_type?: string | null
           discipline?: string | null
+          due_date?: string | null
           id?: string
           inspected_at?: string
           inspection_no?: string | null
@@ -427,6 +792,8 @@ export type Database = {
           line_no?: string | null
           ncr_code?: string | null
           parent_inspection_id?: string | null
+          plan_item_id?: string | null
+          priority?: string | null
           project_id?: string | null
           requested_at?: string | null
           requested_by?: string | null
@@ -437,6 +804,7 @@ export type Database = {
           spool_no?: string | null
           started_at?: string | null
           status?: string
+          template_id?: string | null
           updated_at?: string
           weld_id?: string | null
           welder_id?: string | null
@@ -457,6 +825,7 @@ export type Database = {
           created_at?: string
           defect_type?: string | null
           discipline?: string | null
+          due_date?: string | null
           id?: string
           inspected_at?: string
           inspection_no?: string | null
@@ -466,6 +835,8 @@ export type Database = {
           line_no?: string | null
           ncr_code?: string | null
           parent_inspection_id?: string | null
+          plan_item_id?: string | null
+          priority?: string | null
           project_id?: string | null
           requested_at?: string | null
           requested_by?: string | null
@@ -476,6 +847,7 @@ export type Database = {
           spool_no?: string | null
           started_at?: string | null
           status?: string
+          template_id?: string | null
           updated_at?: string
           weld_id?: string | null
           welder_id?: string | null
@@ -499,10 +871,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "inspections_plan_item_id_fkey"
+            columns: ["plan_item_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_plan_items"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "inspections_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspections_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_templates"
             referencedColumns: ["id"]
           },
           {

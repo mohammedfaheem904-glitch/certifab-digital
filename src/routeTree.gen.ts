@@ -71,6 +71,7 @@ import { Route as AppPqrsPqrIdRouteImport } from './routes/app.pqrs.$pqrId'
 import { Route as AppNcrsNcrIdRouteImport } from './routes/app.ncrs.$ncrId'
 import { Route as AppInstrumentsTrashRouteImport } from './routes/app.instruments.trash'
 import { Route as AppInstrumentsInstrumentIdRouteImport } from './routes/app.instruments.$instrumentId'
+import { Route as AppInspectionsPlanRouteImport } from './routes/app.inspections.plan'
 import { Route as AppInspectionsInspectionIdRouteImport } from './routes/app.inspections.$inspectionId'
 import { Route as AppEquipmentTrashRouteImport } from './routes/app.equipment.trash'
 import { Route as AppEquipmentEquipmentIdRouteImport } from './routes/app.equipment.$equipmentId'
@@ -391,6 +392,11 @@ const AppInstrumentsInstrumentIdRoute =
     path: '/$instrumentId',
     getParentRoute: () => AppInstrumentsRoute,
   } as any)
+const AppInspectionsPlanRoute = AppInspectionsPlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => AppInspectionsRoute,
+} as any)
 const AppInspectionsInspectionIdRoute =
   AppInspectionsInspectionIdRouteImport.update({
     id: '/$inspectionId',
@@ -451,6 +457,7 @@ export interface FileRoutesByFullPath {
   '/app/equipment/$equipmentId': typeof AppEquipmentEquipmentIdRoute
   '/app/equipment/trash': typeof AppEquipmentTrashRoute
   '/app/inspections/$inspectionId': typeof AppInspectionsInspectionIdRoute
+  '/app/inspections/plan': typeof AppInspectionsPlanRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
@@ -512,6 +519,7 @@ export interface FileRoutesByTo {
   '/app/equipment/$equipmentId': typeof AppEquipmentEquipmentIdRoute
   '/app/equipment/trash': typeof AppEquipmentTrashRoute
   '/app/inspections/$inspectionId': typeof AppInspectionsInspectionIdRoute
+  '/app/inspections/plan': typeof AppInspectionsPlanRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
@@ -582,6 +590,7 @@ export interface FileRoutesById {
   '/app/equipment/$equipmentId': typeof AppEquipmentEquipmentIdRoute
   '/app/equipment/trash': typeof AppEquipmentTrashRoute
   '/app/inspections/$inspectionId': typeof AppInspectionsInspectionIdRoute
+  '/app/inspections/plan': typeof AppInspectionsPlanRoute
   '/app/instruments/$instrumentId': typeof AppInstrumentsInstrumentIdRoute
   '/app/instruments/trash': typeof AppInstrumentsTrashRoute
   '/app/ncrs/$ncrId': typeof AppNcrsNcrIdRoute
@@ -653,6 +662,7 @@ export interface FileRouteTypes {
     | '/app/equipment/$equipmentId'
     | '/app/equipment/trash'
     | '/app/inspections/$inspectionId'
+    | '/app/inspections/plan'
     | '/app/instruments/$instrumentId'
     | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
@@ -714,6 +724,7 @@ export interface FileRouteTypes {
     | '/app/equipment/$equipmentId'
     | '/app/equipment/trash'
     | '/app/inspections/$inspectionId'
+    | '/app/inspections/plan'
     | '/app/instruments/$instrumentId'
     | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
@@ -783,6 +794,7 @@ export interface FileRouteTypes {
     | '/app/equipment/$equipmentId'
     | '/app/equipment/trash'
     | '/app/inspections/$inspectionId'
+    | '/app/inspections/plan'
     | '/app/instruments/$instrumentId'
     | '/app/instruments/trash'
     | '/app/ncrs/$ncrId'
@@ -1275,6 +1287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsInstrumentIdRouteImport
       parentRoute: typeof AppInstrumentsRoute
     }
+    '/app/inspections/plan': {
+      id: '/app/inspections/plan'
+      path: '/plan'
+      fullPath: '/app/inspections/plan'
+      preLoaderRoute: typeof AppInspectionsPlanRouteImport
+      parentRoute: typeof AppInspectionsRoute
+    }
     '/app/inspections/$inspectionId': {
       id: '/app/inspections/$inspectionId'
       path: '/$inspectionId'
@@ -1331,10 +1350,12 @@ const AppEquipmentRouteWithChildren = AppEquipmentRoute._addFileChildren(
 
 interface AppInspectionsRouteChildren {
   AppInspectionsInspectionIdRoute: typeof AppInspectionsInspectionIdRoute
+  AppInspectionsPlanRoute: typeof AppInspectionsPlanRoute
 }
 
 const AppInspectionsRouteChildren: AppInspectionsRouteChildren = {
   AppInspectionsInspectionIdRoute: AppInspectionsInspectionIdRoute,
+  AppInspectionsPlanRoute: AppInspectionsPlanRoute,
 }
 
 const AppInspectionsRouteWithChildren = AppInspectionsRoute._addFileChildren(
