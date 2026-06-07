@@ -153,20 +153,42 @@ function InspectionDetail() {
         </div>
       </div>
 
-      <InspectionWorkflowStepper status={i.workflow_status} />
+      <div className="grid lg:grid-cols-[1fr_320px] gap-4 items-start">
+        <InspectionWorkflowStepper status={i.workflow_status} />
+        <ReadinessGauge result={scoreInspection({
+          checklistItems: checklist.data ?? [],
+          workflowStatus: i.workflow_status,
+          hasFindings: !!i.defect_type,
+        })} />
+      </div>
 
-      <Tabs defaultValue="details">
+      <Tabs defaultValue="form">
         <TabsList>
+          <TabsTrigger value="form">Inspection form</TabsTrigger>
           <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="checklist">Checklist ({checklist.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="checklist">Custom items ({(checklist.data ?? []).filter((x: any) => !x.template_field_id).length})</TabsTrigger>
           <TabsTrigger value="findings">Findings</TabsTrigger>
           <TabsTrigger value="audit">Audit trail ({events.data?.length ?? 0})</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="form">
+          {profile?.company_id && (
+            <DynamicInspectionForm
+              companyId={profile.company_id}
+              inspectionId={inspectionId}
+              inspectionType={i.inspection_type}
+              currentTemplateId={i.template_id ?? null}
+              items={(checklist.data ?? []).filter((x: any) => x.template_field_id)}
+              refresh={() => qc.invalidateQueries({ queryKey: ["inspection_checklist", inspectionId] })}
+            />
+          )}
+        </TabsContent>
 
         <TabsContent value="details" className="space-y-4">
           <div className="rounded-xl border border-border bg-card p-5 grid grid-cols-2 md:grid-cols-3 gap-4">
             <DetailField label="Type" value={i.inspection_type} onSave={(v) => update({ inspection_type: v }, "type_changed")} options={["VT","Dimensional","Fit-Up","Welding Surveillance","Final","RT","UT","PT","MT","PMI","Hardness","Hydrotest Witness"]} />
             <DetailField label="Discipline" value={i.discipline ?? ""} onSave={(v) => update({ discipline: v }, "discipline_changed")} options={["Welding","Piping","Structural","Mechanical","Electrical","Civil"]} />
+            <DetailField label="Priority" value={i.priority ?? "Normal"} onSave={(v) => update({ priority: v })} options={["Low","Normal","High","Critical"]} />
             <DetailField label="Area" value={i.area ?? ""} onSave={(v) => update({ area: v || null })} />
             <DetailField label="Line No" value={i.line_no ?? ""} onSave={(v) => update({ line_no: v || null })} />
             <DetailField label="Spool No" value={i.spool_no ?? ""} onSave={(v) => update({ spool_no: v || null })} />
@@ -174,6 +196,7 @@ function InspectionDetail() {
             <DetailField label="Welder" value={i.welder_name ?? ""} onSave={(v) => update({ welder_name: v || null })} />
             <DetailField label="Assignee" value={i.assigned_to_name ?? ""} onSave={(v) => update({ assigned_to_name: v || null }, "assignee_changed")} />
             <DetailField label="Scheduled for" type="date" value={i.scheduled_for ?? ""} onSave={(v) => update({ scheduled_for: v || null })} />
+            <DetailField label="Due date" type="date" value={i.due_date ?? ""} onSave={(v) => update({ due_date: v || null })} />
             <DetailField label="Client requirement" value={i.client_requirement_ref ?? ""} onSave={(v) => update({ client_requirement_ref: v || null })} />
             <DetailField label="Inspector name" value={i.inspector_name ?? ""} onSave={(v) => update({ inspector_name: v || null })} />
             <DetailField label="NCR code" value={i.ncr_code ?? ""} onSave={(v) => update({ ncr_code: v || null })} />
@@ -181,7 +204,7 @@ function InspectionDetail() {
         </TabsContent>
 
         <TabsContent value="checklist">
-          <ChecklistTab inspectionId={inspectionId} companyId={profile?.company_id ?? null} items={checklist.data ?? []} refresh={() => qc.invalidateQueries({ queryKey: ["inspection_checklist", inspectionId] })} />
+          <ChecklistTab inspectionId={inspectionId} companyId={profile?.company_id ?? null} items={(checklist.data ?? []).filter((x: any) => !x.template_field_id)} refresh={() => qc.invalidateQueries({ queryKey: ["inspection_checklist", inspectionId] })} />
         </TabsContent>
 
         <TabsContent value="findings">
