@@ -15,6 +15,9 @@ import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
 import { InspectionWorkflowStepper } from "@/components/inspections/InspectionWorkflowStepper";
 import { InspectionActionBar } from "@/components/inspections/InspectionActionBar";
 import { InspectionTimeline } from "@/components/inspections/InspectionTimeline";
+import { DynamicInspectionForm } from "@/components/inspections/DynamicInspectionForm";
+import { ReadinessGauge } from "@/components/inspections/ReadinessGauge";
+import { scoreInspection } from "@/lib/inspection-readiness";
 import { inspectionStatusTone, type InspectionWorkflowStatus } from "@/lib/inspection-workflow";
 import { toast } from "sonner";
 
