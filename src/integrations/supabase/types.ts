@@ -738,6 +738,8 @@ export type Database = {
           completed_at: string | null
           created_at: string
           defect_type: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           discipline: string | null
           due_date: string | null
           id: string
@@ -781,6 +783,8 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           defect_type?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           discipline?: string | null
           due_date?: string | null
           id?: string
@@ -824,6 +828,8 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           defect_type?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           discipline?: string | null
           due_date?: string | null
           id?: string
@@ -3830,6 +3836,7 @@ export type Database = {
         Returns: undefined
       }
       restore_equipment: { Args: { _id: string }; Returns: undefined }
+      restore_inspection: { Args: { _id: string }; Returns: undefined }
       restore_instrument: { Args: { _id: string }; Returns: undefined }
       restore_pqr: { Args: { _id: string }; Returns: undefined }
       restore_procedure: { Args: { _id: string }; Returns: undefined }
@@ -3838,6 +3845,7 @@ export type Database = {
       restore_qualification: { Args: { _id: string }; Returns: undefined }
       restore_weld: { Args: { _id: string }; Returns: undefined }
       soft_delete_equipment: { Args: { _id: string }; Returns: undefined }
+      soft_delete_inspection: { Args: { _id: string }; Returns: undefined }
       soft_delete_instrument: { Args: { _id: string }; Returns: undefined }
       soft_delete_pqr: { Args: { _id: string }; Returns: undefined }
       soft_delete_procedure: { Args: { _id: string }; Returns: undefined }
