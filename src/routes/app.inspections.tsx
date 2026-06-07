@@ -63,7 +63,16 @@ function InspectionsPage() {
     <ModulePage
       title="Inspections & NCR Workflow"
       subtitle="Plan, execute, accept or reject inspections — and govern the corrective-action lifecycle from request to closure."
-      action={<NewInspectionDialog onDone={() => qc.invalidateQueries({ queryKey: ["inspections"] })} />}
+      action={
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Link to="/app/inspections/trash">
+              <Button size="sm" variant="outline"><Trash2 className="size-4 me-1" /> Trash</Button>
+            </Link>
+          )}
+          <NewInspectionDialog onDone={() => qc.invalidateQueries({ queryKey: ["inspections"] })} />
+        </div>
+      }
     >
       <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-3 border-b border-border">
         <Stat icon={ClipboardCheck} label="Open" value={counts.open} tone="info" />
