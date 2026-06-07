@@ -24,7 +24,8 @@ export const Route = createFileRoute("/app/inspections")({
 });
 
 function InspectionsPage() {
-  const { profile } = useAuth();
+  const { profile, roles } = useAuth();
+  const isAdmin = roles.includes("super_admin");
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
