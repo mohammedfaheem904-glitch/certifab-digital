@@ -163,10 +163,10 @@ function ProjectDetailsPage() {
       <Card className="p-4">
         <h3 className="text-sm font-semibold mb-3">Related records</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <CountBox label="Welds" value={counts.welds} />
-          <CountBox label="Inspections" value={counts.inspections} />
-          <CountBox label="NCRs" value={counts.ncrs} />
-          <CountBox label="Instruments assigned" value={counts.instruments} />
+          <CountBox label="Welds" value={counts?.welds ?? 0} />
+          <CountBox label="Inspections" value={counts?.inspections ?? 0} />
+          <CountBox label="NCRs" value={counts?.ncrs ?? 0} />
+          <CountBox label="Instruments assigned" value={counts?.instruments ?? 0} />
         </div>
       </Card>
 
