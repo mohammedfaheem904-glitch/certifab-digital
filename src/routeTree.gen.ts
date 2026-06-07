@@ -32,7 +32,6 @@ import { Route as AppProceduresRouteImport } from './routes/app.procedures'
 import { Route as AppPqrsRouteImport } from './routes/app.pqrs'
 import { Route as AppNcrsRouteImport } from './routes/app.ncrs'
 import { Route as AppInstrumentsRouteImport } from './routes/app.instruments'
-import { Route as AppInspectionsRouteImport } from './routes/app.inspections'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppAuditRouteImport } from './routes/app.audit'
@@ -43,6 +42,7 @@ import { Route as AppProjectsIndexRouteImport } from './routes/app.projects.inde
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
 import { Route as AppPqrsIndexRouteImport } from './routes/app.pqrs.index'
 import { Route as AppInstrumentsIndexRouteImport } from './routes/app.instruments.index'
+import { Route as AppInspectionsIndexRouteImport } from './routes/app.inspections.index'
 import { Route as AppEquipmentIndexRouteImport } from './routes/app.equipment.index'
 import { Route as AppAdminIndexRouteImport } from './routes/app.admin.index'
 import { Route as VerifyWpsTokenRouteImport } from './routes/verify.wps.$token'
@@ -194,11 +194,6 @@ const AppInstrumentsRoute = AppInstrumentsRouteImport.update({
   path: '/instruments',
   getParentRoute: () => AppRoute,
 } as any)
-const AppInspectionsRoute = AppInspectionsRouteImport.update({
-  id: '/inspections',
-  path: '/inspections',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppEquipmentRoute = AppEquipmentRouteImport.update({
   id: '/equipment',
   path: '/equipment',
@@ -248,6 +243,11 @@ const AppInstrumentsIndexRoute = AppInstrumentsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppInstrumentsRoute,
+} as any)
+const AppInspectionsIndexRoute = AppInspectionsIndexRouteImport.update({
+  id: '/inspections/',
+  path: '/inspections/',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppEquipmentIndexRoute = AppEquipmentIndexRouteImport.update({
   id: '/',
@@ -394,20 +394,20 @@ const AppInstrumentsInstrumentIdRoute =
     getParentRoute: () => AppInstrumentsRoute,
   } as any)
 const AppInspectionsTrashRoute = AppInspectionsTrashRouteImport.update({
-  id: '/trash',
-  path: '/trash',
-  getParentRoute: () => AppInspectionsRoute,
+  id: '/inspections/trash',
+  path: '/inspections/trash',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppInspectionsPlanRoute = AppInspectionsPlanRouteImport.update({
-  id: '/plan',
-  path: '/plan',
-  getParentRoute: () => AppInspectionsRoute,
+  id: '/inspections/plan',
+  path: '/inspections/plan',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppInspectionsInspectionIdRoute =
   AppInspectionsInspectionIdRouteImport.update({
-    id: '/$inspectionId',
-    path: '/$inspectionId',
-    getParentRoute: () => AppInspectionsRoute,
+    id: '/inspections/$inspectionId',
+    path: '/inspections/$inspectionId',
+    getParentRoute: () => AppRoute,
   } as any)
 const AppEquipmentTrashRoute = AppEquipmentTrashRouteImport.update({
   id: '/trash',
@@ -446,7 +446,6 @@ export interface FileRoutesByFullPath {
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRouteWithChildren
-  '/app/inspections': typeof AppInspectionsRouteWithChildren
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/pqrs': typeof AppPqrsRouteWithChildren
@@ -493,6 +492,7 @@ export interface FileRoutesByFullPath {
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/equipment/': typeof AppEquipmentIndexRoute
+  '/app/inspections/': typeof AppInspectionsIndexRoute
   '/app/instruments/': typeof AppInstrumentsIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
@@ -515,7 +515,6 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
-  '/app/inspections': typeof AppInspectionsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
@@ -556,6 +555,7 @@ export interface FileRoutesByTo {
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin': typeof AppAdminIndexRoute
   '/app/equipment': typeof AppEquipmentIndexRoute
+  '/app/inspections': typeof AppInspectionsIndexRoute
   '/app/instruments': typeof AppInstrumentsIndexRoute
   '/app/pqrs': typeof AppPqrsIndexRoute
   '/app/procedures': typeof AppProceduresIndexRoute
@@ -581,7 +581,6 @@ export interface FileRoutesById {
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRouteWithChildren
-  '/app/inspections': typeof AppInspectionsRouteWithChildren
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/pqrs': typeof AppPqrsRouteWithChildren
@@ -628,6 +627,7 @@ export interface FileRoutesById {
   '/verify/wps/$token': typeof VerifyWpsTokenRoute
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/equipment/': typeof AppEquipmentIndexRoute
+  '/app/inspections/': typeof AppInspectionsIndexRoute
   '/app/instruments/': typeof AppInstrumentsIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
@@ -654,7 +654,6 @@ export interface FileRouteTypes {
     | '/app/audit'
     | '/app/billing'
     | '/app/equipment'
-    | '/app/inspections'
     | '/app/instruments'
     | '/app/ncrs'
     | '/app/pqrs'
@@ -701,6 +700,7 @@ export interface FileRouteTypes {
     | '/verify/wps/$token'
     | '/app/admin/'
     | '/app/equipment/'
+    | '/app/inspections/'
     | '/app/instruments/'
     | '/app/pqrs/'
     | '/app/procedures/'
@@ -723,7 +723,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/app/audit'
     | '/app/billing'
-    | '/app/inspections'
     | '/app/ncrs'
     | '/app/reports'
     | '/app/settings'
@@ -764,6 +763,7 @@ export interface FileRouteTypes {
     | '/verify/wps/$token'
     | '/app/admin'
     | '/app/equipment'
+    | '/app/inspections'
     | '/app/instruments'
     | '/app/pqrs'
     | '/app/procedures'
@@ -788,7 +788,6 @@ export interface FileRouteTypes {
     | '/app/audit'
     | '/app/billing'
     | '/app/equipment'
-    | '/app/inspections'
     | '/app/instruments'
     | '/app/ncrs'
     | '/app/pqrs'
@@ -835,6 +834,7 @@ export interface FileRouteTypes {
     | '/verify/wps/$token'
     | '/app/admin/'
     | '/app/equipment/'
+    | '/app/inspections/'
     | '/app/instruments/'
     | '/app/pqrs/'
     | '/app/procedures/'
@@ -1026,13 +1026,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInstrumentsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/inspections': {
-      id: '/app/inspections'
-      path: '/inspections'
-      fullPath: '/app/inspections'
-      preLoaderRoute: typeof AppInspectionsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/equipment': {
       id: '/app/equipment'
       path: '/equipment'
@@ -1102,6 +1095,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/instruments/'
       preLoaderRoute: typeof AppInstrumentsIndexRouteImport
       parentRoute: typeof AppInstrumentsRoute
+    }
+    '/app/inspections/': {
+      id: '/app/inspections/'
+      path: '/inspections'
+      fullPath: '/app/inspections/'
+      preLoaderRoute: typeof AppInspectionsIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/equipment/': {
       id: '/app/equipment/'
@@ -1301,24 +1301,24 @@ declare module '@tanstack/react-router' {
     }
     '/app/inspections/trash': {
       id: '/app/inspections/trash'
-      path: '/trash'
+      path: '/inspections/trash'
       fullPath: '/app/inspections/trash'
       preLoaderRoute: typeof AppInspectionsTrashRouteImport
-      parentRoute: typeof AppInspectionsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/inspections/plan': {
       id: '/app/inspections/plan'
-      path: '/plan'
+      path: '/inspections/plan'
       fullPath: '/app/inspections/plan'
       preLoaderRoute: typeof AppInspectionsPlanRouteImport
-      parentRoute: typeof AppInspectionsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/inspections/$inspectionId': {
       id: '/app/inspections/$inspectionId'
-      path: '/$inspectionId'
+      path: '/inspections/$inspectionId'
       fullPath: '/app/inspections/$inspectionId'
       preLoaderRoute: typeof AppInspectionsInspectionIdRouteImport
-      parentRoute: typeof AppInspectionsRoute
+      parentRoute: typeof AppRoute
     }
     '/app/equipment/trash': {
       id: '/app/equipment/trash'
@@ -1365,22 +1365,6 @@ const AppEquipmentRouteChildren: AppEquipmentRouteChildren = {
 
 const AppEquipmentRouteWithChildren = AppEquipmentRoute._addFileChildren(
   AppEquipmentRouteChildren,
-)
-
-interface AppInspectionsRouteChildren {
-  AppInspectionsInspectionIdRoute: typeof AppInspectionsInspectionIdRoute
-  AppInspectionsPlanRoute: typeof AppInspectionsPlanRoute
-  AppInspectionsTrashRoute: typeof AppInspectionsTrashRoute
-}
-
-const AppInspectionsRouteChildren: AppInspectionsRouteChildren = {
-  AppInspectionsInspectionIdRoute: AppInspectionsInspectionIdRoute,
-  AppInspectionsPlanRoute: AppInspectionsPlanRoute,
-  AppInspectionsTrashRoute: AppInspectionsTrashRoute,
-}
-
-const AppInspectionsRouteWithChildren = AppInspectionsRoute._addFileChildren(
-  AppInspectionsRouteChildren,
 )
 
 interface AppInstrumentsRouteChildren {
@@ -1513,7 +1497,6 @@ interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppBillingRoute: typeof AppBillingRoute
   AppEquipmentRoute: typeof AppEquipmentRouteWithChildren
-  AppInspectionsRoute: typeof AppInspectionsRouteWithChildren
   AppInstrumentsRoute: typeof AppInstrumentsRouteWithChildren
   AppNcrsRoute: typeof AppNcrsRouteWithChildren
   AppPqrsRoute: typeof AppPqrsRouteWithChildren
@@ -1527,10 +1510,14 @@ interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppAdminCompaniesRoute: typeof AppAdminCompaniesRoute
   AppAdminUsersRoute: typeof AppAdminUsersRoute
+  AppInspectionsInspectionIdRoute: typeof AppInspectionsInspectionIdRoute
+  AppInspectionsPlanRoute: typeof AppInspectionsPlanRoute
+  AppInspectionsTrashRoute: typeof AppInspectionsTrashRoute
   AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
   AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
   AppWeldsTrashRoute: typeof AppWeldsTrashRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
+  AppInspectionsIndexRoute: typeof AppInspectionsIndexRoute
   AppWeldsIndexRoute: typeof AppWeldsIndexRoute
 }
 
@@ -1538,7 +1525,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppBillingRoute: AppBillingRoute,
   AppEquipmentRoute: AppEquipmentRouteWithChildren,
-  AppInspectionsRoute: AppInspectionsRouteWithChildren,
   AppInstrumentsRoute: AppInstrumentsRouteWithChildren,
   AppNcrsRoute: AppNcrsRouteWithChildren,
   AppPqrsRoute: AppPqrsRouteWithChildren,
@@ -1552,10 +1538,14 @@ const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppAdminCompaniesRoute: AppAdminCompaniesRoute,
   AppAdminUsersRoute: AppAdminUsersRoute,
+  AppInspectionsInspectionIdRoute: AppInspectionsInspectionIdRoute,
+  AppInspectionsPlanRoute: AppInspectionsPlanRoute,
+  AppInspectionsTrashRoute: AppInspectionsTrashRoute,
   AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
   AppWeldsDashboardRoute: AppWeldsDashboardRoute,
   AppWeldsTrashRoute: AppWeldsTrashRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
+  AppInspectionsIndexRoute: AppInspectionsIndexRoute,
   AppWeldsIndexRoute: AppWeldsIndexRoute,
 }
 
