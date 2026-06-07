@@ -39,6 +39,7 @@ import { Route as AppAuditRouteImport } from './routes/app.audit'
 import { Route as AppWeldsIndexRouteImport } from './routes/app.welds.index'
 import { Route as AppQualificationsIndexRouteImport } from './routes/app.qualifications.index'
 import { Route as AppPwpsIndexRouteImport } from './routes/app.pwps.index'
+import { Route as AppProjectsIndexRouteImport } from './routes/app.projects.index'
 import { Route as AppProceduresIndexRouteImport } from './routes/app.procedures.index'
 import { Route as AppPqrsIndexRouteImport } from './routes/app.pqrs.index'
 import { Route as AppInstrumentsIndexRouteImport } from './routes/app.instruments.index'
@@ -59,6 +60,9 @@ import { Route as AppQualificationsQualIdRouteImport } from './routes/app.qualif
 import { Route as AppPwpsTrashRouteImport } from './routes/app.pwps.trash'
 import { Route as AppPwpsDashboardRouteImport } from './routes/app.pwps.dashboard'
 import { Route as AppPwpsPwpsIdRouteImport } from './routes/app.pwps.$pwpsId'
+import { Route as AppProjectsTrashRouteImport } from './routes/app.projects.trash'
+import { Route as AppProjectsDashboardRouteImport } from './routes/app.projects.dashboard'
+import { Route as AppProjectsProjectIdRouteImport } from './routes/app.projects.$projectId'
 import { Route as AppProceduresDashboardRouteImport } from './routes/app.procedures.dashboard'
 import { Route as AppProceduresProcedureIdRouteImport } from './routes/app.procedures.$procedureId'
 import { Route as AppPqrsTrashRouteImport } from './routes/app.pqrs.trash'
@@ -222,6 +226,11 @@ const AppPwpsIndexRoute = AppPwpsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppPwpsRoute,
 } as any)
+const AppProjectsIndexRoute = AppProjectsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppProjectsRoute,
+} as any)
 const AppProceduresIndexRoute = AppProceduresIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -324,6 +333,21 @@ const AppPwpsPwpsIdRoute = AppPwpsPwpsIdRouteImport.update({
   path: '/$pwpsId',
   getParentRoute: () => AppPwpsRoute,
 } as any)
+const AppProjectsTrashRoute = AppProjectsTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AppProjectsRoute,
+} as any)
+const AppProjectsDashboardRoute = AppProjectsDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppProjectsRoute,
+} as any)
+const AppProjectsProjectIdRoute = AppProjectsProjectIdRouteImport.update({
+  id: '/$projectId',
+  path: '/$projectId',
+  getParentRoute: () => AppProjectsRoute,
+} as any)
 const AppProceduresDashboardRoute = AppProceduresDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -408,7 +432,7 @@ export interface FileRoutesByFullPath {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/pqrs': typeof AppPqrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
-  '/app/projects': typeof AppProjectsRoute
+  '/app/projects': typeof AppProjectsRouteWithChildren
   '/app/pwps': typeof AppPwpsRouteWithChildren
   '/app/qualifications': typeof AppQualificationsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
@@ -427,6 +451,9 @@ export interface FileRoutesByFullPath {
   '/app/pqrs/trash': typeof AppPqrsTrashRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
+  '/app/projects/$projectId': typeof AppProjectsProjectIdRoute
+  '/app/projects/dashboard': typeof AppProjectsDashboardRoute
+  '/app/projects/trash': typeof AppProjectsTrashRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
   '/app/pwps/dashboard': typeof AppPwpsDashboardRoute
   '/app/pwps/trash': typeof AppPwpsTrashRoute
@@ -447,6 +474,7 @@ export interface FileRoutesByFullPath {
   '/app/instruments/': typeof AppInstrumentsIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
+  '/app/projects/': typeof AppProjectsIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
   '/app/welds/': typeof AppWeldsIndexRoute
@@ -467,7 +495,6 @@ export interface FileRoutesByTo {
   '/app/billing': typeof AppBillingRoute
   '/app/inspections': typeof AppInspectionsRoute
   '/app/ncrs': typeof AppNcrsRouteWithChildren
-  '/app/projects': typeof AppProjectsRoute
   '/app/reports': typeof AppReportsRouteWithChildren
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
@@ -484,6 +511,9 @@ export interface FileRoutesByTo {
   '/app/pqrs/trash': typeof AppPqrsTrashRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
+  '/app/projects/$projectId': typeof AppProjectsProjectIdRoute
+  '/app/projects/dashboard': typeof AppProjectsDashboardRoute
+  '/app/projects/trash': typeof AppProjectsTrashRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
   '/app/pwps/dashboard': typeof AppPwpsDashboardRoute
   '/app/pwps/trash': typeof AppPwpsTrashRoute
@@ -504,6 +534,7 @@ export interface FileRoutesByTo {
   '/app/instruments': typeof AppInstrumentsIndexRoute
   '/app/pqrs': typeof AppPqrsIndexRoute
   '/app/procedures': typeof AppProceduresIndexRoute
+  '/app/projects': typeof AppProjectsIndexRoute
   '/app/pwps': typeof AppPwpsIndexRoute
   '/app/qualifications': typeof AppQualificationsIndexRoute
   '/app/welds': typeof AppWeldsIndexRoute
@@ -530,7 +561,7 @@ export interface FileRoutesById {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/pqrs': typeof AppPqrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
-  '/app/projects': typeof AppProjectsRoute
+  '/app/projects': typeof AppProjectsRouteWithChildren
   '/app/pwps': typeof AppPwpsRouteWithChildren
   '/app/qualifications': typeof AppQualificationsRouteWithChildren
   '/app/reports': typeof AppReportsRouteWithChildren
@@ -549,6 +580,9 @@ export interface FileRoutesById {
   '/app/pqrs/trash': typeof AppPqrsTrashRoute
   '/app/procedures/$procedureId': typeof AppProceduresProcedureIdRoute
   '/app/procedures/dashboard': typeof AppProceduresDashboardRoute
+  '/app/projects/$projectId': typeof AppProjectsProjectIdRoute
+  '/app/projects/dashboard': typeof AppProjectsDashboardRoute
+  '/app/projects/trash': typeof AppProjectsTrashRoute
   '/app/pwps/$pwpsId': typeof AppPwpsPwpsIdRoute
   '/app/pwps/dashboard': typeof AppPwpsDashboardRoute
   '/app/pwps/trash': typeof AppPwpsTrashRoute
@@ -569,6 +603,7 @@ export interface FileRoutesById {
   '/app/instruments/': typeof AppInstrumentsIndexRoute
   '/app/pqrs/': typeof AppPqrsIndexRoute
   '/app/procedures/': typeof AppProceduresIndexRoute
+  '/app/projects/': typeof AppProjectsIndexRoute
   '/app/pwps/': typeof AppPwpsIndexRoute
   '/app/qualifications/': typeof AppQualificationsIndexRoute
   '/app/welds/': typeof AppWeldsIndexRoute
@@ -615,6 +650,9 @@ export interface FileRouteTypes {
     | '/app/pqrs/trash'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
+    | '/app/projects/$projectId'
+    | '/app/projects/dashboard'
+    | '/app/projects/trash'
     | '/app/pwps/$pwpsId'
     | '/app/pwps/dashboard'
     | '/app/pwps/trash'
@@ -635,6 +673,7 @@ export interface FileRouteTypes {
     | '/app/instruments/'
     | '/app/pqrs/'
     | '/app/procedures/'
+    | '/app/projects/'
     | '/app/pwps/'
     | '/app/qualifications/'
     | '/app/welds/'
@@ -655,7 +694,6 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/inspections'
     | '/app/ncrs'
-    | '/app/projects'
     | '/app/reports'
     | '/app/settings'
     | '/app/team'
@@ -672,6 +710,9 @@ export interface FileRouteTypes {
     | '/app/pqrs/trash'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
+    | '/app/projects/$projectId'
+    | '/app/projects/dashboard'
+    | '/app/projects/trash'
     | '/app/pwps/$pwpsId'
     | '/app/pwps/dashboard'
     | '/app/pwps/trash'
@@ -692,6 +733,7 @@ export interface FileRouteTypes {
     | '/app/instruments'
     | '/app/pqrs'
     | '/app/procedures'
+    | '/app/projects'
     | '/app/pwps'
     | '/app/qualifications'
     | '/app/welds'
@@ -736,6 +778,9 @@ export interface FileRouteTypes {
     | '/app/pqrs/trash'
     | '/app/procedures/$procedureId'
     | '/app/procedures/dashboard'
+    | '/app/projects/$projectId'
+    | '/app/projects/dashboard'
+    | '/app/projects/trash'
     | '/app/pwps/$pwpsId'
     | '/app/pwps/dashboard'
     | '/app/pwps/trash'
@@ -756,6 +801,7 @@ export interface FileRouteTypes {
     | '/app/instruments/'
     | '/app/pqrs/'
     | '/app/procedures/'
+    | '/app/projects/'
     | '/app/pwps/'
     | '/app/qualifications/'
     | '/app/welds/'
@@ -992,6 +1038,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPwpsIndexRouteImport
       parentRoute: typeof AppPwpsRoute
     }
+    '/app/projects/': {
+      id: '/app/projects/'
+      path: '/'
+      fullPath: '/app/projects/'
+      preLoaderRoute: typeof AppProjectsIndexRouteImport
+      parentRoute: typeof AppProjectsRoute
+    }
     '/app/procedures/': {
       id: '/app/procedures/'
       path: '/'
@@ -1131,6 +1184,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/pwps/$pwpsId'
       preLoaderRoute: typeof AppPwpsPwpsIdRouteImport
       parentRoute: typeof AppPwpsRoute
+    }
+    '/app/projects/trash': {
+      id: '/app/projects/trash'
+      path: '/trash'
+      fullPath: '/app/projects/trash'
+      preLoaderRoute: typeof AppProjectsTrashRouteImport
+      parentRoute: typeof AppProjectsRoute
+    }
+    '/app/projects/dashboard': {
+      id: '/app/projects/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/projects/dashboard'
+      preLoaderRoute: typeof AppProjectsDashboardRouteImport
+      parentRoute: typeof AppProjectsRoute
+    }
+    '/app/projects/$projectId': {
+      id: '/app/projects/$projectId'
+      path: '/$projectId'
+      fullPath: '/app/projects/$projectId'
+      preLoaderRoute: typeof AppProjectsProjectIdRouteImport
+      parentRoute: typeof AppProjectsRoute
     }
     '/app/procedures/dashboard': {
       id: '/app/procedures/dashboard'
@@ -1295,6 +1369,24 @@ const AppProceduresRouteWithChildren = AppProceduresRoute._addFileChildren(
   AppProceduresRouteChildren,
 )
 
+interface AppProjectsRouteChildren {
+  AppProjectsProjectIdRoute: typeof AppProjectsProjectIdRoute
+  AppProjectsDashboardRoute: typeof AppProjectsDashboardRoute
+  AppProjectsTrashRoute: typeof AppProjectsTrashRoute
+  AppProjectsIndexRoute: typeof AppProjectsIndexRoute
+}
+
+const AppProjectsRouteChildren: AppProjectsRouteChildren = {
+  AppProjectsProjectIdRoute: AppProjectsProjectIdRoute,
+  AppProjectsDashboardRoute: AppProjectsDashboardRoute,
+  AppProjectsTrashRoute: AppProjectsTrashRoute,
+  AppProjectsIndexRoute: AppProjectsIndexRoute,
+}
+
+const AppProjectsRouteWithChildren = AppProjectsRoute._addFileChildren(
+  AppProjectsRouteChildren,
+)
+
 interface AppPwpsRouteChildren {
   AppPwpsPwpsIdRoute: typeof AppPwpsPwpsIdRoute
   AppPwpsDashboardRoute: typeof AppPwpsDashboardRoute
@@ -1352,7 +1444,7 @@ interface AppRouteChildren {
   AppNcrsRoute: typeof AppNcrsRouteWithChildren
   AppPqrsRoute: typeof AppPqrsRouteWithChildren
   AppProceduresRoute: typeof AppProceduresRouteWithChildren
-  AppProjectsRoute: typeof AppProjectsRoute
+  AppProjectsRoute: typeof AppProjectsRouteWithChildren
   AppPwpsRoute: typeof AppPwpsRouteWithChildren
   AppQualificationsRoute: typeof AppQualificationsRouteWithChildren
   AppReportsRoute: typeof AppReportsRouteWithChildren
@@ -1377,7 +1469,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppNcrsRoute: AppNcrsRouteWithChildren,
   AppPqrsRoute: AppPqrsRouteWithChildren,
   AppProceduresRoute: AppProceduresRouteWithChildren,
-  AppProjectsRoute: AppProjectsRoute,
+  AppProjectsRoute: AppProjectsRouteWithChildren,
   AppPwpsRoute: AppPwpsRouteWithChildren,
   AppQualificationsRoute: AppQualificationsRouteWithChildren,
   AppReportsRoute: AppReportsRouteWithChildren,
