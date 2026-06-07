@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, ClipboardCheck, Clock, ShieldAlert, CheckCircle2, Download } from "lucide-react";
+import { Loader2, Plus, ClipboardCheck, Clock, ShieldAlert, CheckCircle2, Download, Eye, Trash2 } from "lucide-react";
 import { INSPECTION_WORKFLOW_STAGES, inspectionStatusTone } from "@/lib/inspection-workflow";
 import { exportExcel } from "@/lib/export";
 import { toast } from "sonner";
@@ -24,7 +24,8 @@ export const Route = createFileRoute("/app/inspections")({
 });
 
 function InspectionsPage() {
-  const { profile } = useAuth();
+  const { profile, roles } = useAuth();
+  const isAdmin = roles.includes("super_admin");
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -62,7 +63,16 @@ function InspectionsPage() {
     <ModulePage
       title="Inspections & NCR Workflow"
       subtitle="Plan, execute, accept or reject inspections — and govern the corrective-action lifecycle from request to closure."
-      action={<NewInspectionDialog onDone={() => qc.invalidateQueries({ queryKey: ["inspections"] })} />}
+      action={
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Link to="/app/inspections/trash">
+              <Button size="sm" variant="outline"><Trash2 className="size-4 me-1" /> Trash</Button>
+            </Link>
+          )}
+          <NewInspectionDialog onDone={() => qc.invalidateQueries({ queryKey: ["inspections"] })} />
+        </div>
+      }
     >
       <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-3 border-b border-border">
         <Stat icon={ClipboardCheck} label="Open" value={counts.open} tone="info" />
@@ -99,11 +109,11 @@ function InspectionsPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40 sticky top-0">
-            <tr><Th>Inspection</Th><Th>Type</Th><Th>Discipline</Th><Th>Line / Joint</Th><Th>Welder</Th><Th>Assignee</Th><Th>Status</Th><Th>Scheduled</Th></tr>
+            <tr><Th>Inspection</Th><Th>Type</Th><Th>Discipline</Th><Th>Line / Joint</Th><Th>Welder</Th><Th>Assignee</Th><Th>Status</Th><Th>Scheduled</Th><th className="text-end font-medium pe-5 py-2.5">Actions</th></tr>
           </thead>
           <tbody>
-            {isLoading && <tr><td colSpan={8} className="px-5 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /></td></tr>}
-            {!isLoading && rows.length === 0 && <tr><td colSpan={8} className="px-5 py-10 text-center text-muted-foreground">No inspections.</td></tr>}
+            {isLoading && <tr><td colSpan={9} className="px-5 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /></td></tr>}
+            {!isLoading && rows.length === 0 && <tr><td colSpan={9} className="px-5 py-10 text-center text-muted-foreground">No inspections.</td></tr>}
             {rows.map((r: any) => (
               <tr key={r.id} className="border-t border-border/60 hover:bg-muted/20">
                 <td className="px-5 py-3 font-medium">
@@ -119,6 +129,29 @@ function InspectionsPage() {
                 <td className="px-5 py-3 text-xs">{r.assigned_to_name ?? "—"}</td>
                 <td className="px-5 py-3"><WorkflowChip status={r.workflow_status} /></td>
                 <td className="px-5 py-3 text-xs text-muted-foreground">{r.scheduled_for ?? "—"}</td>
+                <td className="pe-5 py-3">
+                  <div className="flex justify-end gap-1">
+                    <Link to="/app/inspections/$inspectionId" params={{ inspectionId: r.id }}>
+                      <Button size="icon" variant="ghost" className="size-8" title="View details"><Eye className="size-4" /></Button>
+                    </Link>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-8 text-destructive hover:text-destructive"
+                      title="Move to trash"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (!confirm(`Move inspection ${r.inspection_no ?? r.id.slice(0, 8)} to trash?`)) return;
+                        const { error } = await (supabase.rpc as any)("soft_delete_inspection", { _id: r.id });
+                        if (error) return toast.error(error.message);
+                        toast.success("Moved to trash.");
+                        qc.invalidateQueries({ queryKey: ["inspections"] });
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
