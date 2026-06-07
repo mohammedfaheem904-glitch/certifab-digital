@@ -1442,9 +1442,49 @@ export type Database = {
           },
         ]
       }
+      project_events: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          company_id: string
+          created_at: string
+          id: string
+          kind: string
+          payload: Json | null
+          project_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          payload?: Json | null
+          project_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          payload?: Json | null
+          project_id?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           client: string | null
+          closed_at: string | null
+          closed_by: string | null
           code: string
           company_id: string
           created_at: string
@@ -1452,15 +1492,31 @@ export type Database = {
           deleted_by: string | null
           description: string | null
           end_date: string | null
+          held_at: string | null
+          hold_reason: string | null
           id: string
           location: string | null
           name: string
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          resumed_at: string | null
           start_date: string | null
+          started_at: string | null
           status: Database["public"]["Enums"]["project_status"]
+          submitted_at: string | null
           updated_at: string
+          workflow_status: Database["public"]["Enums"]["project_workflow_status"]
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           client?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
           code: string
           company_id: string
           created_at?: string
@@ -1468,15 +1524,31 @@ export type Database = {
           deleted_by?: string | null
           description?: string | null
           end_date?: string | null
+          held_at?: string | null
+          hold_reason?: string | null
           id?: string
           location?: string | null
           name: string
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          resumed_at?: string | null
           start_date?: string | null
+          started_at?: string | null
           status?: Database["public"]["Enums"]["project_status"]
+          submitted_at?: string | null
           updated_at?: string
+          workflow_status?: Database["public"]["Enums"]["project_workflow_status"]
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           client?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
           code?: string
           company_id?: string
           created_at?: string
@@ -1484,12 +1556,21 @@ export type Database = {
           deleted_by?: string | null
           description?: string | null
           end_date?: string | null
+          held_at?: string | null
+          hold_reason?: string | null
           id?: string
           location?: string | null
           name?: string
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          resumed_at?: string | null
           start_date?: string | null
+          started_at?: string | null
           status?: Database["public"]["Enums"]["project_status"]
+          submitted_at?: string | null
           updated_at?: string
+          workflow_status?: Database["public"]["Enums"]["project_workflow_status"]
         }
         Relationships: [
           {
@@ -3196,6 +3277,15 @@ export type Database = {
       soft_delete_pwps: { Args: { _id: string }; Returns: undefined }
       soft_delete_qualification: { Args: { _id: string }; Returns: undefined }
       soft_delete_weld: { Args: { _id: string }; Returns: undefined }
+      transition_project: {
+        Args: {
+          _comment?: string
+          _id: string
+          _reason?: string
+          _to: Database["public"]["Enums"]["project_workflow_status"]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
@@ -3254,6 +3344,15 @@ export type Database = {
         | "Active"
         | "On Hold"
         | "Completed"
+        | "Cancelled"
+      project_workflow_status:
+        | "Draft"
+        | "Planning"
+        | "Approved"
+        | "In Progress"
+        | "On Hold"
+        | "Closed"
+        | "Rejected"
         | "Cancelled"
       pwps_status:
         | "Draft"
@@ -3465,6 +3564,16 @@ export const Constants = {
         "Active",
         "On Hold",
         "Completed",
+        "Cancelled",
+      ],
+      project_workflow_status: [
+        "Draft",
+        "Planning",
+        "Approved",
+        "In Progress",
+        "On Hold",
+        "Closed",
+        "Rejected",
         "Cancelled",
       ],
       pwps_status: [
