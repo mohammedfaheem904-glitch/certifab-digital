@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 import { useTenantBranding } from "@/lib/tenant-branding";
 import { toast } from "sonner";
@@ -54,18 +55,17 @@ function Login() {
 
   const handleGoogle = async () => {
     setBusy(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin + dest,
-        queryParams: { access_type: "offline", prompt: "select_account" },
-      },
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin + dest,
+      extraParams: { prompt: "select_account" },
     });
-    if (error) {
-      toast.error(error.message ?? "Google sign-in failed");
+    if (result.error) {
+      toast.error(result.error.message ?? "Google sign-in failed");
       setBusy(false);
+      return;
     }
-    // On success, the browser is redirected to Google; nothing else to do here.
+    if (result.redirected) return;
+    window.location.assign(dest);
   };
 
   return (
