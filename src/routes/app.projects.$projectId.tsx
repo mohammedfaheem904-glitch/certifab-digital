@@ -85,14 +85,14 @@ function ProjectDetailsPage() {
     nav({ to: "/app/projects" });
   };
 
-  if (project === undefined) {
+  if (isLoading || project === undefined) {
     return (
       <ModulePage title="Project" subtitle="Loading…">
         <div className="py-16 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline me-2" /> Loading…</div>
       </ModulePage>
     );
   }
-  if (project === null) {
+  if (!project) {
     return (
       <ModulePage title="Project not found" subtitle="">
         <div className="py-16 text-center text-muted-foreground">This project does not exist or has been removed.</div>
