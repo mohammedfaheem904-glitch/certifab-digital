@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, ClipboardCheck, Clock, ShieldAlert, CheckCircle2, Download } from "lucide-react";
+import { Loader2, Plus, ClipboardCheck, Clock, ShieldAlert, CheckCircle2, Download, Eye, Trash2 } from "lucide-react";
 import { INSPECTION_WORKFLOW_STAGES, inspectionStatusTone } from "@/lib/inspection-workflow";
 import { exportExcel } from "@/lib/export";
 import { toast } from "sonner";
