@@ -109,15 +109,6 @@ function InspectionsPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40 sticky top-0">
-            <tr><Th>Inspection</Th><Th>Type</Th><Th>Discipline</Th><Th>Line / Joint</Th><Th>Welder</Th><Th>Assignee</Th><Th>Status</Th><Th>Scheduled</Th></tr>
-          </thead>
-          <tbody>
-            {isLoading && <tr><td colSpan={8} className="px-5 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /></td></tr>}
-            {!isLoading && rows.length === 0 && <tr><td colSpan={8} className="px-5 py-10 text-center text-muted-foreground">No inspections.</td></tr>}
-            {rows.map((r: any) => (
-              <tr key={r.id} className="border-t border-border/60 hover:bg-muted/20">
-                <td className="px-5 py-3 font-medium">
-                  <Link to="/app/inspections/$inspectionId" params={{ inspectionId: r.id }} className="hover:text-primary">
             <tr><Th>Inspection</Th><Th>Type</Th><Th>Discipline</Th><Th>Line / Joint</Th><Th>Welder</Th><Th>Assignee</Th><Th>Status</Th><Th>Scheduled</Th><th className="text-end font-medium pe-5 py-2.5">Actions</th></tr>
           </thead>
           <tbody>
