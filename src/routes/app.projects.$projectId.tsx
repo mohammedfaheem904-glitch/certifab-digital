@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ModulePage } from "@/components/ModulePage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -47,53 +47,32 @@ function ProjectDetailsPage() {
   const { profile } = useAuth();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [project, setProject] = useState<Project | null | undefined>(undefined);
-  const [counts, setCounts] = useState<Counts>({ welds: 0, inspections: 0, ncrs: 0, instruments: 0 });
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (!profile?.company_id) return;
-    let cancel = false;
-    (async () => {
+  const { data: project, isLoading } = useQuery<Project | null>({
+    queryKey: ["project", projectId],
+    enabled: !!profile?.company_id,
+    queryFn: async () => {
       const { data, error } = await (supabase.from("projects" as any) as any)
-        .select("*")
-        .eq("id", projectId)
-        .maybeSingle();
-      if (cancel) return;
-      if (error) { toast.error(error.message); setProject(null); return; }
-      setProject((data ?? null) as Project | null);
+        .select("*").eq("id", projectId).maybeSingle();
+      if (error) throw error;
+      return (data ?? null) as Project | null;
+    },
+  });
 
+  const { data: counts } = useQuery<Counts>({
+    queryKey: ["project_counts", projectId],
+    enabled: !!profile?.company_id,
+    queryFn: async () => {
       const [w, i, n, ins] = await Promise.all([
         (supabase.from("welds" as any) as any).select("id", { count: "exact", head: true }).eq("project_id", projectId),
         (supabase.from("inspections" as any) as any).select("id", { count: "exact", head: true }).eq("project_id", projectId),
         (supabase.from("ncrs" as any) as any).select("id", { count: "exact", head: true }).eq("project_id", projectId),
         (supabase.from("instruments" as any) as any).select("id", { count: "exact", head: true }).eq("assigned_project_id", projectId),
       ]);
-      if (cancel) return;
-      setCounts({
-        welds: w.count ?? 0,
-        inspections: i.count ?? 0,
-        ncrs: n.count ?? 0,
-        instruments: ins.count ?? 0,
-      });
-    })();
-    return () => { cancel = true; };
-  }, [projectId, profile?.company_id, qc.getQueryData(["project", projectId])]);
-
-  // Subscribe to invalidations triggered by ActionBar
-  useEffect(() => {
-    const unsub = qc.getQueryCache().subscribe((event) => {
-      if (event?.query?.queryKey?.[0] === "project" && event.query.queryKey[1] === projectId) {
-        // refetch
-        (async () => {
-          const { data } = await (supabase.from("projects" as any) as any)
-            .select("*").eq("id", projectId).maybeSingle();
-          setProject((data ?? null) as Project | null);
-        })();
-      }
-    });
-    return () => unsub();
-  }, [qc, projectId]);
+      return { welds: w.count ?? 0, inspections: i.count ?? 0, ncrs: n.count ?? 0, instruments: ins.count ?? 0 };
+    },
+  });
 
   const moveToTrash = async () => {
     if (!confirm("Move this project to trash?")) return;
