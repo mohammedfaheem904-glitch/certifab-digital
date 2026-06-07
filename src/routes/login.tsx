@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 import { useTenantBranding } from "@/lib/tenant-branding";
 import { toast } from "sonner";
