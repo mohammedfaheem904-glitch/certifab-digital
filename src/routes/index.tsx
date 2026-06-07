@@ -105,7 +105,7 @@ function Landing() {
             { icon: FileText, title: "WPS & PQR control", body: "Author, revise and lock procedures. Heat-input engine validates every weld against the qualified range." },
             { icon: ClipboardCheck, title: "Welder qualifications", body: "Track WPQ/PQR, expiry, scope of approval and continuity. Email reminders before lapses." },
             { icon: QrCode, title: "Weld traceability", body: "Every joint has a QR token linking welder, WPS, heat numbers, NDT results and NCRs." },
-            { icon: ShieldCheck, title: "Inspection & NCR workflow", body: "VT, RT, UT, PT, MT outcomes feed a status-driven NCR pipeline with root cause and CA/PA." },
+            { icon: ShieldCheck, title: "Inspections & NCRs workflow", body: "VT, RT, UT, PT, MT outcomes feed a status-driven NCR pipeline with root cause and CA/PA." },
             { icon: Gauge, title: "Calibration register", body: "Welding machines and QA/QC instruments with certificate uploads and overdue alerts." },
             { icon: BarChart3, title: "Realtime KPIs", body: "Acceptance rate, repair rate, welder performance and project burn-down — live." },
           ].map((f) => (
