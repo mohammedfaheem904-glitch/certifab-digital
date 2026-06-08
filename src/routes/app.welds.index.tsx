@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { ModulePage } from "@/components/ModulePage";
 import { StatusBadge } from "@/components/StatusBadge";
 import { NewRecordDialog } from "@/components/NewRecordDialog";
@@ -58,6 +59,7 @@ export const Route = createFileRoute("/app/welds/")({
 });
 
 function WeldsPage() {
+  const confirmDialog = useConfirm();
   const nav = useNavigate();
   const qc = useQueryClient();
   const { roles, profile } = useAuth();
@@ -147,7 +149,7 @@ function WeldsPage() {
   const toExport = selected.size > 0 ? filtered.filter((r) => selected.has(r.id)) : filtered;
 
   const moveToTrash = async (ids: string[]) => {
-    if (!confirm(`Move ${ids.length} weld${ids.length > 1 ? "s" : ""} to trash?`)) return;
+    if (!(await confirmDialog(`Move ${ids.length} weld${ids.length > 1 ? "s" : ""} to trash?`))) return;
     setBusy(true);
     const results = await Promise.all(
       ids.map((id) => (supabase.rpc as any)("soft_delete_weld", { _id: id })),

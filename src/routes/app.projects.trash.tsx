@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ModulePage } from "@/components/ModulePage";
@@ -23,6 +24,7 @@ type Row = {
 };
 
 function TrashPage() {
+  const confirmDialog = useConfirm();
   const { roles, profile } = useAuth();
   const isAdmin = roles.includes("super_admin");
   const qc = useQueryClient();
@@ -62,7 +64,7 @@ function TrashPage() {
   };
 
   const hardDelete = async (id: string) => {
-    if (!confirm("Permanently delete this project? This cannot be undone.")) return;
+    if (!(await confirmDialog("Permanently delete this project? This cannot be undone."))) return;
     setBusy(id);
     const { error } = await (supabase.from("projects" as any) as any).delete().eq("id", id);
     setBusy(null);

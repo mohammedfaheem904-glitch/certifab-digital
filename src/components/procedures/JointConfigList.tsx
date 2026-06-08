@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ const positionOptions = [
 ];
 
 export function JointConfigList({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
+  const confirmDialog = useConfirm();
   const qc = useQueryClient();
   const { profile } = useAuth();
   const queryKey = ["wps_joint_configurations", procedureId] as const;
@@ -85,6 +87,7 @@ export function JointConfigList({ procedureId, canEdit }: { procedureId: string;
 }
 
 function JointCard({ joint, canEdit, onChange }: { joint: any; canEdit: boolean; onChange: () => void }) {
+  const confirmDialog = useConfirm();
   const { profile } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -125,7 +128,7 @@ function JointCard({ joint, canEdit, onChange }: { joint: any; canEdit: boolean;
   };
 
   const removeJoint = async () => {
-    if (!confirm("Delete this joint configuration?")) return;
+    if (!(await confirmDialog("Delete this joint configuration?"))) return;
     if (joint.sketch_path) await supabase.storage.from("wps-sketches").remove([joint.sketch_path]);
     const { error } = await supabase.from("wps_joint_configurations").delete().eq("id", joint.id);
     if (error) return toast.error(error.message);

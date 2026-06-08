@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import { useIdleTimeout } from "@/lib/use-idle-timeout";
 import { useAuth } from "@/lib/auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,13 +23,22 @@ const OUT_MS = 60 * 60 * 1000; // 60 min idle → auto sign-out
  */
 export function IdleTimeoutGuard() {
   const { session, signOut } = useAuth();
+  const qc = useQueryClient();
+  const nav = useNavigate();
   const [warnOpen, setWarnOpen] = useState(false);
+
+  const fullSignOut = useCallback(async () => {
+    await qc.cancelQueries();
+    qc.clear();
+    await signOut();
+    nav({ to: "/login", replace: true });
+  }, [qc, signOut, nav]);
 
   const onWarn = useCallback(() => setWarnOpen(true), []);
   const onTimeout = useCallback(async () => {
     setWarnOpen(false);
-    await signOut();
-  }, [signOut]);
+    await fullSignOut();
+  }, [fullSignOut]);
 
   useIdleTimeout({
     enabled: !!session,
@@ -48,7 +59,7 @@ export function IdleTimeoutGuard() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => signOut()}>
+          <AlertDialogCancel onClick={() => fullSignOut()}>
             Sign out now
           </AlertDialogCancel>
           <AlertDialogAction onClick={() => setWarnOpen(false)}>

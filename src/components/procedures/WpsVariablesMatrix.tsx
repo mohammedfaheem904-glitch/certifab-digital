@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -126,6 +127,7 @@ export function WpsVariablesMatrix({
   canEdit: boolean;
   process?: string | null;
 }) {
+  const confirmDialog = useConfirm();
   const { profile } = useAuth();
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
@@ -168,7 +170,7 @@ export function WpsVariablesMatrix({
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Delete this variable?")) return;
+    if (!(await confirmDialog("Delete this variable?"))) return;
     const { error } = await (supabase.from("wps_variables" as any) as any).delete().eq("id", id);
     if (error) return toast.error(error.message);
     refresh();
@@ -195,7 +197,7 @@ export function WpsVariablesMatrix({
 
   const seedAll = async () => {
     if (!profile?.company_id) return;
-    if (rows.length > 0 && !confirm("Seed default ASME IX variables in addition to existing rows?")) return;
+    if (rows.length > 0 && !(await confirmDialog("Seed default ASME IX variables in addition to existing rows?"))) return;
     setBusy(true);
     const payload = PRESETS.map((p, i) => ({
       company_id: profile.company_id,

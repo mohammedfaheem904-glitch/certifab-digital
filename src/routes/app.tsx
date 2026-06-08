@@ -1,11 +1,21 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, redirect } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
 import { IdleTimeoutGuard } from "@/components/IdleTimeoutGuard";
 import { PendingApprovalScreen, RejectedScreen } from "@/components/ApprovalScreen";
 import { useAuth } from "@/lib/auth";
 import { PlanProvider } from "@/lib/use-plan";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/app")({
+  beforeLoad: async ({ location }) => {
+    // Client-only gate (Supabase session lives in localStorage). Prevents
+    // protected content flash before a component-level <Navigate /> kicks in.
+    if (typeof window === "undefined") return;
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      throw redirect({ to: "/login", search: { redirect: location.href } as any });
+    }
+  },
   component: AppGate,
 });
 
@@ -18,6 +28,7 @@ function AppGate() {
       </div>
     );
   }
+  // Safety net for hydration race; beforeLoad already redirected SSR/preload.
   if (!session) return <Navigate to="/login" />;
   if (profile?.approval_status === "pending") return <PendingApprovalScreen />;
   if (profile?.approval_status === "rejected") return <RejectedScreen />;
@@ -28,4 +39,3 @@ function AppGate() {
     </PlanProvider>
   );
 }
-

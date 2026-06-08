@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useConfirm } from "@/components/ConfirmDialog";
+import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ModulePage } from "@/components/ModulePage";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ type Row = {
 };
 
 function TrashPage() {
+  const confirmDialog = useConfirm();
   const { roles, profile } = useAuth();
   const isAdmin = roles.includes("super_admin");
   const nav = useNavigate();
@@ -31,7 +33,7 @@ function TrashPage() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!profile?.company_id) return;
     setRows(null);
     const { data, error } = await (supabase.from("inspections" as any) as any)
@@ -41,9 +43,9 @@ function TrashPage() {
       .order("deleted_at", { ascending: false });
     if (error) { toast.error(error.message); setRows([]); return; }
     setRows((data ?? []) as Row[]);
-  };
+  }, [profile?.company_id]);
 
-  useEffect(() => { if (isAdmin) load(); /* eslint-disable-next-line */ }, [isAdmin, profile?.company_id]);
+  useEffect(() => { if (isAdmin) load(); }, [isAdmin, profile?.company_id, load]);
 
   if (!isAdmin) {
     return (
@@ -64,7 +66,7 @@ function TrashPage() {
   };
 
   const hardDelete = async (id: string) => {
-    if (!confirm("Permanently delete this inspection? This cannot be undone.")) return;
+    if (!(await confirmDialog("Permanently delete this inspection? This cannot be undone."))) return;
     setBusy(id);
     const { error } = await (supabase.from("inspections" as any) as any).delete().eq("id", id);
     setBusy(null);

@@ -1,4 +1,5 @@
 import { ReactNode, useState } from "react";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Plus, Trash2 } from "lucide-react";
@@ -40,6 +41,7 @@ type Props = {
 export function RelationalTable({
   title, description, table, procedureId, columns, emptyMessage, canEdit, extraRowDefaults, renderExtra,
 }: Props) {
+  const confirmDialog = useConfirm();
   const qc = useQueryClient();
   const { profile } = useAuth();
   const [saving, setSaving] = useState<string | null>(null);
@@ -87,7 +89,7 @@ export function RelationalTable({
   };
 
   const removeRow = async (id: string) => {
-    if (!confirm("Delete this row?")) return;
+    if (!(await confirmDialog("Delete this row?"))) return;
     const { error } = await (supabase.from(table) as any).delete().eq("id", id);
     if (error) return toast.error(error.message);
     refresh();

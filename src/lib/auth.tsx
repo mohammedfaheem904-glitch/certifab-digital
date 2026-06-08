@@ -91,7 +91,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+      // Only react to identity transitions; ignore TOKEN_REFRESHED / INITIAL_SESSION
+      // to avoid redundant profile reloads on every tab focus / hourly refresh.
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {

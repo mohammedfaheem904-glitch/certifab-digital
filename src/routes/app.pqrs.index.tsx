@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ModulePage } from "@/components/ModulePage";
@@ -45,6 +46,7 @@ const STATUSES = ["Draft", "Under Review", "Approved", "Rejected", "Superseded"]
 const RESULTS = ["Pending", "Passed", "Failed", "Inconclusive"];
 
 function PqrsIndexPage() {
+  const confirmDialog = useConfirm();
   const { profile, roles } = useAuth();
   const cid = profile?.company_id;
   const isAdmin = roles.includes("super_admin");
@@ -118,7 +120,7 @@ function PqrsIndexPage() {
   const toExport = selected.size > 0 ? filtered.filter((r) => selected.has(r.id)) : filtered;
 
   const moveToTrash = async (ids: string[]) => {
-    if (!confirm(`Move ${ids.length} record${ids.length > 1 ? "s" : ""} to trash?`)) return;
+    if (!(await confirmDialog(`Move ${ids.length} record${ids.length > 1 ? "s" : ""} to trash?`))) return;
     setBusy(true);
     const results = await Promise.all(ids.map((id) => (supabase.rpc as any)("soft_delete_pqr", { _id: id })));
     setBusy(false);

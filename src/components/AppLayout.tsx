@@ -260,8 +260,10 @@ export function AppLayout() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={async () => {
+                  await qc.cancelQueries();
+                  qc.clear();
                   await signOut();
-                  nav({ to: "/login" });
+                  nav({ to: "/login", replace: true });
                 }}
               >
                 <LogOut className="size-4 me-2" /> Sign out
