@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteErrorFallback";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +17,8 @@ import type { ProjectWorkflowStatus } from "@/lib/project-workflow";
 
 export const Route = createFileRoute("/app/projects/$projectId")({
   component: ProjectDetailsPage,
+  errorComponent: RouteErrorFallback,
+  notFoundComponent: RouteNotFoundFallback,
 });
 
 type Project = {

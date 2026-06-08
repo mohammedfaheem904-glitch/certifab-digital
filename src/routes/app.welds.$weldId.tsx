@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteErrorFallback";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -21,6 +22,8 @@ import type { WeldWorkflowStatus } from "@/lib/weld-workflow";
 
 export const Route = createFileRoute("/app/welds/$weldId")({
   component: WeldDetail,
+  errorComponent: RouteErrorFallback,
+  notFoundComponent: RouteNotFoundFallback,
 });
 
 function WeldDetail() {

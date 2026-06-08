@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteErrorFallback";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
@@ -22,6 +23,8 @@ import { evaluatePqr } from "@/lib/pqr-evaluation";
 
 export const Route = createFileRoute("/app/pqrs/$pqrId")({
   component: PqrDetailPage,
+  errorComponent: RouteErrorFallback,
+  notFoundComponent: RouteNotFoundFallback,
 });
 
 const RESULT_TONE: Record<string, string> = {

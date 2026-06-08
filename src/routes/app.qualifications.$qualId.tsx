@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteErrorFallback";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -31,6 +32,8 @@ import { QualificationGuidanceStrip } from "@/components/qualifications/Qualific
 
 export const Route = createFileRoute("/app/qualifications/$qualId")({
   component: QualDetail,
+  errorComponent: RouteErrorFallback,
+  notFoundComponent: RouteNotFoundFallback,
 });
 
 function QualDetail() {

@@ -5,6 +5,7 @@ import { MarketingShell, Section, Eyebrow } from "@/components/MarketingShell";
 
 export const Route = createFileRoute("/")({
   head: () => ({
+    links: [{ rel: "canonical", href: "https://weldyard.com/" }],
     meta: [
       { title: "Weld Yard — Digital Welding Management System (DWMS)" },
       { name: "description", content: "Cloud DWMS for industrial welding QA/QC. Manage WPS/PQR, welder qualifications, weld traceability, NDT inspections, NCRs and equipment calibration in one platform." },
