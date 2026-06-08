@@ -197,7 +197,7 @@ export function WpsVariablesMatrix({
 
   const seedAll = async () => {
     if (!profile?.company_id) return;
-    if (rows.length > 0 && !confirm("Seed default ASME IX variables in addition to existing rows?")) return;
+    if (rows.length > 0 && !(await confirmDialog("Seed default ASME IX variables in addition to existing rows?"))) return;
     setBusy(true);
     const payload = PRESETS.map((p, i) => ({
       company_id: profile.company_id,
