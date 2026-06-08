@@ -1517,6 +1517,8 @@ export type Database = {
           containment_action: string | null
           corrective_action: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           due_date: string | null
           effectiveness_result: string | null
@@ -1551,6 +1553,8 @@ export type Database = {
           containment_action?: string | null
           corrective_action?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           due_date?: string | null
           effectiveness_result?: string | null
@@ -1585,6 +1589,8 @@ export type Database = {
           containment_action?: string | null
           corrective_action?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           due_date?: string | null
           effectiveness_result?: string | null
@@ -4312,6 +4318,7 @@ export type Database = {
       restore_equipment: { Args: { _id: string }; Returns: undefined }
       restore_inspection: { Args: { _id: string }; Returns: undefined }
       restore_instrument: { Args: { _id: string }; Returns: undefined }
+      restore_ncr: { Args: { _id: string }; Returns: undefined }
       restore_pqr: { Args: { _id: string }; Returns: undefined }
       restore_procedure: { Args: { _id: string }; Returns: undefined }
       restore_project: { Args: { _id: string }; Returns: undefined }
@@ -4321,6 +4328,7 @@ export type Database = {
       soft_delete_equipment: { Args: { _id: string }; Returns: undefined }
       soft_delete_inspection: { Args: { _id: string }; Returns: undefined }
       soft_delete_instrument: { Args: { _id: string }; Returns: undefined }
+      soft_delete_ncr: { Args: { _id: string }; Returns: undefined }
       soft_delete_pqr: { Args: { _id: string }; Returns: undefined }
       soft_delete_procedure: { Args: { _id: string }; Returns: undefined }
       soft_delete_project: { Args: { _id: string }; Returns: undefined }

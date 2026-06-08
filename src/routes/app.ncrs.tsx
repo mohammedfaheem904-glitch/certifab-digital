@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,32 +11,49 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/StatusBadge";
-import { AlertTriangle, Clock, Loader2, Plus, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Clock, Loader2, Plus, ShieldAlert, Eye, Trash2 } from "lucide-react";
 import { daysUntil } from "@/lib/format";
 import { exportExcel } from "@/lib/export";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/ConfirmDialog";
+import { useIsEditor } from "@/lib/use-role";
 
 export const Route = createFileRoute("/app/ncrs")({
   component: NcrsPage,
 });
 
 function NcrsPage() {
-  const { profile } = useAuth();
+  const { profile, roles } = useAuth();
+  const isAdmin = roles.includes("super_admin");
+  const isEditor = useIsEditor();
+  const nav = useNavigate();
+  const confirmDialog = useConfirm();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery<any[]>({
     queryKey: ["ncrs", profile?.company_id],
     enabled: !!profile?.company_id,
     queryFn: async () => {
       const { data, error } = await (supabase.from("ncrs" as any) as any)
-        .select("*").eq("company_id", profile!.company_id).order("created_at", { ascending: false });
+        .select("*").eq("company_id", profile!.company_id).is("deleted_at", null).order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const moveToTrash = async (id: string, label: string) => {
+    if (!(await confirmDialog(`Move ${label} to trash?`))) return;
+    setBusyId(id);
+    const { error } = await (supabase.rpc as any)("soft_delete_ncr", { _id: id });
+    setBusyId(null);
+    if (error) return toast.error(error.message);
+    toast.success("Moved to trash.");
+    qc.invalidateQueries({ queryKey: ["ncrs"] });
+  };
 
   const rows = (data ?? []).filter((r: any) => {
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
@@ -52,7 +69,16 @@ function NcrsPage() {
     <ModulePage
       title="Non-Conformance Reports"
       subtitle="Raise, investigate, and close NCRs with full root-cause and corrective-action workflow."
-      action={<NewNcrDialog onDone={() => qc.invalidateQueries({ queryKey: ["ncrs"] })} />}
+      action={
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Link to="/app/ncrs/trash">
+              <Button variant="outline" size="sm"><Trash2 className="size-4 me-1" /> Trash</Button>
+            </Link>
+          )}
+          <NewNcrDialog onDone={() => qc.invalidateQueries({ queryKey: ["ncrs"] })} />
+        </div>
+      }
     >
       <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-3 border-b border-border">
         <Stat icon={ShieldAlert} label="Open" value={open} tone="warning" />
@@ -81,11 +107,11 @@ function NcrsPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40 sticky top-0">
-            <tr><Th>NCR</Th><Th>Title</Th><Th>Severity</Th><Th>Status</Th><Th>Due</Th><Th>Raised</Th></tr>
+            <tr><Th>NCR</Th><Th>Title</Th><Th>Severity</Th><Th>Status</Th><Th>Due</Th><Th>Raised</Th><th className="text-end font-medium px-5 py-2.5">Actions</th></tr>
           </thead>
           <tbody>
-            {isLoading && <tr><td colSpan={6} className="px-5 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /></td></tr>}
-            {!isLoading && rows.length === 0 && <tr><td colSpan={6} className="px-5 py-10 text-center text-muted-foreground">No NCRs.</td></tr>}
+            {isLoading && <tr><td colSpan={7} className="px-5 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /></td></tr>}
+            {!isLoading && rows.length === 0 && <tr><td colSpan={7} className="px-5 py-10 text-center text-muted-foreground">No NCRs.</td></tr>}
             {rows.map((r: any) => {
               const d = r.due_date ? daysUntil(r.due_date) : null;
               return (
@@ -102,6 +128,16 @@ function NcrsPage() {
                       <span className="ms-2 text-[10px] px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">Overdue {Math.abs(d)}d</span>}
                   </td>
                   <td className="px-5 py-3 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 text-end">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => nav({ to: "/app/ncrs/$ncrId", params: { ncrId: r.id } })} aria-label="Open NCR details"><Eye className="size-4" /></Button>
+                      {isEditor && (
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" disabled={busyId === r.id} onClick={() => moveToTrash(r.id, r.ncr_no)} aria-label="Move to trash">
+                          {busyId === r.id ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+                        </Button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               );
             })}
