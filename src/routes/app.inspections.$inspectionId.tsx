@@ -171,7 +171,7 @@ function InspectionDetail() {
           <TabsTrigger value="form">Inspection form</TabsTrigger>
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="checklist">Custom items ({(checklist.data ?? []).filter((x: any) => !x.template_field_id).length})</TabsTrigger>
-          <TabsTrigger value="findings">Findings</TabsTrigger>
+          <TabsTrigger value="findings">Defects</TabsTrigger>
           <TabsTrigger value="audit">Audit trail ({events.data?.length ?? 0})</TabsTrigger>
         </TabsList>
 
