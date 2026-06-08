@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { useIsEditor } from "@/lib/use-role";
 
-export const Route = createFileRoute("/app/ncrs")({
+export const Route = createFileRoute("/app/ncrs/")({
   component: NcrsPage,
 });
 
