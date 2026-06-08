@@ -50,6 +50,78 @@ export type Database = {
         }
         Relationships: []
       }
+      capa_actions: {
+        Row: {
+          action_type: Database["public"]["Enums"]["capa_type"]
+          company_id: string
+          completed_at: string | null
+          completion_evidence: string | null
+          created_at: string
+          description: string
+          effectiveness_notes: string | null
+          effectiveness_verified_at: string | null
+          effectiveness_verified_by: string | null
+          id: string
+          ncr_id: string
+          owner: string | null
+          owner_name: string | null
+          status: Database["public"]["Enums"]["capa_status"]
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          action_type?: Database["public"]["Enums"]["capa_type"]
+          company_id: string
+          completed_at?: string | null
+          completion_evidence?: string | null
+          created_at?: string
+          description: string
+          effectiveness_notes?: string | null
+          effectiveness_verified_at?: string | null
+          effectiveness_verified_by?: string | null
+          id?: string
+          ncr_id: string
+          owner?: string | null
+          owner_name?: string | null
+          status?: Database["public"]["Enums"]["capa_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["capa_type"]
+          company_id?: string
+          completed_at?: string | null
+          completion_evidence?: string | null
+          created_at?: string
+          description?: string
+          effectiveness_notes?: string | null
+          effectiveness_verified_at?: string | null
+          effectiveness_verified_by?: string | null
+          id?: string
+          ncr_id?: string
+          owner?: string | null
+          owner_name?: string | null
+          status?: Database["public"]["Enums"]["capa_status"]
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capa_actions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capa_actions_ncr_id_fkey"
+            columns: ["ncr_id"]
+            isOneToOne: false
+            referencedRelation: "ncrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           allowed_email_domains: string[]
@@ -97,6 +169,62 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      defect_catalog: {
+        Row: {
+          category: Database["public"]["Enums"]["defect_category"]
+          code: string
+          code_references: string | null
+          company_id: string | null
+          created_at: string
+          default_severity: Database["public"]["Enums"]["severity_level"]
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          repair_guidance: string | null
+          typical_causes: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["defect_category"]
+          code: string
+          code_references?: string | null
+          company_id?: string | null
+          created_at?: string
+          default_severity?: Database["public"]["Enums"]["severity_level"]
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          repair_guidance?: string | null
+          typical_causes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["defect_category"]
+          code?: string
+          code_references?: string | null
+          company_id?: string | null
+          created_at?: string
+          default_severity?: Database["public"]["Enums"]["severity_level"]
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          repair_guidance?: string | null
+          typical_causes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "defect_catalog_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       equipment: {
         Row: {
@@ -345,6 +473,101 @@ export type Database = {
             columns: ["template_field_id"]
             isOneToOne: false
             referencedRelation: "inspection_template_fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_defects: {
+        Row: {
+          catalog_id: string | null
+          category: Database["public"]["Enums"]["defect_category"]
+          code_reference: string | null
+          company_id: string
+          created_at: string
+          defect_type: string
+          detected_at: string
+          detected_by: string | null
+          disposition: Database["public"]["Enums"]["defect_disposition"] | null
+          id: string
+          inspection_id: string
+          location: string | null
+          measurement: string | null
+          notes: string | null
+          photo_url: string | null
+          repair_recommendation: string | null
+          severity: Database["public"]["Enums"]["severity_level"]
+          updated_at: string
+          weld_id: string | null
+        }
+        Insert: {
+          catalog_id?: string | null
+          category?: Database["public"]["Enums"]["defect_category"]
+          code_reference?: string | null
+          company_id: string
+          created_at?: string
+          defect_type: string
+          detected_at?: string
+          detected_by?: string | null
+          disposition?: Database["public"]["Enums"]["defect_disposition"] | null
+          id?: string
+          inspection_id: string
+          location?: string | null
+          measurement?: string | null
+          notes?: string | null
+          photo_url?: string | null
+          repair_recommendation?: string | null
+          severity?: Database["public"]["Enums"]["severity_level"]
+          updated_at?: string
+          weld_id?: string | null
+        }
+        Update: {
+          catalog_id?: string | null
+          category?: Database["public"]["Enums"]["defect_category"]
+          code_reference?: string | null
+          company_id?: string
+          created_at?: string
+          defect_type?: string
+          detected_at?: string
+          detected_by?: string | null
+          disposition?: Database["public"]["Enums"]["defect_disposition"] | null
+          id?: string
+          inspection_id?: string
+          location?: string | null
+          measurement?: string | null
+          notes?: string | null
+          photo_url?: string | null
+          repair_recommendation?: string | null
+          severity?: Database["public"]["Enums"]["severity_level"]
+          updated_at?: string
+          weld_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_defects_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "defect_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_defects_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_defects_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_defects_weld_id_fkey"
+            columns: ["weld_id"]
+            isOneToOne: false
+            referencedRelation: "welds"
             referencedColumns: ["id"]
           },
         ]
@@ -1202,6 +1425,49 @@ export type Database = {
         }
         Relationships: []
       }
+      ncr_defect_links: {
+        Row: {
+          company_id: string
+          created_at: string
+          defect_id: string
+          ncr_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          defect_id: string
+          ncr_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          defect_id?: string
+          ncr_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ncr_defect_links_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ncr_defect_links_defect_id_fkey"
+            columns: ["defect_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_defects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ncr_defect_links_ncr_id_fkey"
+            columns: ["ncr_id"]
+            isOneToOne: false
+            referencedRelation: "ncrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ncr_events: {
         Row: {
           actor_id: string | null
@@ -1240,15 +1506,22 @@ export type Database = {
       }
       ncrs: {
         Row: {
+          accepted_as_is_reason: string | null
           assigned_to: string | null
           assigned_to_name: string | null
           closed_at: string | null
           closed_by: string | null
+          closure_approved_at: string | null
+          closure_approved_by: string | null
           company_id: string
+          containment_action: string | null
           corrective_action: string | null
           created_at: string
           description: string | null
           due_date: string | null
+          effectiveness_result: string | null
+          effectiveness_review_at: string | null
+          effectiveness_review_by: string | null
           id: string
           inspection_id: string | null
           ncr_no: string
@@ -1256,23 +1529,33 @@ export type Database = {
           project_id: string | null
           raised_by: string | null
           raised_by_name: string | null
+          responsible_person: string | null
           root_cause: string | null
           severity: Database["public"]["Enums"]["severity_level"] | null
+          spool_id: string | null
           status: Database["public"]["Enums"]["ncr_status"]
+          target_date: string | null
           title: string
           updated_at: string
           weld_id: string | null
         }
         Insert: {
+          accepted_as_is_reason?: string | null
           assigned_to?: string | null
           assigned_to_name?: string | null
           closed_at?: string | null
           closed_by?: string | null
+          closure_approved_at?: string | null
+          closure_approved_by?: string | null
           company_id: string
+          containment_action?: string | null
           corrective_action?: string | null
           created_at?: string
           description?: string | null
           due_date?: string | null
+          effectiveness_result?: string | null
+          effectiveness_review_at?: string | null
+          effectiveness_review_by?: string | null
           id?: string
           inspection_id?: string | null
           ncr_no: string
@@ -1280,23 +1563,33 @@ export type Database = {
           project_id?: string | null
           raised_by?: string | null
           raised_by_name?: string | null
+          responsible_person?: string | null
           root_cause?: string | null
           severity?: Database["public"]["Enums"]["severity_level"] | null
+          spool_id?: string | null
           status?: Database["public"]["Enums"]["ncr_status"]
+          target_date?: string | null
           title: string
           updated_at?: string
           weld_id?: string | null
         }
         Update: {
+          accepted_as_is_reason?: string | null
           assigned_to?: string | null
           assigned_to_name?: string | null
           closed_at?: string | null
           closed_by?: string | null
+          closure_approved_at?: string | null
+          closure_approved_by?: string | null
           company_id?: string
+          containment_action?: string | null
           corrective_action?: string | null
           created_at?: string
           description?: string | null
           due_date?: string | null
+          effectiveness_result?: string | null
+          effectiveness_review_at?: string | null
+          effectiveness_review_by?: string | null
           id?: string
           inspection_id?: string | null
           ncr_no?: string
@@ -1304,9 +1597,12 @@ export type Database = {
           project_id?: string | null
           raised_by?: string | null
           raised_by_name?: string | null
+          responsible_person?: string | null
           root_cause?: string | null
           severity?: Database["public"]["Enums"]["severity_level"] | null
+          spool_id?: string | null
           status?: Database["public"]["Enums"]["ncr_status"]
+          target_date?: string | null
           title?: string
           updated_at?: string
           weld_id?: string | null
@@ -2626,6 +2922,78 @@ export type Database = {
           },
         ]
       }
+      rca_analyses: {
+        Row: {
+          company_id: string
+          conclusion: string | null
+          contributing_causes: Json
+          created_at: string
+          evidence: string | null
+          id: string
+          method: Database["public"]["Enums"]["rca_method"]
+          ncr_id: string
+          performed_at: string
+          performed_by: string | null
+          performed_by_name: string | null
+          primary_cause:
+            | Database["public"]["Enums"]["rca_cause_category"]
+            | null
+          primary_cause_detail: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          conclusion?: string | null
+          contributing_causes?: Json
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          method?: Database["public"]["Enums"]["rca_method"]
+          ncr_id: string
+          performed_at?: string
+          performed_by?: string | null
+          performed_by_name?: string | null
+          primary_cause?:
+            | Database["public"]["Enums"]["rca_cause_category"]
+            | null
+          primary_cause_detail?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          conclusion?: string | null
+          contributing_causes?: Json
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          method?: Database["public"]["Enums"]["rca_method"]
+          ncr_id?: string
+          performed_at?: string
+          performed_by?: string | null
+          performed_by_name?: string | null
+          primary_cause?:
+            | Database["public"]["Enums"]["rca_cause_category"]
+            | null
+          primary_cause_detail?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rca_analyses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rca_analyses_ncr_id_fkey"
+            columns: ["ncr_id"]
+            isOneToOne: false
+            referencedRelation: "ncrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reminder_log: {
         Row: {
           company_id: string
@@ -2652,6 +3020,99 @@ export type Database = {
           window_days?: number
         }
         Relationships: []
+      }
+      rework_jobs: {
+        Row: {
+          company_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          ncr_id: string
+          notes: string | null
+          planned_start: string | null
+          reinspection_id: string | null
+          repair_method: string | null
+          rework_wps_id: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["rework_status"]
+          updated_at: string
+          weld_id: string | null
+          welder_id: string | null
+          welder_name: string | null
+        }
+        Insert: {
+          company_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          ncr_id: string
+          notes?: string | null
+          planned_start?: string | null
+          reinspection_id?: string | null
+          repair_method?: string | null
+          rework_wps_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["rework_status"]
+          updated_at?: string
+          weld_id?: string | null
+          welder_id?: string | null
+          welder_name?: string | null
+        }
+        Update: {
+          company_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          ncr_id?: string
+          notes?: string | null
+          planned_start?: string | null
+          reinspection_id?: string | null
+          repair_method?: string | null
+          rework_wps_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["rework_status"]
+          updated_at?: string
+          weld_id?: string | null
+          welder_id?: string | null
+          welder_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rework_jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rework_jobs_ncr_id_fkey"
+            columns: ["ncr_id"]
+            isOneToOne: false
+            referencedRelation: "ncrs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rework_jobs_reinspection_id_fkey"
+            columns: ["reinspection_id"]
+            isOneToOne: false
+            referencedRelation: "inspections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rework_jobs_rework_wps_id_fkey"
+            columns: ["rework_wps_id"]
+            isOneToOne: false
+            referencedRelation: "procedures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rework_jobs_weld_id_fkey"
+            columns: ["weld_id"]
+            isOneToOne: false
+            referencedRelation: "welds"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       test_coupons: {
         Row: {
@@ -3740,6 +4201,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      complete_rework_and_reinspect: {
+        Args: { _notes?: string; _rework_id: string }
+        Returns: string
+      }
       current_company_id: { Args: never; Returns: string }
       get_company_branding_by_domain: {
         Args: { _host: string }
@@ -3831,6 +4296,15 @@ export type Database = {
       is_company_member: { Args: { _company_id: string }; Returns: boolean }
       is_editor: { Args: { _user_id: string }; Returns: boolean }
       is_internal_company: { Args: { _company_id: string }; Returns: boolean }
+      open_ncr_from_defect: {
+        Args: {
+          _defect_ids: string[]
+          _inspection_id: string
+          _severity?: Database["public"]["Enums"]["severity_level"]
+          _title: string
+        }
+        Returns: string
+      }
       reject_user: {
         Args: { _reason: string; _user_id: string }
         Returns: undefined
@@ -3853,6 +4327,24 @@ export type Database = {
       soft_delete_pwps: { Args: { _id: string }; Returns: undefined }
       soft_delete_qualification: { Args: { _id: string }; Returns: undefined }
       soft_delete_weld: { Args: { _id: string }; Returns: undefined }
+      start_rework: {
+        Args: {
+          _method: string
+          _ncr_id: string
+          _welder_name: string
+          _wps_id: string
+        }
+        Returns: string
+      }
+      transition_ncr: {
+        Args: {
+          _comment?: string
+          _id: string
+          _reason?: string
+          _to: Database["public"]["Enums"]["ncr_status"]
+        }
+        Returns: undefined
+      }
       transition_project: {
         Args: {
           _comment?: string
@@ -3878,6 +4370,27 @@ export type Database = {
         | "rejected"
         | "revoked"
       approval_status: "pending" | "approved" | "rejected"
+      capa_status:
+        | "Proposed"
+        | "Approved"
+        | "In Progress"
+        | "Completed"
+        | "Verified"
+        | "Cancelled"
+      capa_type: "Corrective" | "Preventive" | "Containment"
+      defect_category:
+        | "Discontinuity"
+        | "Geometric"
+        | "Metallurgical"
+        | "Surface"
+        | "Dimensional"
+        | "Other"
+      defect_disposition:
+        | "Accept"
+        | "Repair"
+        | "Reject"
+        | "Use As-Is"
+        | "Pending Engineering"
       equipment_status:
         | "Operational"
         | "Maintenance"
@@ -3910,6 +4423,13 @@ export type Database = {
         | "In Review"
         | "Closed"
         | "Rejected"
+        | "Under Investigation"
+        | "Corrective Action Proposed"
+        | "Awaiting Approval"
+        | "Rework Required"
+        | "Repaired"
+        | "Re-Inspection Required"
+        | "Accepted As-Is"
       ndt_method: "RT" | "UT" | "PT" | "MT" | "VT"
       pqr_status:
         | "Draft"
@@ -3949,6 +4469,21 @@ export type Database = {
         | "Rejected"
         | "Converted"
       qualification_status: "Active" | "Expiring Soon" | "Expired" | "Suspended"
+      rca_cause_category:
+        | "Human Error"
+        | "Procedure Issue"
+        | "Material Issue"
+        | "Equipment Issue"
+        | "Environmental Issue"
+        | "Training Deficiency"
+        | "Other"
+      rca_method: "5 Why" | "Fishbone" | "Custom"
+      rework_status:
+        | "Planned"
+        | "In Progress"
+        | "Completed"
+        | "Re-Inspected"
+        | "Cancelled"
       severity_level: "Low" | "Medium" | "High" | "Critical"
       test_result: "Pending" | "Pass" | "Fail" | "N/A"
       weld_status: "Accepted" | "Rejected" | "Repair" | "Pending"
@@ -4109,6 +4644,30 @@ export const Constants = {
         "revoked",
       ],
       approval_status: ["pending", "approved", "rejected"],
+      capa_status: [
+        "Proposed",
+        "Approved",
+        "In Progress",
+        "Completed",
+        "Verified",
+        "Cancelled",
+      ],
+      capa_type: ["Corrective", "Preventive", "Containment"],
+      defect_category: [
+        "Discontinuity",
+        "Geometric",
+        "Metallurgical",
+        "Surface",
+        "Dimensional",
+        "Other",
+      ],
+      defect_disposition: [
+        "Accept",
+        "Repair",
+        "Reject",
+        "Use As-Is",
+        "Pending Engineering",
+      ],
       equipment_status: [
         "Operational",
         "Maintenance",
@@ -4144,6 +4703,13 @@ export const Constants = {
         "In Review",
         "Closed",
         "Rejected",
+        "Under Investigation",
+        "Corrective Action Proposed",
+        "Awaiting Approval",
+        "Rework Required",
+        "Repaired",
+        "Re-Inspection Required",
+        "Accepted As-Is",
       ],
       ndt_method: ["RT", "UT", "PT", "MT", "VT"],
       pqr_status: [
@@ -4183,6 +4749,23 @@ export const Constants = {
         "Converted",
       ],
       qualification_status: ["Active", "Expiring Soon", "Expired", "Suspended"],
+      rca_cause_category: [
+        "Human Error",
+        "Procedure Issue",
+        "Material Issue",
+        "Equipment Issue",
+        "Environmental Issue",
+        "Training Deficiency",
+        "Other",
+      ],
+      rca_method: ["5 Why", "Fishbone", "Custom"],
+      rework_status: [
+        "Planned",
+        "In Progress",
+        "Completed",
+        "Re-Inspected",
+        "Cancelled",
+      ],
       severity_level: ["Low", "Medium", "High", "Critical"],
       test_result: ["Pending", "Pass", "Fail", "N/A"],
       weld_status: ["Accepted", "Rejected", "Repair", "Pending"],

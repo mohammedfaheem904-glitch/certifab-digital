@@ -18,6 +18,7 @@ import { InspectionActionBar } from "@/components/inspections/InspectionActionBa
 import { InspectionTimeline } from "@/components/inspections/InspectionTimeline";
 import { DynamicInspectionForm } from "@/components/inspections/DynamicInspectionForm";
 import { ReadinessGauge } from "@/components/inspections/ReadinessGauge";
+import { DefectsPanel } from "@/components/defects/DefectsPanel";
 import { scoreInspection } from "@/lib/inspection-readiness";
 import { inspectionStatusTone, type InspectionWorkflowStatus } from "@/lib/inspection-workflow";
 import { toast } from "sonner";
