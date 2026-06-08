@@ -140,6 +140,10 @@ function NcrDetail() {
       <Tabs defaultValue="workflow">
         <TabsList className="print:hidden">
           <TabsTrigger value="workflow">Workflow</TabsTrigger>
+          <TabsTrigger value="governance">Governance</TabsTrigger>
+          <TabsTrigger value="rca">Root Cause</TabsTrigger>
+          <TabsTrigger value="capa">CAPA</TabsTrigger>
+          <TabsTrigger value="rework">Rework</TabsTrigger>
           <TabsTrigger value="audit">Audit trail ({events.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="report"><FileText className="size-4 me-1.5" />NCR Report</TabsTrigger>
         </TabsList>
