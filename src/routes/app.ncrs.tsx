@@ -24,21 +24,36 @@ export const Route = createFileRoute("/app/ncrs")({
 });
 
 function NcrsPage() {
-  const { profile } = useAuth();
+  const { profile, roles } = useAuth();
+  const isAdmin = roles.includes("super_admin");
+  const isEditor = useIsEditor();
+  const nav = useNavigate();
+  const confirmDialog = useConfirm();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery<any[]>({
     queryKey: ["ncrs", profile?.company_id],
     enabled: !!profile?.company_id,
     queryFn: async () => {
       const { data, error } = await (supabase.from("ncrs" as any) as any)
-        .select("*").eq("company_id", profile!.company_id).order("created_at", { ascending: false });
+        .select("*").eq("company_id", profile!.company_id).is("deleted_at", null).order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const moveToTrash = async (id: string, label: string) => {
+    if (!(await confirmDialog(`Move ${label} to trash?`))) return;
+    setBusyId(id);
+    const { error } = await (supabase.rpc as any)("soft_delete_ncr", { _id: id });
+    setBusyId(null);
+    if (error) return toast.error(error.message);
+    toast.success("Moved to trash.");
+    qc.invalidateQueries({ queryKey: ["ncrs"] });
+  };
 
   const rows = (data ?? []).filter((r: any) => {
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
