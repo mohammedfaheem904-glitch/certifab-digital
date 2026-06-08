@@ -171,7 +171,7 @@ function InspectionDetail() {
           <TabsTrigger value="form">Inspection form</TabsTrigger>
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="checklist">Custom items ({(checklist.data ?? []).filter((x: any) => !x.template_field_id).length})</TabsTrigger>
-          <TabsTrigger value="findings">Findings</TabsTrigger>
+          <TabsTrigger value="findings">Defects</TabsTrigger>
           <TabsTrigger value="audit">Audit trail ({events.data?.length ?? 0})</TabsTrigger>
         </TabsList>
 
@@ -212,18 +212,11 @@ function InspectionDetail() {
         </TabsContent>
 
         <TabsContent value="findings">
-          <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-            <h3 className="text-sm font-medium">Findings</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <DetailField label="Defect type" value={i.defect_type ?? ""} onSave={(v) => update({ defect_type: v || null }, "defect_logged")} />
-              <DetailField label="Severity" value={i.severity ?? ""} onSave={(v) => update({ severity: v || null })} options={["Low","Medium","High","Critical"]} />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Defect description</Label>
-              <Textarea rows={3} defaultValue={i.notes ?? ""} onBlur={(e) => e.target.value !== (i.notes ?? "") && update({ notes: e.target.value || null })} />
-            </div>
-            <div className="text-xs text-muted-foreground">Phase 3 will add the full defect catalog with severity and code references.</div>
-          </div>
+          <DefectsPanel
+            companyId={profile?.company_id ?? null}
+            inspectionId={inspectionId}
+            weldId={i.weld_id ?? null}
+          />
         </TabsContent>
 
         <TabsContent value="audit">

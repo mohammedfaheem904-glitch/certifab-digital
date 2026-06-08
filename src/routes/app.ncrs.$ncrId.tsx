@@ -16,6 +16,7 @@ import { ArrowLeft, FileText, Loader2 } from "lucide-react";
 import { NcrReportDocument } from "@/components/reports/NcrReportDocument";
 import { daysUntil } from "@/lib/format";
 import { toast } from "sonner";
+import { NcrTransitionBar, RcaPanel, CapaPanel, ReworkPanel } from "@/components/ncr/NcrGovernancePanels";
 
 const FLOW = ["Open", "Root Cause", "CA Pending", "In Review", "Closed"] as const;
 
@@ -139,6 +140,10 @@ function NcrDetail() {
       <Tabs defaultValue="workflow">
         <TabsList className="print:hidden">
           <TabsTrigger value="workflow">Workflow</TabsTrigger>
+          <TabsTrigger value="governance">Governance</TabsTrigger>
+          <TabsTrigger value="rca">Root Cause</TabsTrigger>
+          <TabsTrigger value="capa">CAPA</TabsTrigger>
+          <TabsTrigger value="rework">Rework</TabsTrigger>
           <TabsTrigger value="audit">Audit trail ({events.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="report"><FileText className="size-4 me-1.5" />NCR Report</TabsTrigger>
         </TabsList>
@@ -166,6 +171,25 @@ function NcrDetail() {
               </div>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="governance">
+          <NcrTransitionBar ncr={n} onChanged={() => {
+            qc.invalidateQueries({ queryKey: ["ncr", ncrId] });
+            qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] });
+          }} />
+        </TabsContent>
+        <TabsContent value="rca">
+          <RcaPanel ncrId={ncrId} companyId={profile?.company_id ?? null} onChanged={() => qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] })} />
+        </TabsContent>
+        <TabsContent value="capa">
+          <CapaPanel ncrId={ncrId} companyId={profile?.company_id ?? null} onChanged={() => qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] })} />
+        </TabsContent>
+        <TabsContent value="rework">
+          <ReworkPanel ncr={n} onChanged={() => {
+            qc.invalidateQueries({ queryKey: ["ncr", ncrId] });
+            qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] });
+          }} />
         </TabsContent>
 
         <TabsContent value="audit">
