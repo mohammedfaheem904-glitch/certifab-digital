@@ -30,6 +30,7 @@ import { Route as AppPwpsRouteImport } from './routes/app.pwps'
 import { Route as AppProjectsRouteImport } from './routes/app.projects'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
 import { Route as AppPqrsRouteImport } from './routes/app.pqrs'
+import { Route as AppNcrsRouteImport } from './routes/app.ncrs'
 import { Route as AppInstrumentsRouteImport } from './routes/app.instruments'
 import { Route as AppEquipmentRouteImport } from './routes/app.equipment'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
@@ -186,6 +187,11 @@ const AppPqrsRoute = AppPqrsRouteImport.update({
   path: '/pqrs',
   getParentRoute: () => AppRoute,
 } as any)
+const AppNcrsRoute = AppNcrsRouteImport.update({
+  id: '/ncrs',
+  path: '/ncrs',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInstrumentsRoute = AppInstrumentsRouteImport.update({
   id: '/instruments',
   path: '/instruments',
@@ -237,9 +243,9 @@ const AppPqrsIndexRoute = AppPqrsIndexRouteImport.update({
   getParentRoute: () => AppPqrsRoute,
 } as any)
 const AppNcrsIndexRoute = AppNcrsIndexRouteImport.update({
-  id: '/ncrs/',
-  path: '/ncrs/',
-  getParentRoute: () => AppRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppNcrsRoute,
 } as any)
 const AppInstrumentsIndexRoute = AppInstrumentsIndexRouteImport.update({
   id: '/',
@@ -385,14 +391,14 @@ const AppPqrsPqrIdRoute = AppPqrsPqrIdRouteImport.update({
   getParentRoute: () => AppPqrsRoute,
 } as any)
 const AppNcrsTrashRoute = AppNcrsTrashRouteImport.update({
-  id: '/ncrs/trash',
-  path: '/ncrs/trash',
-  getParentRoute: () => AppRoute,
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AppNcrsRoute,
 } as any)
 const AppNcrsNcrIdRoute = AppNcrsNcrIdRouteImport.update({
-  id: '/ncrs/$ncrId',
-  path: '/ncrs/$ncrId',
-  getParentRoute: () => AppRoute,
+  id: '/$ncrId',
+  path: '/$ncrId',
+  getParentRoute: () => AppNcrsRoute,
 } as any)
 const AppInstrumentsTrashRoute = AppInstrumentsTrashRouteImport.update({
   id: '/trash',
@@ -459,6 +465,7 @@ export interface FileRoutesByFullPath {
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRouteWithChildren
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
+  '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/pqrs': typeof AppPqrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRouteWithChildren
@@ -598,6 +605,7 @@ export interface FileRoutesById {
   '/app/billing': typeof AppBillingRoute
   '/app/equipment': typeof AppEquipmentRouteWithChildren
   '/app/instruments': typeof AppInstrumentsRouteWithChildren
+  '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/pqrs': typeof AppPqrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
   '/app/projects': typeof AppProjectsRouteWithChildren
@@ -673,6 +681,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/equipment'
     | '/app/instruments'
+    | '/app/ncrs'
     | '/app/pqrs'
     | '/app/procedures'
     | '/app/projects'
@@ -811,6 +820,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/equipment'
     | '/app/instruments'
+    | '/app/ncrs'
     | '/app/pqrs'
     | '/app/procedures'
     | '/app/projects'
@@ -1036,6 +1046,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPqrsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/ncrs': {
+      id: '/app/ncrs'
+      path: '/ncrs'
+      fullPath: '/app/ncrs'
+      preLoaderRoute: typeof AppNcrsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/instruments': {
       id: '/app/instruments'
       path: '/instruments'
@@ -1108,10 +1125,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/ncrs/': {
       id: '/app/ncrs/'
-      path: '/ncrs'
+      path: '/'
       fullPath: '/app/ncrs/'
       preLoaderRoute: typeof AppNcrsIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppNcrsRoute
     }
     '/app/instruments/': {
       id: '/app/instruments/'
@@ -1311,17 +1328,17 @@ declare module '@tanstack/react-router' {
     }
     '/app/ncrs/trash': {
       id: '/app/ncrs/trash'
-      path: '/ncrs/trash'
+      path: '/trash'
       fullPath: '/app/ncrs/trash'
       preLoaderRoute: typeof AppNcrsTrashRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppNcrsRoute
     }
     '/app/ncrs/$ncrId': {
       id: '/app/ncrs/$ncrId'
-      path: '/ncrs/$ncrId'
+      path: '/$ncrId'
       fullPath: '/app/ncrs/$ncrId'
       preLoaderRoute: typeof AppNcrsNcrIdRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppNcrsRoute
     }
     '/app/instruments/trash': {
       id: '/app/instruments/trash'
@@ -1420,6 +1437,21 @@ const AppInstrumentsRouteChildren: AppInstrumentsRouteChildren = {
 const AppInstrumentsRouteWithChildren = AppInstrumentsRoute._addFileChildren(
   AppInstrumentsRouteChildren,
 )
+
+interface AppNcrsRouteChildren {
+  AppNcrsNcrIdRoute: typeof AppNcrsNcrIdRoute
+  AppNcrsTrashRoute: typeof AppNcrsTrashRoute
+  AppNcrsIndexRoute: typeof AppNcrsIndexRoute
+}
+
+const AppNcrsRouteChildren: AppNcrsRouteChildren = {
+  AppNcrsNcrIdRoute: AppNcrsNcrIdRoute,
+  AppNcrsTrashRoute: AppNcrsTrashRoute,
+  AppNcrsIndexRoute: AppNcrsIndexRoute,
+}
+
+const AppNcrsRouteWithChildren =
+  AppNcrsRoute._addFileChildren(AppNcrsRouteChildren)
 
 interface AppPqrsRouteChildren {
   AppPqrsPqrIdRoute: typeof AppPqrsPqrIdRoute
@@ -1525,6 +1557,7 @@ interface AppRouteChildren {
   AppBillingRoute: typeof AppBillingRoute
   AppEquipmentRoute: typeof AppEquipmentRouteWithChildren
   AppInstrumentsRoute: typeof AppInstrumentsRouteWithChildren
+  AppNcrsRoute: typeof AppNcrsRouteWithChildren
   AppPqrsRoute: typeof AppPqrsRouteWithChildren
   AppProceduresRoute: typeof AppProceduresRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRouteWithChildren
@@ -1539,15 +1572,12 @@ interface AppRouteChildren {
   AppInspectionsInspectionIdRoute: typeof AppInspectionsInspectionIdRoute
   AppInspectionsPlanRoute: typeof AppInspectionsPlanRoute
   AppInspectionsTrashRoute: typeof AppInspectionsTrashRoute
-  AppNcrsNcrIdRoute: typeof AppNcrsNcrIdRoute
-  AppNcrsTrashRoute: typeof AppNcrsTrashRoute
   AppQualityDashboardRoute: typeof AppQualityDashboardRoute
   AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
   AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
   AppWeldsTrashRoute: typeof AppWeldsTrashRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
   AppInspectionsIndexRoute: typeof AppInspectionsIndexRoute
-  AppNcrsIndexRoute: typeof AppNcrsIndexRoute
   AppWeldsIndexRoute: typeof AppWeldsIndexRoute
 }
 
@@ -1556,6 +1586,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBillingRoute: AppBillingRoute,
   AppEquipmentRoute: AppEquipmentRouteWithChildren,
   AppInstrumentsRoute: AppInstrumentsRouteWithChildren,
+  AppNcrsRoute: AppNcrsRouteWithChildren,
   AppPqrsRoute: AppPqrsRouteWithChildren,
   AppProceduresRoute: AppProceduresRouteWithChildren,
   AppProjectsRoute: AppProjectsRouteWithChildren,
@@ -1570,15 +1601,12 @@ const AppRouteChildren: AppRouteChildren = {
   AppInspectionsInspectionIdRoute: AppInspectionsInspectionIdRoute,
   AppInspectionsPlanRoute: AppInspectionsPlanRoute,
   AppInspectionsTrashRoute: AppInspectionsTrashRoute,
-  AppNcrsNcrIdRoute: AppNcrsNcrIdRoute,
-  AppNcrsTrashRoute: AppNcrsTrashRoute,
   AppQualityDashboardRoute: AppQualityDashboardRoute,
   AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
   AppWeldsDashboardRoute: AppWeldsDashboardRoute,
   AppWeldsTrashRoute: AppWeldsTrashRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
   AppInspectionsIndexRoute: AppInspectionsIndexRoute,
-  AppNcrsIndexRoute: AppNcrsIndexRoute,
   AppWeldsIndexRoute: AppWeldsIndexRoute,
 }
 
