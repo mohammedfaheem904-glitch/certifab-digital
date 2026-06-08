@@ -69,7 +69,16 @@ function NcrsPage() {
     <ModulePage
       title="Non-Conformance Reports"
       subtitle="Raise, investigate, and close NCRs with full root-cause and corrective-action workflow."
-      action={<NewNcrDialog onDone={() => qc.invalidateQueries({ queryKey: ["ncrs"] })} />}
+      action={
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Link to="/app/ncrs/trash">
+              <Button variant="outline" size="sm"><Trash2 className="size-4 me-1" /> Trash</Button>
+            </Link>
+          )}
+          <NewNcrDialog onDone={() => qc.invalidateQueries({ queryKey: ["ncrs"] })} />
+        </div>
+      }
     >
       <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-3 border-b border-border">
         <Stat icon={ShieldAlert} label="Open" value={open} tone="warning" />
