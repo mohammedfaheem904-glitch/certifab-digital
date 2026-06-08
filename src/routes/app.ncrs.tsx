@@ -130,7 +130,9 @@ function NcrsPage() {
                   <td className="px-5 py-3 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
                   <td className="px-5 py-3 text-end">
                     <div className="flex items-center justify-end gap-1">
-                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => nav({ to: "/app/ncrs/$ncrId", params: { ncrId: r.id } })} aria-label="Open NCR details"><Eye className="size-4" /></Button>
+                      <Link to="/app/ncrs/$ncrId" params={{ ncrId: r.id }} aria-label="Open NCR details">
+                        <Button size="icon" variant="ghost" className="h-8 w-8"><Eye className="size-4" /></Button>
+                      </Link>
                       {isEditor && (
                         <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" disabled={busyId === r.id} onClick={() => moveToTrash(r.id, r.ncr_no)} aria-label="Move to trash">
                           {busyId === r.id ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
