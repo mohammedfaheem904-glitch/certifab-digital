@@ -87,6 +87,7 @@ export function JointConfigList({ procedureId, canEdit }: { procedureId: string;
 }
 
 function JointCard({ joint, canEdit, onChange }: { joint: any; canEdit: boolean; onChange: () => void }) {
+  const confirmDialog = useConfirm();
   const { profile } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);

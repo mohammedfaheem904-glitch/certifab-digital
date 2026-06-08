@@ -69,6 +69,7 @@ export const Route = createFileRoute("/app/procedures/$procedureId")({
 });
 
 function ProcedureDetailPage() {
+  const confirmDialog = useConfirm();
   const { procedureId } = Route.useParams();
   const { profile, user, roles } = useAuth();
   const qc = useQueryClient();
