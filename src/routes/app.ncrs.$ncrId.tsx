@@ -173,6 +173,25 @@ function NcrDetail() {
           </div>
         </TabsContent>
 
+        <TabsContent value="governance">
+          <NcrTransitionBar ncr={n} onChanged={() => {
+            qc.invalidateQueries({ queryKey: ["ncr", ncrId] });
+            qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] });
+          }} />
+        </TabsContent>
+        <TabsContent value="rca">
+          <RcaPanel ncrId={ncrId} companyId={profile?.company_id ?? null} onChanged={() => qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] })} />
+        </TabsContent>
+        <TabsContent value="capa">
+          <CapaPanel ncrId={ncrId} companyId={profile?.company_id ?? null} onChanged={() => qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] })} />
+        </TabsContent>
+        <TabsContent value="rework">
+          <ReworkPanel ncr={n} onChanged={() => {
+            qc.invalidateQueries({ queryKey: ["ncr", ncrId] });
+            qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] });
+          }} />
+        </TabsContent>
+
         <TabsContent value="audit">
           <div className="rounded-xl border border-border bg-card p-5">
             <ol className="relative border-s border-border ms-2 space-y-4">
