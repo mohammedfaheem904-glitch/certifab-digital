@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,11 +11,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/StatusBadge";
-import { AlertTriangle, Clock, Loader2, Plus, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Clock, Loader2, Plus, ShieldAlert, Eye, Trash2 } from "lucide-react";
 import { daysUntil } from "@/lib/format";
 import { exportExcel } from "@/lib/export";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/ConfirmDialog";
+import { useIsEditor } from "@/lib/use-role";
 
 export const Route = createFileRoute("/app/ncrs")({
   component: NcrsPage,
