@@ -107,11 +107,11 @@ function NcrsPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-xs text-muted-foreground bg-muted/40 sticky top-0">
-            <tr><Th>NCR</Th><Th>Title</Th><Th>Severity</Th><Th>Status</Th><Th>Due</Th><Th>Raised</Th></tr>
+            <tr><Th>NCR</Th><Th>Title</Th><Th>Severity</Th><Th>Status</Th><Th>Due</Th><Th>Raised</Th><th className="text-end font-medium px-5 py-2.5">Actions</th></tr>
           </thead>
           <tbody>
-            {isLoading && <tr><td colSpan={6} className="px-5 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /></td></tr>}
-            {!isLoading && rows.length === 0 && <tr><td colSpan={6} className="px-5 py-10 text-center text-muted-foreground">No NCRs.</td></tr>}
+            {isLoading && <tr><td colSpan={7} className="px-5 py-10 text-center text-muted-foreground"><Loader2 className="size-4 animate-spin inline" /></td></tr>}
+            {!isLoading && rows.length === 0 && <tr><td colSpan={7} className="px-5 py-10 text-center text-muted-foreground">No NCRs.</td></tr>}
             {rows.map((r: any) => {
               const d = r.due_date ? daysUntil(r.due_date) : null;
               return (
@@ -128,6 +128,16 @@ function NcrsPage() {
                       <span className="ms-2 text-[10px] px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">Overdue {Math.abs(d)}d</span>}
                   </td>
                   <td className="px-5 py-3 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 text-end">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => nav({ to: "/app/ncrs/$ncrId", params: { ncrId: r.id } })} aria-label="Open NCR details"><Eye className="size-4" /></Button>
+                      {isEditor && (
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" disabled={busyId === r.id} onClick={() => moveToTrash(r.id, r.ncr_no)} aria-label="Move to trash">
+                          {busyId === r.id ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+                        </Button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               );
             })}
