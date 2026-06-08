@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useConfirm } from "@/components/ConfirmDialog";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ModulePage } from "@/components/ModulePage";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,7 @@ function TrashPage() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!profile?.company_id) return;
     setRows(null);
     const { data, error } = await (supabase.from("inspections" as any) as any)
@@ -43,7 +43,7 @@ function TrashPage() {
       .order("deleted_at", { ascending: false });
     if (error) { toast.error(error.message); setRows([]); return; }
     setRows((data ?? []) as Row[]);
-  };
+  }, [profile?.company_id]);
 
   useEffect(() => { if (isAdmin) load(); }, [isAdmin, profile?.company_id, load]);
 
