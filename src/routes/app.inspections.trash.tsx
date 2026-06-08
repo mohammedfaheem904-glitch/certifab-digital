@@ -45,7 +45,7 @@ function TrashPage() {
     setRows((data ?? []) as Row[]);
   };
 
-  useEffect(() => { if (isAdmin) load(); /* eslint-disable-next-line */ }, [isAdmin, profile?.company_id]);
+  useEffect(() => { if (isAdmin) load(); }, [isAdmin, profile?.company_id, load]);
 
   if (!isAdmin) {
     return (
