@@ -94,6 +94,7 @@ export function AppLayout() {
     { to: "/app/welds", label: t("welds"), icon: Flame, surface: "welds" },
     { to: "/app/inspections", label: t("inspections"), icon: ClipboardCheck },
     { to: "/app/ncrs", label: "NCRs", icon: ScrollText, surface: "ncrs" },
+    { to: "/app/quality/dashboard", label: "Quality Dashboard", icon: Gauge },
     { to: "/app/equipment", label: t("equipment"), icon: Wrench },
     { to: "/app/instruments", label: "QA/QC Instruments", icon: Gauge },
     { to: "/app/projects", label: t("projects"), icon: FolderKanban },

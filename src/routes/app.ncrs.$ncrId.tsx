@@ -12,13 +12,17 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import { NcrReportDocument } from "@/components/reports/NcrReportDocument";
 import { daysUntil } from "@/lib/format";
 import { toast } from "sonner";
-import { NcrTransitionBar, RcaPanel, CapaPanel, ReworkPanel } from "@/components/ncr/NcrGovernancePanels";
-
-const FLOW = ["Open", "Root Cause", "CA Pending", "In Review", "Closed"] as const;
+import { NcrTransitionBar, RcaPanel, ReworkPanel } from "@/components/ncr/NcrGovernancePanels";
+import { NcrWorkflowStepper } from "@/components/ncr/NcrWorkflowStepper";
+import { NcrActionBar } from "@/components/ncr/NcrActionBar";
+import { GovernanceBanner } from "@/components/ncr/GovernanceBanner";
+import { CapaBoard } from "@/components/ncr/CapaBoard";
+import { ReInspectionPanel } from "@/components/ncr/ReInspectionPanel";
+import { NcrAuditTimeline } from "@/components/ncr/NcrAuditTimeline";
 
 export const Route = createFileRoute("/app/ncrs/$ncrId")({
   component: NcrDetail,
@@ -52,6 +56,26 @@ function NcrDetail() {
     },
   });
 
+  const capas = useQuery<any[]>({
+    queryKey: ["capa", ncrId],
+    enabled: !!profile?.company_id,
+    queryFn: async () => {
+      const { data } = await (supabase.from("capa_actions" as any) as any)
+        .select("*").eq("ncr_id", ncrId).order("created_at", { ascending: true });
+      return (data ?? []) as any[];
+    },
+  });
+
+  const rework = useQuery<any[]>({
+    queryKey: ["rework", ncrId],
+    enabled: !!profile?.company_id,
+    queryFn: async () => {
+      const { data } = await (supabase.from("rework_jobs" as any) as any)
+        .select("*").eq("ncr_id", ncrId).order("created_at", { ascending: false });
+      return (data ?? []) as any[];
+    },
+  });
+
   const [drafts, setDrafts] = useState<any>({});
   const [busy, setBusy] = useState(false);
 
@@ -80,24 +104,21 @@ function NcrDetail() {
     toast.success("Updated.");
   };
 
-  const advance = async () => {
-    const idx = FLOW.indexOf(n.status as any);
-    const next = idx >= 0 && idx < FLOW.length - 1 ? FLOW[idx + 1] : "Closed";
-    const patch: any = { status: next };
-    if (next === "Closed") {
-      patch.closed_at = new Date().toISOString();
-      patch.closed_by = user?.id ?? null;
-    }
-    await update(patch, "status_advance");
+  const refreshAll = () => {
+    qc.invalidateQueries({ queryKey: ["ncr", ncrId] });
+    qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] });
+    qc.invalidateQueries({ queryKey: ["capa", ncrId] });
+    qc.invalidateQueries({ queryKey: ["rework", ncrId] });
   };
-  const reject = () => update({ status: "Rejected" }, "rejected");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 pb-24">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Link to="/app/ncrs" className="hover:text-foreground inline-flex items-center gap-1"><ArrowLeft className="size-3.5" /> NCRs</Link>
         <span>/</span><span className="text-foreground">{n.ncr_no}</span>
       </div>
+
+      <GovernanceBanner ncr={n} capas={capas.data ?? []} rework={rework.data ?? []} />
 
       <div className="rounded-xl border border-border bg-[image:var(--gradient-surface)] p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -111,40 +132,20 @@ function NcrDetail() {
             <div className="text-sm mt-1">{n.title}</div>
             <div className="text-xs text-muted-foreground mt-1">Raised {new Date(n.created_at).toLocaleString()} · Due {n.due_date ?? "—"}</div>
           </div>
-          <div className="flex gap-2">
-            {!["Closed", "Rejected"].includes(n.status) && (
-              <>
-                <Button variant="outline" size="sm" onClick={reject} disabled={busy}>Reject</Button>
-                <Button size="sm" onClick={advance} disabled={busy} className="bg-[image:var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-glow)]">
-                  {busy ? <Loader2 className="size-4 animate-spin" /> : `Advance → ${FLOW[Math.min(FLOW.indexOf(n.status as any) + 1, FLOW.length - 1)] ?? "Closed"}`}
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-6 flex items-center gap-1 text-xs">
-          {FLOW.map((s, i) => {
-            const idx = FLOW.indexOf(n.status as any);
-            const reached = i <= idx;
-            return (
-              <div key={s} className="flex items-center gap-1">
-                <span className={`px-2 py-1 rounded ${reached ? "bg-primary/15 text-primary" : "bg-muted/40 text-muted-foreground"}`}>{s}</span>
-                {i < FLOW.length - 1 && <span className="text-muted-foreground">→</span>}
-              </div>
-            );
-          })}
         </div>
       </div>
 
+      <NcrWorkflowStepper ncr={n} events={events.data ?? []} />
+
       <Tabs defaultValue="workflow">
         <TabsList className="print:hidden">
-          <TabsTrigger value="workflow">Workflow</TabsTrigger>
-          <TabsTrigger value="governance">Governance</TabsTrigger>
+          <TabsTrigger value="workflow">Details</TabsTrigger>
+          <TabsTrigger value="governance">Transition</TabsTrigger>
           <TabsTrigger value="rca">Root Cause</TabsTrigger>
           <TabsTrigger value="capa">CAPA</TabsTrigger>
           <TabsTrigger value="rework">Rework</TabsTrigger>
-          <TabsTrigger value="audit">Audit trail ({events.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="reinspect">Re-Inspection</TabsTrigger>
+          <TabsTrigger value="audit">Audit timeline ({events.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="report"><FileText className="size-4 me-1.5" />NCR Report</TabsTrigger>
         </TabsList>
         <TabsContent value="workflow" className="space-y-4">
@@ -158,7 +159,7 @@ function NcrDetail() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">Severity</Label>
-                <Select value={n.severity ?? "Medium"} onValueChange={(v) => update({ severity: v }, "severity_changed")}>
+                <Select value={n.severity ?? "Medium"} onValueChange={(v) => update({ severity: v }, "severity_changed")} disabled={busy}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>{["Low", "Medium", "High", "Critical"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
@@ -174,43 +175,31 @@ function NcrDetail() {
         </TabsContent>
 
         <TabsContent value="governance">
-          <NcrTransitionBar ncr={n} onChanged={() => {
-            qc.invalidateQueries({ queryKey: ["ncr", ncrId] });
-            qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] });
-          }} />
+          <NcrTransitionBar ncr={n} onChanged={refreshAll} />
         </TabsContent>
         <TabsContent value="rca">
           <RcaPanel ncrId={ncrId} companyId={profile?.company_id ?? null} onChanged={() => qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] })} />
         </TabsContent>
         <TabsContent value="capa">
-          <CapaPanel ncrId={ncrId} companyId={profile?.company_id ?? null} onChanged={() => qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] })} />
+          <CapaBoard ncrId={ncrId} companyId={profile?.company_id ?? null} capas={capas.data ?? []} />
         </TabsContent>
         <TabsContent value="rework">
-          <ReworkPanel ncr={n} onChanged={() => {
-            qc.invalidateQueries({ queryKey: ["ncr", ncrId] });
-            qc.invalidateQueries({ queryKey: ["ncr_events", ncrId] });
-          }} />
+          <ReworkPanel ncr={n} onChanged={refreshAll} />
         </TabsContent>
-
+        <TabsContent value="reinspect">
+          <ReInspectionPanel ncr={n} events={events.data ?? []} onChanged={refreshAll} />
+        </TabsContent>
         <TabsContent value="audit">
           <div className="rounded-xl border border-border bg-card p-5">
-            <ol className="relative border-s border-border ms-2 space-y-4">
-              {(events.data ?? []).map((e: any) => (
-                <li key={e.id} className="ms-4">
-                  <div className="absolute -start-1.5 mt-1.5 size-3 rounded-full bg-primary/70" />
-                  <div className="text-sm font-medium">{e.kind.replace(/_/g, " ")}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</div>
-                  {e.comment && <div className="text-xs mt-1">{e.comment}</div>}
-                </li>
-              ))}
-              {(events.data?.length ?? 0) === 0 && <div className="text-sm text-muted-foreground">No events yet.</div>}
-            </ol>
+            <NcrAuditTimeline events={events.data ?? []} />
           </div>
         </TabsContent>
         <TabsContent value="report" className="mt-4">
           <NcrReportDocument ncr={n} events={events.data ?? []} />
         </TabsContent>
       </Tabs>
+
+      <NcrActionBar ncr={n} onChanged={refreshAll} />
     </div>
   );
 }
