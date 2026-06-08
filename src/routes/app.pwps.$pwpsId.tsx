@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { RouteErrorFallback, RouteNotFoundFallback } from "@/components/RouteErrorFallback";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Loader2, Save, ShieldCheck } from "lucide-react";
@@ -64,6 +65,8 @@ type Pwps = {
 
 export const Route = createFileRoute("/app/pwps/$pwpsId")({
   component: PwpsDetailPage,
+  errorComponent: RouteErrorFallback,
+  notFoundComponent: RouteNotFoundFallback,
 });
 
 function PwpsDetailPage() {
