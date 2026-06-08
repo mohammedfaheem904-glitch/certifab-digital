@@ -16,6 +16,7 @@ import { ArrowLeft, FileText, Loader2 } from "lucide-react";
 import { NcrReportDocument } from "@/components/reports/NcrReportDocument";
 import { daysUntil } from "@/lib/format";
 import { toast } from "sonner";
+import { NcrTransitionBar, RcaPanel, CapaPanel, ReworkPanel } from "@/components/ncr/NcrGovernancePanels";
 
 const FLOW = ["Open", "Root Cause", "CA Pending", "In Review", "Closed"] as const;
 
