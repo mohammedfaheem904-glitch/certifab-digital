@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/app/qualifications/$qualId")({
 });
 
 function QualDetail() {
+  const confirmDialog = useConfirm();
   const { qualId } = Route.useParams();
   const nav = useNavigate();
   const qc = useQueryClient();
@@ -79,7 +81,7 @@ function QualDetail() {
   };
 
   const softDelete = async () => {
-    if (!confirm("Move this WPQ to Trash? Super admins can restore it later.")) return;
+    if (!(await confirmDialog("Move this WPQ to Trash? Super admins can restore it later."))) return;
     const { error } = await (supabase.rpc as any)("soft_delete_qualification", { _id: qualId });
     if (error) {
       toast.error(error.message);
@@ -103,7 +105,7 @@ function QualDetail() {
   };
 
   const hardDelete = async () => {
-    if (!confirm("Permanently delete this WPQ and ALL related records? This cannot be undone.")) return;
+    if (!(await confirmDialog("Permanently delete this WPQ and ALL related records? This cannot be undone."))) return;
     const { error } = await supabase.from("qualifications").delete().eq("id", qualId);
     if (error) {
       toast.error(error.message);

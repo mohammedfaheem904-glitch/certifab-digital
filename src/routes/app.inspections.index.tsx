@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/app/inspections/")({
 });
 
 function InspectionsPage() {
+  const confirmDialog = useConfirm();
   const { profile, roles } = useAuth();
   const isAdmin = roles.includes("super_admin");
   const qc = useQueryClient();
@@ -141,7 +143,7 @@ function InspectionsPage() {
                       title="Move to trash"
                       onClick={async (e) => {
                         e.stopPropagation();
-                        if (!confirm(`Move inspection ${r.inspection_no ?? r.id.slice(0, 8)} to trash?`)) return;
+                        if (!(await confirmDialog(`Move inspection ${r.inspection_no ?? r.id.slice(0, 8)} to trash?`))) return;
                         const { error } = await (supabase.rpc as any)("soft_delete_inspection", { _id: r.id });
                         if (error) return toast.error(error.message);
                         toast.success("Moved to trash.");

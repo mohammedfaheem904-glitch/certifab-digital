@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ModulePage } from "@/components/ModulePage";
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/app/instruments/")({
 });
 
 function InstrumentsPage() {
+  const confirmDialog = useConfirm();
   const { data, isLoading } = useCompanyRows<Row>("instruments", { order: { column: "calibration_due", ascending: true } });
   const qc = useQueryClient();
   const nav = useNavigate();
@@ -103,7 +105,7 @@ function InstrumentsPage() {
   };
 
   const moveToTrash = async (ids: string[]) => {
-    if (!confirm(`Move ${ids.length} instrument(s) to trash?`)) return;
+    if (!(await confirmDialog(`Move ${ids.length} instrument(s) to trash?`))) return;
     setBusy("bulk");
     let ok = 0, fail = 0;
     for (const id of ids) {

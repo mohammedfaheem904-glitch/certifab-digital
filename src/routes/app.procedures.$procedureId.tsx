@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -33,6 +34,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { PRINT_MODES, type WpsPrintMode } from "@/lib/wps-export";
 
 function PrintModeMenu() {
+  const confirmDialog = useConfirm();
   const print = (mode: WpsPrintMode) => {
     document.body.setAttribute("data-wps-print-mode", mode);
     setTimeout(() => {
@@ -263,7 +265,7 @@ function ProcedureDetailPage() {
   };
 
   const deleteAttachment = async (id: string, path: string) => {
-    if (!confirm("Delete this attachment?")) return;
+    if (!(await confirmDialog("Delete this attachment?"))) return;
     await supabase.storage.from("procedure-files").remove([path]);
     const { error } = await supabase.from("procedure_attachments").delete().eq("id", id);
     if (error) return toast.error(error.message);

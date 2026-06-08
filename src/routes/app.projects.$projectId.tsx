@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useConfirm } from "@/components/ConfirmDialog";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ModulePage } from "@/components/ModulePage";
@@ -43,6 +44,7 @@ type Project = {
 type Counts = { welds: number; inspections: number; ncrs: number; instruments: number };
 
 function ProjectDetailsPage() {
+  const confirmDialog = useConfirm();
   const { projectId } = Route.useParams();
   const { profile } = useAuth();
   const nav = useNavigate();
@@ -75,7 +77,7 @@ function ProjectDetailsPage() {
   });
 
   const moveToTrash = async () => {
-    if (!confirm("Move this project to trash?")) return;
+    if (!(await confirmDialog("Move this project to trash?"))) return;
     setBusy(true);
     const { error } = await (supabase.rpc as any)("soft_delete_project", { _id: projectId });
     setBusy(false);
