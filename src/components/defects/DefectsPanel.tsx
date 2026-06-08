@@ -12,6 +12,7 @@ import { Loader2, Plus, Trash2, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { useNavigate } from "@tanstack/react-router";
+import { DefectNcrTag } from "@/components/ncr/DefectNcrTag";
 
 const SEVERITIES = ["Low", "Medium", "High", "Critical"] as const;
 const DISPOSITIONS = ["Accept", "Repair", "Reject", "Use As-Is", "Pending Engineering"];
@@ -44,7 +45,28 @@ export function DefectsPanel({
     },
   });
 
-  const refresh = () => qc.invalidateQueries({ queryKey: ["inspection_defects", inspectionId] });
+  const defectIds = (defects.data ?? []).map((d: any) => d.id);
+  const ncrLinks = useQuery<Record<string, { ncr_id: string; ncr_no: string; status: string }>>({
+    queryKey: ["defect_ncr_links", inspectionId, defectIds.length],
+    enabled: !!companyId && defectIds.length > 0,
+    queryFn: async () => {
+      const { data } = await (supabase.from("ncr_defect_links" as any) as any)
+        .select("defect_id, ncrs(id, ncr_no, status, deleted_at)")
+        .in("defect_id", defectIds);
+      const map: Record<string, any> = {};
+      (data ?? []).forEach((row: any) => {
+        if (row.ncrs && !row.ncrs.deleted_at) {
+          map[row.defect_id] = { ncr_id: row.ncrs.id, ncr_no: row.ncrs.ncr_no, status: row.ncrs.status };
+        }
+      });
+      return map;
+    },
+  });
+
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["inspection_defects", inspectionId] });
+    qc.invalidateQueries({ queryKey: ["defect_ncr_links", inspectionId] });
+  };
 
   const remove = async (id: string) => {
     if (!(await confirm({ title: "Delete defect?", description: "This will be removed permanently.", destructive: true }))) return;
@@ -101,28 +123,32 @@ export function DefectsPanel({
       )}
 
       <ul className="divide-y divide-border/60">
-        {(defects.data ?? []).map((d: any) => (
-          <li key={d.id} className="py-3 flex items-start gap-3">
-            <input type="checkbox" className="mt-1 size-4" checked={selected.has(d.id)} onChange={() => toggle(d.id)} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-medium">{d.defect_type}</span>
-                <Badge variant="outline">{d.category}</Badge>
-                <SeverityBadge severity={d.severity} />
-                {d.disposition && <Badge variant="outline" className="text-muted-foreground">{d.disposition}</Badge>}
+        {(defects.data ?? []).map((d: any) => {
+          const link = ncrLinks.data?.[d.id] ?? null;
+          return (
+            <li key={d.id} className="py-3 flex items-start gap-3">
+              <input type="checkbox" className="mt-1 size-4" checked={selected.has(d.id)} onChange={() => toggle(d.id)} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-medium">{d.defect_type}</span>
+                  <Badge variant="outline">{d.category}</Badge>
+                  <SeverityBadge severity={d.severity} />
+                  {d.disposition && <Badge variant="outline" className="text-muted-foreground">{d.disposition}</Badge>}
+                  <DefectNcrTag link={link} />
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {d.location && <>📍 {d.location} · </>}
+                  {d.code_reference && <>📘 {d.code_reference} · </>}
+                  {d.measurement && <>📏 {d.measurement}</>}
+                </div>
+                {d.repair_recommendation && <div className="text-xs mt-1">🔧 {d.repair_recommendation}</div>}
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">
-                {d.location && <>📍 {d.location} · </>}
-                {d.code_reference && <>📘 {d.code_reference} · </>}
-                {d.measurement && <>📏 {d.measurement}</>}
-              </div>
-              {d.repair_recommendation && <div className="text-xs mt-1">🔧 {d.repair_recommendation}</div>}
-            </div>
-            <Button variant="ghost" size="icon" onClick={() => remove(d.id)}>
-              <Trash2 className="size-4 text-muted-foreground" />
-            </Button>
-          </li>
-        ))}
+              <Button variant="ghost" size="icon" onClick={() => remove(d.id)} aria-label="Delete defect">
+                <Trash2 className="size-4 text-muted-foreground" />
+              </Button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

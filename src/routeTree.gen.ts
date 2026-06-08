@@ -53,6 +53,7 @@ import { Route as AppWeldsTrashRouteImport } from './routes/app.welds.trash'
 import { Route as AppWeldsDashboardRouteImport } from './routes/app.welds.dashboard'
 import { Route as AppWeldsWeldIdRouteImport } from './routes/app.welds.$weldId'
 import { Route as AppReportsSlugRouteImport } from './routes/app.reports.$slug'
+import { Route as AppQualityDashboardRouteImport } from './routes/app.quality.dashboard'
 import { Route as AppQualificationsTrashRouteImport } from './routes/app.qualifications.trash'
 import { Route as AppQualificationsNewRouteImport } from './routes/app.qualifications.new'
 import { Route as AppQualificationsDashboardRouteImport } from './routes/app.qualifications.dashboard'
@@ -301,6 +302,11 @@ const AppReportsSlugRoute = AppReportsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => AppReportsRoute,
 } as any)
+const AppQualityDashboardRoute = AppQualityDashboardRouteImport.update({
+  id: '/quality/dashboard',
+  path: '/quality/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppQualificationsTrashRoute = AppQualificationsTrashRouteImport.update({
   id: '/trash',
   path: '/trash',
@@ -489,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
   '/app/qualifications/trash': typeof AppQualificationsTrashRoute
+  '/app/quality/dashboard': typeof AppQualityDashboardRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/app/welds/dashboard': typeof AppWeldsDashboardRoute
@@ -553,6 +560,7 @@ export interface FileRoutesByTo {
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
   '/app/qualifications/trash': typeof AppQualificationsTrashRoute
+  '/app/quality/dashboard': typeof AppQualityDashboardRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/app/welds/dashboard': typeof AppWeldsDashboardRoute
@@ -626,6 +634,7 @@ export interface FileRoutesById {
   '/app/qualifications/dashboard': typeof AppQualificationsDashboardRoute
   '/app/qualifications/new': typeof AppQualificationsNewRoute
   '/app/qualifications/trash': typeof AppQualificationsTrashRoute
+  '/app/quality/dashboard': typeof AppQualityDashboardRoute
   '/app/reports/$slug': typeof AppReportsSlugRoute
   '/app/welds/$weldId': typeof AppWeldsWeldIdRoute
   '/app/welds/dashboard': typeof AppWeldsDashboardRoute
@@ -700,6 +709,7 @@ export interface FileRouteTypes {
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
     | '/app/qualifications/trash'
+    | '/app/quality/dashboard'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/app/welds/dashboard'
@@ -764,6 +774,7 @@ export interface FileRouteTypes {
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
     | '/app/qualifications/trash'
+    | '/app/quality/dashboard'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/app/welds/dashboard'
@@ -836,6 +847,7 @@ export interface FileRouteTypes {
     | '/app/qualifications/dashboard'
     | '/app/qualifications/new'
     | '/app/qualifications/trash'
+    | '/app/quality/dashboard'
     | '/app/reports/$slug'
     | '/app/welds/$weldId'
     | '/app/welds/dashboard'
@@ -1184,6 +1196,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/reports/$slug'
       preLoaderRoute: typeof AppReportsSlugRouteImport
       parentRoute: typeof AppReportsRoute
+    }
+    '/app/quality/dashboard': {
+      id: '/app/quality/dashboard'
+      path: '/quality/dashboard'
+      fullPath: '/app/quality/dashboard'
+      preLoaderRoute: typeof AppQualityDashboardRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/qualifications/trash': {
       id: '/app/qualifications/trash'
@@ -1534,6 +1553,7 @@ interface AppRouteChildren {
   AppInspectionsInspectionIdRoute: typeof AppInspectionsInspectionIdRoute
   AppInspectionsPlanRoute: typeof AppInspectionsPlanRoute
   AppInspectionsTrashRoute: typeof AppInspectionsTrashRoute
+  AppQualityDashboardRoute: typeof AppQualityDashboardRoute
   AppWeldsWeldIdRoute: typeof AppWeldsWeldIdRoute
   AppWeldsDashboardRoute: typeof AppWeldsDashboardRoute
   AppWeldsTrashRoute: typeof AppWeldsTrashRoute
@@ -1562,6 +1582,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppInspectionsInspectionIdRoute: AppInspectionsInspectionIdRoute,
   AppInspectionsPlanRoute: AppInspectionsPlanRoute,
   AppInspectionsTrashRoute: AppInspectionsTrashRoute,
+  AppQualityDashboardRoute: AppQualityDashboardRoute,
   AppWeldsWeldIdRoute: AppWeldsWeldIdRoute,
   AppWeldsDashboardRoute: AppWeldsDashboardRoute,
   AppWeldsTrashRoute: AppWeldsTrashRoute,
