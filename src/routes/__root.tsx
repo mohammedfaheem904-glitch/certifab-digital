@@ -11,6 +11,7 @@ import { AuthProvider } from "@/lib/auth";
 import { TenantBrandingProvider } from "@/lib/tenant-branding";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ConfirmDialogProvider } from "@/components/ConfirmDialog";
 
 function NotFoundComponent() {
   return (
@@ -83,10 +84,12 @@ function RootComponent() {
       <AuthProvider>
         <TenantBrandingProvider>
           <I18nProvider>
-            <ErrorBoundary>
-              <Outlet />
-            </ErrorBoundary>
-            <Toaster richColors position="top-right" />
+            <ConfirmDialogProvider>
+              <ErrorBoundary>
+                <Outlet />
+              </ErrorBoundary>
+              <Toaster richColors position="top-right" />
+            </ConfirmDialogProvider>
           </I18nProvider>
         </TenantBrandingProvider>
       </AuthProvider>
