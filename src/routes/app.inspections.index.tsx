@@ -63,7 +63,7 @@ function InspectionsPage() {
 
   return (
     <ModulePage
-      title="Inspections & NCR Workflow"
+      title="Inspections"
       subtitle="Plan, execute, accept or reject inspections — and govern the corrective-action lifecycle from request to closure."
       action={
         <div className="flex items-center gap-2">
