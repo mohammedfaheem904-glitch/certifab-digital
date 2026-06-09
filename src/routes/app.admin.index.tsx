@@ -167,7 +167,7 @@ function AdminConsole() {
           <div className="flex items-center justify-between px-5 py-3 border-b border-border">
             <div className="flex items-center gap-2 text-sm font-medium">
               <FileWarning className="size-4 text-warning" />
-              Welder qualifications expiring (30 days)
+              Welders qualifications expiring (30 days)
             </div>
             <Button asChild variant="ghost" size="sm">
               <Link to="/app/qualifications">Manage</Link>

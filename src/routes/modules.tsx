@@ -19,7 +19,7 @@ export const Route = createFileRoute("/modules")({
 const MODULES = [
   { icon: FolderOpen, n: "Projects", d: "Multi-project workspace with client, location and scope." },
   { icon: FileText, n: "WPS (Welding Procedure Specification)", d: "Versioned procedure register with approval, lock, attachments and PDF export." },
-  { icon: ClipboardCheck, n: "Welder Qualifications", d: "WPQ register, scope of approval, continuity, expiry alerts." },
+  { icon: ClipboardCheck, n: "Welders Qualifications", d: "WPQ register, scope of approval, continuity, expiry alerts." },
   { icon: Activity, n: "Weld Traceability", d: "Joint log with QR token, heat numbers, filler metals, drawing/spool/line." },
   { icon: ShieldCheck, n: "Inspections (NDT)", d: "VT, RT, UT, PT, MT outcomes with inspector and signed-off evidence." },
   { icon: AlertTriangle, n: "Non-Conformance (NCR)", d: "Status-driven NCR pipeline with root cause, CA/PA and review." },
@@ -41,7 +41,7 @@ function ModulesPage() {
             Twelve modules. One operational record.
           </h1>
           <p className="mt-5 text-lg text-muted-foreground max-w-2xl">
-            Each module is independently useful and tightly integrated. Start with welder qualifications today, add weld traceability and NCR management as you scale.
+            Each module is independently useful and tightly integrated. Start with welders qualifications today, add weld traceability and NCR management as you scale.
           </p>
         </div>
       </section>
