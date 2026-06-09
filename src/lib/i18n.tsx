@@ -8,7 +8,7 @@ const dict = {
     tagline: "Digital Welding Management System",
     dashboard: "Dashboard",
     procedures: "Procedures",
-    qualifications: "Qualifications",
+    qualifications: "WPQ (Welder Performance Qualification)",
     welds: "Weld Log",
     inspections: "Inspections",
     equipment: "Equipment",

@@ -21,7 +21,7 @@ const GROUPS = [
     title: "Procedure & qualification control",
     items: [
       { icon: FileText, n: "WPS / PQR authoring", d: "Versioned procedures with revision lock, approval workflow and PDF exports." },
-      { icon: ClipboardCheck, n: "Welders qualifications", d: "WPQ register with scope of approval, continuity tracking and expiry alerts." },
+      { icon: ClipboardCheck, n: "WPQ (Welder Performance Qualification)", d: "WPQ register with scope of approval, continuity tracking and expiry alerts." },
       { icon: Workflow, n: "Heat-input engine", d: "Automatic kJ/mm calculation from voltage, amperage and travel speed; validates against the WPS qualified range." },
     ],
   },
