@@ -10,7 +10,7 @@ export const Route = createFileRoute("/app/reports/$slug")({
 });
 
 const TITLES: Record<string, string> = {
-  qualifications: "Welder Qualifications Register",
+  qualifications: "Welders Qualifications Register",
   procedures: "WPS / PQR Register",
   welds: "Weld Traceability Report",
   inspections: "Inspection Outcomes Report",

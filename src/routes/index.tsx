@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "canonical", href: "https://weldyard.com/" }],
     meta: [
       { title: "Weld Yard — Digital Welding Management System (DWMS)" },
-      { name: "description", content: "Cloud DWMS for industrial welding QA/QC. Manage WPS/PQR, welder qualifications, weld traceability, NDT inspections, NCRs and equipment calibration in one platform." },
+      { name: "description", content: "Cloud DWMS for industrial welding QA/QC. Manage WPS/PQR, welders qualifications, weld traceability, NDT inspections, NCRs and equipment calibration in one platform." },
       { property: "og:title", content: "Weld Yard — Digital Welding Management" },
       { property: "og:description", content: "Replace paper and Excel with a modern industrial SaaS for welding QA/QC." },
       { property: "og:url", content: "https://weldyard.com/" },
@@ -43,7 +43,7 @@ function Landing() {
             QA/QC.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-2xl">
-            Manage WPS, welder qualifications, weld traceability, NDT inspections,
+            Manage WPS, welders qualifications, weld traceability, NDT inspections,
             NCRs and equipment calibration — across every project, every site, every shift.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -104,7 +104,7 @@ function Landing() {
         <div className="mt-12 grid md:grid-cols-3 gap-5">
           {[
             { icon: FileText, title: "WPS & PQR control", body: "Author, revise and lock procedures. Heat-input engine validates every weld against the qualified range." },
-            { icon: ClipboardCheck, title: "Welder qualifications", body: "Track WPQ/PQR, expiry, scope of approval and continuity. Email reminders before lapses." },
+            { icon: ClipboardCheck, title: "Welders qualifications", body: "Track WPQ/PQR, expiry, scope of approval and continuity. Email reminders before lapses." },
             { icon: QrCode, title: "Weld traceability", body: "Every joint has a QR token linking welder, WPS, heat numbers, NDT results and NCRs." },
             { icon: ShieldCheck, title: "Inspections & NCRs workflow", body: "VT, RT, UT, PT, MT outcomes feed a status-driven NCR pipeline with root cause and CA/PA." },
             { icon: Gauge, title: "Calibration register", body: "Welding machines and QA/QC instruments with certificate uploads and overdue alerts." },

@@ -90,7 +90,7 @@ function TrashPage() {
   return (
     <ModulePage
       title="WPQ Trash"
-      subtitle="Soft-deleted Welder Qualifications. Restore to bring them back into active records."
+      subtitle="Soft-deleted Welders Qualifications. Restore to bring them back into active records."
       action={
         <Link to="/app/qualifications">
           <Button size="sm" variant="outline"><ArrowLeft className="size-4 me-1" /> Back to WPQ</Button>

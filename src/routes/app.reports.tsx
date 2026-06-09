@@ -3,7 +3,7 @@ import { ModulePage } from "@/components/ModulePage";
 import { FileText, ChevronRight } from "lucide-react";
 
 const REPORTS = [
-  { slug: "qualifications", title: "Welder Qualifications Register", desc: "Personnel certificates, expiries and continuity status." },
+  { slug: "qualifications", title: "Welders Qualifications Register", desc: "Personnel certificates, expiries and continuity status." },
   { slug: "procedures", title: "WPS / PQR Register", desc: "Approved procedures with revision and standard reference." },
   { slug: "welds", title: "Weld Traceability Report", desc: "Project → weld → procedure → inspection chain." },
   { slug: "inspections", title: "Inspection Outcomes Report", desc: "VT/PT/MT/RT/UT results with defect breakdown." },
