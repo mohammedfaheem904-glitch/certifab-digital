@@ -111,7 +111,7 @@ function QualificationsPage() {
 
   return (
     <ModulePage
-      title="Welders Qualifications"
+      title="WPQ (Welder Performance Qualification)"
       subtitle="ASME Section IX WPQ certificates — issuance, expiry, continuity & verification."
       action={
         <div className="flex gap-2">
