@@ -106,13 +106,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
       setRoles((rs ?? []).map((r: { role: string }) => r.role as AppRole));
 
-      if (p?.company_id) {
+      const companyId = p?.company_id;
+
+      if (companyId) {
         const { data: c } = await withTimeout(
           async () =>
             await supabase
               .from("companies")
               .select("name, logo_url, report_footer")
-              .eq("id", p.company_id)
+              .eq("id", companyId)
               .maybeSingle(),
           "Company bootstrap",
         );
