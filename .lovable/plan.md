@@ -1,29 +1,48 @@
-# Fix: NCR detail pages not opening
+## Goal
+Prevent the recurring "Preview has not been built yet" state by removing the frontend startup paths that can take the whole preview down after edits/rebuilds.
 
-## Root cause
+## What I found
+- The project preview is loading right now on my side, so the issue is not a permanent outage.
+- The hosted backend is healthy.
+- The current app boot path is fragile:
+  - `src/integrations/supabase/client.ts` can throw during startup if env/config resolution fails.
+  - `src/lib/auth.tsx` initializes auth immediately at app boot, so a client/init failure can blank the whole preview.
+  - There is no dedicated app-level fallback for configuration/bootstrap failures, so the preview can appear "not built" instead of showing a useful error state.
+- I did **not** find evidence that `.env` is being ignored in this repo, so I will not use that as the assumed root cause here.
 
-`src/routes/app.ncrs.tsx` is acting as the **parent** of `app.ncrs.$ncrId.tsx` and `app.ncrs.trash.tsx` (per `routeTree.gen.ts` lines 189–193). Because dot-segments create parent/child relationships in TanStack file routing, the parent must render `<Outlet />` for children to mount.
+## Implementation plan
+1. **Harden backend client initialization**
+   - Refactor the browser client bootstrap so it never crashes the entire app during preview startup.
+   - Remove unsafe browser-side env access patterns and replace them with a single safe config reader.
+   - Make the client report a structured configuration error instead of throwing at import/use time.
 
-Currently `app.ncrs.tsx` renders the full list page (`NcrsPage`) with no `<Outlet />`. Result: navigating to `/app/ncrs/<id>` matches the child route, but the parent keeps showing the list and the detail never renders.
+2. **Make auth startup resilient**
+   - Update the auth provider to handle client/session initialization failures gracefully.
+   - Prevent boot-time exceptions from propagating into a full preview failure.
+   - Preserve normal sign-in behavior when configuration is valid.
 
-Other modules in this project already follow the correct split (e.g. `app.welds.tsx` layout + `app.welds.index.tsx` leaf, same for pqrs/procedures/projects/pwps/qualifications).
+3. **Add a stable recovery UI for bootstrap failures**
+   - Show a clear in-app error screen when configuration/bootstrap fails, instead of letting the preview die.
+   - Keep this scoped to startup/runtime reliability only.
 
-## Fix
+4. **Add lightweight diagnostics for future recurrence**
+   - Add targeted console/error logging around client creation and auth boot.
+   - This makes future failures visible in preview tools instead of surfacing only as the generic preview message.
 
-1. **Rename** `src/routes/app.ncrs.tsx` → `src/routes/app.ncrs.index.tsx` and update its `createFileRoute("/app/ncrs")` to `createFileRoute("/app/ncrs/")` (the index leaf).
-2. **Create** a new minimal `src/routes/app.ncrs.tsx` layout:
-   ```tsx
-   import { createFileRoute, Outlet } from "@tanstack/react-router";
-   export const Route = createFileRoute("/app/ncrs")({
-     component: () => <Outlet />,
-   });
-   ```
-3. Let the TanStack Router Vite plugin regenerate `routeTree.gen.ts` automatically.
+5. **Validate against the recurrence pattern**
+   - Verify the app still opens after repeated frontend changes/reloads.
+   - Confirm the landing page and auth flow still render.
+   - Confirm that, if configuration is ever missing again, the app shows a controlled error state rather than collapsing the preview.
 
-No business logic, UI, or styling changes. Only the routing shell.
+## Technical details
+- Files likely involved:
+  - `src/integrations/supabase/client.ts`
+  - `src/lib/auth.tsx`
+  - `src/routes/__root.tsx` or a small new bootstrap/config error component
+- Scope intentionally excluded:
+  - No database schema changes
+  - No auth-provider reconfiguration unless a separate issue is found
+  - No unrelated UI/content edits
 
-## Verification
-
-- `/app/ncrs` still shows the list (now served by `app.ncrs.index.tsx`).
-- Clicking a row navigates to `/app/ncrs/<id>` and renders `NcrDetail`.
-- `/app/ncrs/trash` continues to work.
+## Expected result
+After this fix, small edits should no longer be able to knock the whole preview into an unrecoverable "not built yet" state. If startup configuration ever breaks again, the app should stay accessible and show a controlled error instead of failing invisibly.
