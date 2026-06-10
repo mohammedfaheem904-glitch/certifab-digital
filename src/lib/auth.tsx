@@ -143,7 +143,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsub: (() => void) | undefined;
     try {
       const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
-        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+        if (
+          event !== "INITIAL_SESSION" &&
+          event !== "SIGNED_IN" &&
+          event !== "SIGNED_OUT" &&
+          event !== "USER_UPDATED"
+        ) {
+          return;
+        }
         setBootstrapError(null);
         setSession(s);
         setUser(s?.user ?? null);
@@ -156,12 +163,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setCompanyLogo(null);
           setReportFooter(null);
         }
+        setLoading(false);
       });
       unsub = () => sub.subscription.unsubscribe();
 
-      supabase.auth
-        .getSession()
-        .then((result) => withTimeout(async () => result, "Auth session bootstrap"))
+      withTimeout(() => supabase.auth.getSession(), "Auth session bootstrap")
         .then(async ({ data }) => {
           setBootstrapError(null);
           setSession(data.session);
