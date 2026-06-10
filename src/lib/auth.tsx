@@ -91,31 +91,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
-      // Only react to identity transitions; ignore TOKEN_REFRESHED / INITIAL_SESSION
-      // to avoid redundant profile reloads on every tab focus / hourly refresh.
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) {
-        setTimeout(() => loadProfile(s.user.id), 0);
-      } else {
-        setProfile(null);
-        setRoles([]);
-        setCompanyName(null);
-        setCompanyLogo(null);
-        setReportFooter(null);
-      }
-    });
+    let unsub: (() => void) | undefined;
+    try {
+      const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+        setSession(s);
+        setUser(s?.user ?? null);
+        if (s?.user) {
+          setTimeout(() => loadProfile(s.user.id).catch((e) => console.error("[auth] loadProfile failed", e)), 0);
+        } else {
+          setProfile(null);
+          setRoles([]);
+          setCompanyName(null);
+          setCompanyLogo(null);
+          setReportFooter(null);
+        }
+      });
+      unsub = () => sub.subscription.unsubscribe();
 
-    supabase.auth.getSession().then(async ({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user) await loadProfile(data.session.user.id);
+      supabase.auth
+        .getSession()
+        .then(async ({ data }) => {
+          setSession(data.session);
+          setUser(data.session?.user ?? null);
+          if (data.session?.user) {
+            try {
+              await loadProfile(data.session.user.id);
+            } catch (e) {
+              console.error("[auth] initial loadProfile failed", e);
+            }
+          }
+          setLoading(false);
+        })
+        .catch((e) => {
+          console.error("[auth] getSession failed", e);
+          setLoading(false);
+        });
+    } catch (e) {
+      // Backend client unavailable at boot — keep the app rendering instead
+      // of letting the preview die.
+      console.error("[auth] auth init failed; continuing in unauthenticated mode", e);
       setLoading(false);
-    });
+    }
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      if (unsub) unsub();
+    };
   }, []);
 
   return (
