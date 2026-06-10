@@ -53,13 +53,13 @@ const Ctx = createContext<AuthState>({
 
 const AUTH_BOOT_TIMEOUT_MS = 8000;
 
-function withTimeout<T>(promise: Promise<T>, label: string, timeoutMs = AUTH_BOOT_TIMEOUT_MS) {
+function withTimeout<T>(factory: () => Promise<T>, label: string, timeoutMs = AUTH_BOOT_TIMEOUT_MS) {
   return new Promise<T>((resolve, reject) => {
     const timeoutId = setTimeout(() => {
       reject(new Error(`${label} timed out`));
     }, timeoutMs);
 
-    promise.then(
+    factory().then(
       (value) => {
         clearTimeout(timeoutId);
         resolve(value);
@@ -86,31 +86,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadProfile = async (uid: string) => {
     try {
       const { data: p } = await withTimeout(
-        supabase
-          .from("profiles")
-          .select("id, company_id, display_name, job_title, avatar_url, approval_status, rejection_reason")
-          .eq("id", uid)
-          .maybeSingle(),
+        async () =>
+          await supabase
+            .from("profiles")
+            .select("id, company_id, display_name, job_title, avatar_url, approval_status, rejection_reason")
+            .eq("id", uid)
+            .maybeSingle(),
         "Profile bootstrap",
       );
       setProfile((p as Profile | null) ?? null);
 
       const { data: rs } = await withTimeout(
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", uid),
+        async () =>
+          await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", uid),
         "Role bootstrap",
       );
-      setRoles((rs ?? []).map((r) => r.role as AppRole));
+      setRoles((rs ?? []).map((r: { role: string }) => r.role as AppRole));
 
       if (p?.company_id) {
         const { data: c } = await withTimeout(
-          supabase
-            .from("companies")
-            .select("name, logo_url, report_footer")
-            .eq("id", p.company_id)
-            .maybeSingle(),
+          async () =>
+            await supabase
+              .from("companies")
+              .select("name, logo_url, report_footer")
+              .eq("id", p.company_id)
+              .maybeSingle(),
           "Company bootstrap",
         );
         setCompanyName(c?.name ?? null);
@@ -156,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       supabase.auth
         .getSession()
-        .then((result) => withTimeout(Promise.resolve(result), "Auth session bootstrap"))
+        .then((result) => withTimeout(async () => result, "Auth session bootstrap"))
         .then(async ({ data }) => {
           setBootstrapError(null);
           setSession(data.session);
