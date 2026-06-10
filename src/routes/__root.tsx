@@ -14,6 +14,43 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ConfirmDialogProvider } from "@/components/ConfirmDialog";
 import { getSupabaseBootstrapError } from "@/integrations/supabase/client";
 
+function isRecoverableRouteError(error: Error) {
+  const message = error?.message?.toLowerCase?.() ?? "";
+  return (
+    message.includes("failed to fetch dynamically imported module") ||
+    message.includes("importing a module script failed") ||
+    message.includes("dynamically imported") ||
+    message.includes("loading chunk") ||
+    message.includes("chunkloaderror") ||
+    message.includes("modulepreload")
+  );
+}
+
+function RecoveryScreen({ title, message }: { title: string; message: string }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{title}</h1>
+        <p className="mt-2 text-sm text-muted-foreground break-words">{message}</p>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Reload
+          </button>
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+          >
+            Go home
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -39,6 +76,15 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+
+  if (isRecoverableRouteError(error)) {
+    return (
+      <RecoveryScreen
+        title="Preview needs a refresh"
+        message="A route update failed to reload cleanly after edits. Refreshing the preview will reconnect the latest code without leaving the app inaccessible."
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">

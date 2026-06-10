@@ -25,6 +25,7 @@ export type Profile = {
 
 type AuthState = {
   loading: boolean;
+  bootstrapError: string | null;
   session: Session | null;
   user: User | null;
   profile: Profile | null;
@@ -38,6 +39,7 @@ type AuthState = {
 
 const Ctx = createContext<AuthState>({
   loading: true,
+  bootstrapError: null,
   session: null,
   user: null,
   profile: null,
@@ -49,6 +51,27 @@ const Ctx = createContext<AuthState>({
   refresh: async () => {},
 });
 
+const AUTH_BOOT_TIMEOUT_MS = 8000;
+
+function withTimeout<T>(factory: () => Promise<T>, label: string, timeoutMs = AUTH_BOOT_TIMEOUT_MS) {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error(`${label} timed out`));
+    }, timeoutMs);
+
+    factory().then(
+      (value) => {
+        clearTimeout(timeoutId);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      },
+    );
+  });
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -58,35 +81,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
   const [reportFooter, setReportFooter] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [bootstrapError, setBootstrapError] = useState<string | null>(null);
 
   const loadProfile = async (uid: string) => {
-    const { data: p } = await supabase
-      .from("profiles")
-      .select("id, company_id, display_name, job_title, avatar_url, approval_status, rejection_reason")
-      .eq("id", uid)
-      .maybeSingle();
-    setProfile((p as Profile | null) ?? null);
+    try {
+      const { data: p } = await withTimeout(
+        async () =>
+          await supabase
+            .from("profiles")
+            .select("id, company_id, display_name, job_title, avatar_url, approval_status, rejection_reason")
+            .eq("id", uid)
+            .maybeSingle(),
+        "Profile bootstrap",
+      );
+      setProfile((p as Profile | null) ?? null);
 
+      const { data: rs } = await withTimeout(
+        async () =>
+          await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", uid),
+        "Role bootstrap",
+      );
+      setRoles((rs ?? []).map((r: { role: string }) => r.role as AppRole));
 
-    const { data: rs } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", uid);
-    setRoles((rs ?? []).map((r) => r.role as AppRole));
+      const companyId = p?.company_id;
 
-    if (p?.company_id) {
-      const { data: c } = await supabase
-        .from("companies")
-        .select("name, logo_url, report_footer")
-        .eq("id", p.company_id)
-        .maybeSingle();
-      setCompanyName(c?.name ?? null);
-      setCompanyLogo(c?.logo_url ?? null);
-      setReportFooter(c?.report_footer ?? null);
-    } else {
+      if (companyId) {
+        const { data: c } = await withTimeout(
+          async () =>
+            await supabase
+              .from("companies")
+              .select("name, logo_url, report_footer")
+              .eq("id", companyId)
+              .maybeSingle(),
+          "Company bootstrap",
+        );
+        setCompanyName(c?.name ?? null);
+        setCompanyLogo(c?.logo_url ?? null);
+        setReportFooter(c?.report_footer ?? null);
+      } else {
+        setCompanyName(null);
+        setCompanyLogo(null);
+        setReportFooter(null);
+      }
+
+      setBootstrapError(null);
+    } catch (error) {
+      setProfile(null);
+      setRoles([]);
       setCompanyName(null);
       setCompanyLogo(null);
       setReportFooter(null);
+      setBootstrapError(error instanceof Error ? error.message : String(error));
+      throw error;
     }
   };
 
@@ -94,7 +143,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsub: (() => void) | undefined;
     try {
       const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
-        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+        if (
+          event !== "INITIAL_SESSION" &&
+          event !== "SIGNED_IN" &&
+          event !== "SIGNED_OUT" &&
+          event !== "USER_UPDATED"
+        ) {
+          return;
+        }
+        setBootstrapError(null);
         setSession(s);
         setUser(s?.user ?? null);
         if (s?.user) {
@@ -106,12 +163,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setCompanyLogo(null);
           setReportFooter(null);
         }
+        setLoading(false);
       });
       unsub = () => sub.subscription.unsubscribe();
 
-      supabase.auth
-        .getSession()
+      withTimeout(() => supabase.auth.getSession(), "Auth session bootstrap")
         .then(async ({ data }) => {
+          setBootstrapError(null);
           setSession(data.session);
           setUser(data.session?.user ?? null);
           if (data.session?.user) {
@@ -125,12 +183,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         .catch((e) => {
           console.error("[auth] getSession failed", e);
+          setBootstrapError(e instanceof Error ? e.message : String(e));
           setLoading(false);
         });
     } catch (e) {
       // Backend client unavailable at boot — keep the app rendering instead
       // of letting the preview die.
       console.error("[auth] auth init failed; continuing in unauthenticated mode", e);
+      setBootstrapError(e instanceof Error ? e.message : String(e));
       setLoading(false);
     }
 
@@ -143,6 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <Ctx.Provider
       value={{
         loading,
+        bootstrapError,
         session,
         user,
         profile,
