@@ -31,6 +31,22 @@ window.addEventListener("error", (event) => {
   }
 });
 
+window.addEventListener("unhandledrejection", (event) => {
+  const reason = event.reason;
+  const message = reason instanceof Error ? reason.message : String(reason ?? "");
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes("failed to fetch dynamically imported module") ||
+    normalized.includes("loading chunk") ||
+    normalized.includes("chunkloaderror") ||
+    normalized.includes("modulepreload")
+  ) {
+    console.error("[preview recovery] unhandled route chunk failure", reason);
+    renderBootstrapFallback("A route update failed to finish loading after recent edits. Reloading the preview will reconnect the newest code safely.");
+  }
+});
+
 declare module "@tanstack/react-router" {
   interface Register {
     router: ReturnType<typeof getRouter>;
