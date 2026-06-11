@@ -227,6 +227,9 @@ function PqrDetailPage() {
         <TabsContent value="evaluation" className="mt-4">
           <PqrEvaluationPanel pqrId={pqrId} pqr={data} evaluation={evaluation} canEdit={isEditor} />
         </TabsContent>
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="pqr" entityId={pqrId} />
+        </TabsContent>
       </Tabs>
     </div>
   );
