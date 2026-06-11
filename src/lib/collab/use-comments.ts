@@ -130,7 +130,7 @@ export function useComments(entityType: CollabEntityType, entityId: string | nul
       )
       .subscribe();
     return () => {
-      supabase.removeChannel(ch);
+      void supabase.removeChannel(ch);
     };
   }, [enabled, entityType, entityId, qc]);
 
