@@ -227,6 +227,10 @@ function InstrumentDetail() {
             hint="Drag certificates, manuals, photos."
           />
         </TabsContent>
+
+        <TabsContent value="discussion">
+          <CollaborationTab entityType="instrument" entityId={instrumentId} />
+        </TabsContent>
       </Tabs>
     </div>
   );
