@@ -19,6 +19,7 @@ import {
   pwpsStageIndex,
   type PwpsStatus,
 } from "@/lib/pwps-workflow";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 type Pwps = {
   id: string;
