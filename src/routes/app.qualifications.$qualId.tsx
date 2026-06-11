@@ -365,6 +365,9 @@ function QualDetail() {
             verifyUrl={verifyUrl}
           />
         </TabsContent>
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="qualification" entityId={qualId} />
+        </TabsContent>
       </Tabs>
     </div>
   );
