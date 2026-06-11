@@ -1,7 +1,9 @@
 {
   "name": "weld-yard",
   "private": true,
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
