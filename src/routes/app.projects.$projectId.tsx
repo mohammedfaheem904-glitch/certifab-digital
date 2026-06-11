@@ -14,6 +14,7 @@ import { ProjectWorkflowStepper } from "@/components/projects/ProjectWorkflowSte
 import { ProjectActionBar } from "@/components/projects/ProjectActionBar";
 import { ProjectTimeline } from "@/components/projects/ProjectTimeline";
 import type { ProjectWorkflowStatus } from "@/lib/project-workflow";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/projects/$projectId")({
   component: ProjectDetailsPage,
