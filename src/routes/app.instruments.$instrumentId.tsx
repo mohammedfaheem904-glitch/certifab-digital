@@ -18,6 +18,7 @@ import { daysUntil } from "@/lib/format";
 import { exportExcel } from "@/lib/export";
 import { signedUrl } from "@/lib/storage";
 import { toast } from "sonner";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/instruments/$instrumentId")({
   component: InstrumentDetail,
