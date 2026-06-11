@@ -21,6 +21,7 @@ import { ReadinessGauge } from "@/components/inspections/ReadinessGauge";
 import { DefectsPanel } from "@/components/defects/DefectsPanel";
 import { scoreInspection } from "@/lib/inspection-readiness";
 import { inspectionStatusTone, type InspectionWorkflowStatus } from "@/lib/inspection-workflow";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/inspections/$inspectionId")({
