@@ -1,84 +1,45 @@
-## Current findings
+## Plan
 
-- **Current status from my side:** the preview host is responding right now, `/` loads, and `/app` redirects to `/login` instead of crashing.
-- **Hosted backend status:** healthy.
-- **Latest available preview-server log in the sandbox:**
+1. Capture the current preview/build failure from the platform-facing side.
+   - Inspect the latest preview/dev-server logs and compare them with the live preview state.
+   - Confirm whether the failure is a real compile/build error, a stale preview status, or an intermittent orchestration issue.
+   - Deliver the exact failing log lines if a failure is present.
 
-```text
-[stderr] $ vite --port "8080"
-[stdout]
-[stdout]   VITE v7.3.5  ready in 1558 ms
-[stdout]
-[stdout]   ➜  Local:   http://localhost:8080/
-[stdout]   ➜  Network: http://10.32.78.54:8080/
-```
+2. Remove structural causes of non-deterministic preview behavior.
+   - Revert unsupported manual changes in the auto-generated backend client and move any resilience/fallback handling into app-owned files instead.
+   - Re-check the router/tooling versions and generated-route alignment so preview rebuilds stay deterministic after edits.
+   - Verify that dependency resolution uses one consistent lockfile/toolchain path.
 
-- **Current preview network evidence:** the document, `src/main.tsx`, router files, and route modules are returning `200` from the preview host.
-- **Environment-variable evidence:** the public backend env values exist in `.env`, and `.gitignore` is **not** excluding `.env`.
-- **Most likely root cause:** **frontend dependency/codegen drift**, not a backend outage and not currently a missing-env failure.
+3. Execute a clean rebuild path and validate stability.
+   - Clear generated preview artifacts/cache paths that can preserve stale route or module state.
+   - Reinstall dependencies from a single source of truth and restart the preview cleanly.
+   - Verify `/` and `/app` load after the clean rebuild and after a follow-up edit-triggered refresh.
 
-## Best diagnosis so far
+4. Implement the permanent corrective action.
+   - Keep only the minimum runtime recovery UI needed for chunk/update failures.
+   - Ensure preview boot no longer depends on edited generated files or brittle startup behavior.
+   - Document the exact root cause and the hardening change so this does not recur.
 
-The strongest structural issue is a **TanStack Router version mismatch / drift** in the preview toolchain:
+## What I’ve already confirmed
 
-- `package.json`
-  - `@tanstack/react-router`: `^1.168.25`
-  - `@tanstack/router-plugin`: `^1.167.28`
-- `bun.lock` currently resolves different versions again:
-  - `@tanstack/react-router@1.170.12`
-  - `@tanstack/router-plugin@1.168.15`
-  - plugin internals also reference older generator pieces
-
-That kind of mismatch can cause intermittent **route codegen / HMR / dynamic-module loading failures after edits**, which matches your symptom pattern much better than an infrastructure problem.
-
-## What I will do
-
-1. **Normalize the router build toolchain**
-   - Pin `@tanstack/react-router` and `@tanstack/router-plugin` to the same compatible release family.
-   - Regenerate/refresh route artifacts so runtime and generated files agree.
-
-2. **Remove dependency graph drift**
-   - Make one lockfile the source of truth for this project.
-   - Eliminate stale dependency resolution that can cause preview builds to behave differently across rebuilds.
-
-3. **Execute a clean rebuild**
-   - Clear generated preview/build caches and stale install artifacts.
-   - Reinstall dependencies cleanly.
-   - Restart the preview from a clean state.
-
-4. **Re-validate the exact failure surfaces**
-   - Check `/` and `/app` after rebuild.
-   - Confirm there are no router/module/chunk errors in preview logs.
-   - Verify the preview remains accessible after an edit-triggered reload.
-
-5. **Keep the reliability guards already added**
-   - Preserve the app-side recovery screens and resilient auth bootstrap changes already made.
-   - Only change what is necessary for the recurring preview-build issue.
-
-## What this likely means
-
-- **Code compilation:** no active compile error is visible in the current available log.
-- **Missing environment variables:** **not the leading cause** from current evidence.
-- **Dependency issues:** **most likely yes**.
-- **Cache corruption / stale generated artifacts:** **very plausible secondary factor**.
-- **Lovable-side infrastructure problem:** **not supported by the current evidence** because the preview host and backend are both responding from my side.
-
-## Validation I will provide after implementation
-
-- The exact clean-rebuild result.
-- The post-fix preview status.
-- The concrete corrective change made.
-- Whether the issue was fully reproducible as dependency/codegen drift, cache staleness, or something else discovered during the rebuild.
+- The live preview host is currently serving the app from my side.
+- The document, main entry, router files, and route modules are returning `200`.
+- I do not currently see a browser runtime error matching the platform placeholder state.
+- That means the remaining likely causes are preview-pipeline drift, stale generated artifacts, unsupported edits to generated integration code, or platform-side status desync rather than a simple in-app crash.
 
 ## Technical details
 
-- Files likely involved:
+- Primary files to inspect/fix:
   - `package.json`
-  - `bun.lock` / `package-lock.json`
   - `vite.config.ts`
   - `src/routeTree.gen.ts`
-  - router/bootstrap files already hardened earlier
-- Success criteria:
-  - preview opens reliably
-  - no generic “Preview has not been built yet” state after routine edits
-  - router-generated code and installed versions stay aligned
+  - `src/router.tsx`
+  - `src/routes/__root.tsx`
+  - `src/main.tsx`
+  - `src/lib/auth.tsx`
+  - `src/integrations/supabase/client.ts` (auto-generated; should not contain custom logic)
+- Permanent success criteria:
+  - Preview generates reliably after edits
+  - No recurring “Preview has not been built yet” state for normal rebuilds
+  - Clean rebuild completes without hidden dependency/codegen drift
+  - Preview remains accessible after validation reloads
