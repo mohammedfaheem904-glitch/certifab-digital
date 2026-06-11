@@ -27,8 +27,9 @@ export function useCompanyRows<T = any>(
 
   useEffect(() => {
     if (!cid || !opts?.realtime) return;
+    const topic = `rt-${table}-${cid}-${crypto.randomUUID()}`;
     const ch = supabase
-      .channel(`rt-${table}-${cid}`)
+      .channel(topic)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table, filter: `company_id=eq.${cid}` },
@@ -36,7 +37,7 @@ export function useCompanyRows<T = any>(
       )
       .subscribe();
     return () => {
-      supabase.removeChannel(ch);
+      void supabase.removeChannel(ch);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cid, table, opts?.realtime]);
