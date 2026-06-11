@@ -18,6 +18,7 @@ import { daysUntil } from "@/lib/format";
 import { exportExcel } from "@/lib/export";
 import { signedUrl } from "@/lib/storage";
 import { toast } from "sonner";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/instruments/$instrumentId")({
   component: InstrumentDetail,
@@ -153,6 +154,7 @@ function InstrumentDetail() {
           <TabsTrigger value="calibrations">Calibrations</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
           <TabsTrigger value="upload">Documents</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
         </TabsList>
 
         <TabsContent value="calibrations" className="space-y-4">
@@ -224,6 +226,10 @@ function InstrumentDetail() {
             recordId={instrumentId}
             hint="Drag certificates, manuals, photos."
           />
+        </TabsContent>
+
+        <TabsContent value="discussion">
+          <CollaborationTab entityType="instrument" entityId={instrumentId} />
         </TabsContent>
       </Tabs>
     </div>

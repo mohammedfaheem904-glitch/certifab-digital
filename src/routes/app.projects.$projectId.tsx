@@ -14,6 +14,7 @@ import { ProjectWorkflowStepper } from "@/components/projects/ProjectWorkflowSte
 import { ProjectActionBar } from "@/components/projects/ProjectActionBar";
 import { ProjectTimeline } from "@/components/projects/ProjectTimeline";
 import type { ProjectWorkflowStatus } from "@/lib/project-workflow";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/projects/$projectId")({
   component: ProjectDetailsPage,
@@ -178,6 +179,11 @@ function ProjectDetailsPage() {
       <Card className="p-4">
         <h3 className="text-sm font-semibold mb-3 flex items-center gap-2"><History className="size-4" /> Workflow timeline</h3>
         <ProjectTimeline projectId={project.id} />
+      </Card>
+
+      <Card className="p-4">
+        <h3 className="text-sm font-semibold mb-3">Collaboration</h3>
+        <CollaborationTab entityType="project" entityId={project.id} />
       </Card>
     </div>
   );

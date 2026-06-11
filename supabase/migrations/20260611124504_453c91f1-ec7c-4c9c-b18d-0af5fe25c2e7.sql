@@ -1,0 +1,1 @@
+ALTER TYPE public.collab_entity_type ADD VALUE IF NOT EXISTS 'equipment';

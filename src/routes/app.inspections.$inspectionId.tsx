@@ -21,6 +21,7 @@ import { ReadinessGauge } from "@/components/inspections/ReadinessGauge";
 import { DefectsPanel } from "@/components/defects/DefectsPanel";
 import { scoreInspection } from "@/lib/inspection-readiness";
 import { inspectionStatusTone, type InspectionWorkflowStatus } from "@/lib/inspection-workflow";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/inspections/$inspectionId")({
@@ -173,6 +174,7 @@ function InspectionDetail() {
           <TabsTrigger value="checklist">Custom items ({(checklist.data ?? []).filter((x: any) => !x.template_field_id).length})</TabsTrigger>
           <TabsTrigger value="findings">Defects</TabsTrigger>
           <TabsTrigger value="audit">Audit trail ({events.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
         </TabsList>
 
         <TabsContent value="form">
@@ -223,6 +225,10 @@ function InspectionDetail() {
           <div className="rounded-xl border border-border bg-card p-5">
             <InspectionTimeline events={events.data ?? []} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="discussion">
+          <CollaborationTab entityType="inspection" entityId={inspectionId} />
         </TabsContent>
       </Tabs>
     </div>

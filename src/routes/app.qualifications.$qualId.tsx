@@ -29,6 +29,7 @@ import {
   formatRange,
 } from "@/lib/qualification-intelligence";
 import { QualificationGuidanceStrip } from "@/components/qualifications/QualificationGuidanceStrip";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/qualifications/$qualId")({
   component: QualDetail,
@@ -210,6 +211,7 @@ function QualDetail() {
           <TabsTrigger value="attachments">Attachments ({bundle.attachments.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="audit">Audit ({bundle.audit.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="certificate"><FileText className="size-4 me-1" /> Certificate</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -362,6 +364,9 @@ function QualDetail() {
             signatures={bundle.signatures.data ?? []}
             verifyUrl={verifyUrl}
           />
+        </TabsContent>
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="qualification" entityId={qualId} />
         </TabsContent>
       </Tabs>
     </div>

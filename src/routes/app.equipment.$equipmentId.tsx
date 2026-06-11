@@ -16,6 +16,7 @@ import { daysUntil } from "@/lib/format";
 import { exportExcel } from "@/lib/export";
 import { signedUrl } from "@/lib/storage";
 import { toast } from "sonner";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/equipment/$equipmentId")({
   component: EquipmentDetail,
@@ -171,6 +172,11 @@ function EquipmentDetail() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h3 className="text-sm font-semibold mb-3">Collaboration</h3>
+        <CollaborationTab entityType="equipment" entityId={equipmentId} />
       </div>
     </div>
   );

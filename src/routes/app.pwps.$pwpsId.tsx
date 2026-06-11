@@ -19,6 +19,7 @@ import {
   pwpsStageIndex,
   type PwpsStatus,
 } from "@/lib/pwps-workflow";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 type Pwps = {
   id: string;
@@ -486,6 +487,15 @@ function PwpsDetailPage() {
           </Field>
         </Section>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Collaboration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CollaborationTab entityType="pwps" entityId={pwpsId} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -20,6 +20,7 @@ import { QualifiedRangesForm } from "@/components/pqr/QualifiedRangesForm";
 import { PqrEvaluationPanel } from "@/components/pqr/PqrEvaluationPanel";
 import { PqrWorkflowStepper, type StepperStep } from "@/components/pqr/PqrWorkflowStepper";
 import { evaluatePqr } from "@/lib/pqr-evaluation";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/pqrs/$pqrId")({
   component: PqrDetailPage,
@@ -179,6 +180,7 @@ function PqrDetailPage() {
           <TabsTrigger value="findings">Findings ({findings.filter((f: any) => !f.resolved).length})</TabsTrigger>
           <TabsTrigger value="ranges">Qualified Ranges</TabsTrigger>
           <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4 mt-4">
@@ -224,6 +226,9 @@ function PqrDetailPage() {
         </TabsContent>
         <TabsContent value="evaluation" className="mt-4">
           <PqrEvaluationPanel pqrId={pqrId} pqr={data} evaluation={evaluation} canEdit={isEditor} />
+        </TabsContent>
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="pqr" entityId={pqrId} />
         </TabsContent>
       </Tabs>
     </div>
