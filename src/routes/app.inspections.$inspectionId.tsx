@@ -226,6 +226,10 @@ function InspectionDetail() {
             <InspectionTimeline events={events.data ?? []} />
           </div>
         </TabsContent>
+
+        <TabsContent value="discussion">
+          <CollaborationTab entityType="inspection" entityId={inspectionId} />
+        </TabsContent>
       </Tabs>
     </div>
   );
