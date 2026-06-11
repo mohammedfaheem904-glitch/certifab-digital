@@ -211,6 +211,7 @@ function QualDetail() {
           <TabsTrigger value="attachments">Attachments ({bundle.attachments.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="audit">Audit ({bundle.audit.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="certificate"><FileText className="size-4 me-1" /> Certificate</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
