@@ -12,7 +12,6 @@ import { TenantBrandingProvider } from "@/lib/tenant-branding";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ConfirmDialogProvider } from "@/components/ConfirmDialog";
-import { getSupabaseBootstrapError } from "@/integrations/supabase/client";
 
 function isRecoverableRouteError(error: Error) {
   const message = error?.message?.toLowerCase?.() ?? "";
@@ -125,30 +124,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const bootErr = getSupabaseBootstrapError();
-
-  if (bootErr) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="max-w-md text-center">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Backend configuration issue
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground break-words">
-            {bootErr.message} The app will keep running, but data features are unavailable until this is resolved.
-          </p>
-          <div className="mt-6">
-            <button
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Reload
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
