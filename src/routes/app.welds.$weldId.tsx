@@ -228,6 +228,10 @@ function WeldDetail() {
           />
         </TabsContent>
 
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="weld" entityId={weldId} />
+        </TabsContent>
+
         <TabsContent value="certificate" className="mt-4">
           <WeldTraceabilityDocument
             weld={w}
