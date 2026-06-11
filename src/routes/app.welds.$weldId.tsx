@@ -18,6 +18,7 @@ import { WeldActionBar } from "@/components/welds/WeldActionBar";
 import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
 import { WeldTimeline } from "@/components/welds/WeldTimeline";
 import { WeldGuidanceStrip } from "@/components/welds/WeldGuidanceStrip";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import type { WeldWorkflowStatus } from "@/lib/weld-workflow";
 
 export const Route = createFileRoute("/app/welds/$weldId")({
@@ -157,6 +158,7 @@ function WeldDetail() {
           <TabsTrigger value="ncrs">NCRs ({ncrs.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="timeline"><History className="size-4 me-1.5" />Timeline</TabsTrigger>
           <TabsTrigger value="attachments">Attachments</TabsTrigger>
+          <TabsTrigger value="discussion"><History className="size-4 me-1.5" />Discussion</TabsTrigger>
           <TabsTrigger value="certificate"><FileText className="size-4 me-1.5" />Traceability Report</TabsTrigger>
         </TabsList>
 
@@ -224,6 +226,10 @@ function WeldDetail() {
             hint="Photos, RT films, sketches."
             accept="image/*,application/pdf"
           />
+        </TabsContent>
+
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="weld" entityId={weldId} />
         </TabsContent>
 
         <TabsContent value="certificate" className="mt-4">

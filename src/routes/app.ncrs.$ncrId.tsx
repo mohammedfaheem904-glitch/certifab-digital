@@ -23,6 +23,7 @@ import { GovernanceBanner } from "@/components/ncr/GovernanceBanner";
 import { CapaBoard } from "@/components/ncr/CapaBoard";
 import { ReInspectionPanel } from "@/components/ncr/ReInspectionPanel";
 import { NcrAuditTimeline } from "@/components/ncr/NcrAuditTimeline";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/ncrs/$ncrId")({
   component: NcrDetail,
@@ -146,6 +147,7 @@ function NcrDetail() {
           <TabsTrigger value="rework">Rework</TabsTrigger>
           <TabsTrigger value="reinspect">Re-Inspection</TabsTrigger>
           <TabsTrigger value="audit">Audit timeline ({events.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
           <TabsTrigger value="report"><FileText className="size-4 me-1.5" />NCR Report</TabsTrigger>
         </TabsList>
         <TabsContent value="workflow" className="space-y-4">
@@ -193,6 +195,9 @@ function NcrDetail() {
           <div className="rounded-xl border border-border bg-card p-5">
             <NcrAuditTimeline events={events.data ?? []} />
           </div>
+        </TabsContent>
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="ncr" entityId={ncrId} />
         </TabsContent>
         <TabsContent value="report" className="mt-4">
           <NcrReportDocument ncr={n} events={events.data ?? []} />

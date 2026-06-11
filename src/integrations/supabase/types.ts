@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_events: {
+        Row: {
+          actor_id: string | null
+          company_id: string
+          created_at: string
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["collab_entity_type"]
+          id: string
+          kind: string
+          payload: Json
+          summary: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          company_id: string
+          created_at?: string
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["collab_entity_type"]
+          id?: string
+          kind: string
+          payload?: Json
+          summary?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          company_id?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: Database["public"]["Enums"]["collab_entity_type"]
+          id?: string
+          kind?: string
+          payload?: Json
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -118,6 +162,162 @@ export type Database = {
             columns: ["ncr_id"]
             isOneToOne: false
             referencedRelation: "ncrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comment_attachments: {
+        Row: {
+          comment_id: string
+          company_id: string
+          created_at: string
+          file_name: string
+          id: string
+          mime_type: string | null
+          size_bytes: number | null
+          storage_bucket: string
+          storage_path: string
+        }
+        Insert: {
+          comment_id: string
+          company_id: string
+          created_at?: string
+          file_name: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_bucket?: string
+          storage_path: string
+        }
+        Update: {
+          comment_id?: string
+          company_id?: string
+          created_at?: string
+          file_name?: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_bucket?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_attachments_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comment_attachments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comment_reactions: {
+        Row: {
+          comment_id: string
+          company_id: string
+          created_at: string
+          emoji: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          company_id: string
+          created_at?: string
+          emoji: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          company_id?: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_reactions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comment_reactions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          author_id: string
+          body_md: string
+          body_plain: string
+          category: string | null
+          company_id: string
+          created_at: string
+          deleted_at: string | null
+          edited_at: string | null
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["collab_entity_type"]
+          id: string
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body_md: string
+          body_plain: string
+          category?: string | null
+          company_id: string
+          created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["collab_entity_type"]
+          id?: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body_md?: string
+          body_plain?: string
+          category?: string | null
+          company_id?: string
+          created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
+          entity_id?: string
+          entity_type?: Database["public"]["Enums"]["collab_entity_type"]
+          id?: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
             referencedColumns: ["id"]
           },
         ]
@@ -1385,6 +1585,48 @@ export type Database = {
             columns: ["pqr_id"]
             isOneToOne: false
             referencedRelation: "pqrs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentions: {
+        Row: {
+          comment_id: string
+          company_id: string
+          created_at: string
+          id: string
+          mentioned_role: Database["public"]["Enums"]["app_role"] | null
+          mentioned_user_id: string | null
+        }
+        Insert: {
+          comment_id: string
+          company_id: string
+          created_at?: string
+          id?: string
+          mentioned_role?: Database["public"]["Enums"]["app_role"] | null
+          mentioned_user_id?: string | null
+        }
+        Update: {
+          comment_id?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          mentioned_role?: Database["public"]["Enums"]["app_role"] | null
+          mentioned_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -3251,6 +3493,44 @@ export type Database = {
           },
         ]
       }
+      watchers: {
+        Row: {
+          auto_added: boolean
+          company_id: string
+          created_at: string
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["collab_entity_type"]
+          id: string
+          user_id: string
+        }
+        Insert: {
+          auto_added?: boolean
+          company_id: string
+          created_at?: string
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["collab_entity_type"]
+          id?: string
+          user_id: string
+        }
+        Update: {
+          auto_added?: boolean
+          company_id?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: Database["public"]["Enums"]["collab_entity_type"]
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watchers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weld_attachments: {
         Row: {
           company_id: string
@@ -4207,11 +4487,25 @@ export type Database = {
         }
         Returns: undefined
       }
+      can_read_entity: {
+        Args: {
+          _entity_id: string
+          _entity_type: Database["public"]["Enums"]["collab_entity_type"]
+        }
+        Returns: boolean
+      }
       complete_rework_and_reinspect: {
         Args: { _notes?: string; _rework_id: string }
         Returns: string
       }
       current_company_id: { Args: never; Returns: string }
+      entity_link: {
+        Args: {
+          _entity_id: string
+          _entity_type: Database["public"]["Enums"]["collab_entity_type"]
+        }
+        Returns: string
+      }
       get_company_branding_by_domain: {
         Args: { _host: string }
         Returns: {
@@ -4302,12 +4596,27 @@ export type Database = {
       is_company_member: { Args: { _company_id: string }; Returns: boolean }
       is_editor: { Args: { _user_id: string }; Returns: boolean }
       is_internal_company: { Args: { _company_id: string }; Returns: boolean }
+      mark_notifications_read: { Args: { _ids: string[] }; Returns: undefined }
       open_ncr_from_defect: {
         Args: {
           _defect_ids: string[]
           _inspection_id: string
           _severity?: Database["public"]["Enums"]["severity_level"]
           _title: string
+        }
+        Returns: string
+      }
+      post_comment: {
+        Args: {
+          _attachments: Json
+          _body_md: string
+          _body_plain: string
+          _category: string
+          _entity_id: string
+          _entity_type: Database["public"]["Enums"]["collab_entity_type"]
+          _mention_roles: Database["public"]["Enums"]["app_role"][]
+          _mention_user_ids: string[]
+          _parent_id: string
         }
         Returns: string
       }
@@ -4343,6 +4652,17 @@ export type Database = {
           _wps_id: string
         }
         Returns: string
+      }
+      toggle_reaction: {
+        Args: { _comment_id: string; _emoji: string }
+        Returns: boolean
+      }
+      toggle_watch: {
+        Args: {
+          _entity_id: string
+          _entity_type: Database["public"]["Enums"]["collab_entity_type"]
+        }
+        Returns: boolean
       }
       transition_ncr: {
         Args: {
@@ -4386,6 +4706,18 @@ export type Database = {
         | "Verified"
         | "Cancelled"
       capa_type: "Corrective" | "Preventive" | "Containment"
+      collab_entity_type:
+        | "ncr"
+        | "weld"
+        | "procedure"
+        | "pwps"
+        | "pqr"
+        | "qualification"
+        | "inspection"
+        | "project"
+        | "capa"
+        | "rework_job"
+        | "instrument"
       defect_category:
         | "Discontinuity"
         | "Geometric"
@@ -4661,6 +4993,19 @@ export const Constants = {
         "Cancelled",
       ],
       capa_type: ["Corrective", "Preventive", "Containment"],
+      collab_entity_type: [
+        "ncr",
+        "weld",
+        "procedure",
+        "pwps",
+        "pqr",
+        "qualification",
+        "inspection",
+        "project",
+        "capa",
+        "rework_job",
+        "instrument",
+      ],
       defect_category: [
         "Discontinuity",
         "Geometric",

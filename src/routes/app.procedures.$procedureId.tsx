@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { HeatInputCalculator } from "@/components/HeatInputCalculator";
 import { FileUploader } from "@/components/FileUploader";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { WpsDocument } from "@/components/reports/WpsDocument";
 import { JointConfigList } from "@/components/procedures/JointConfigList";
 import { BaseMetalsTable } from "@/components/procedures/BaseMetalsTable";
@@ -380,7 +381,12 @@ function ProcedureDetailPage() {
           <TabsTrigger value="signatures"><PenLine className="size-4 me-1.5" /> Signatures ({sigsQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="approvals"><ShieldCheck className="size-4 me-1.5" /> Approvals ({apprQ.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="audit"><History className="size-4 me-1.5" /> Audit log</TabsTrigger>
+          <TabsTrigger value="discussion"><History className="size-4 me-1.5" /> Discussion</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="procedure" entityId={procedureId} />
+        </TabsContent>
 
         <TabsContent value="builder" className="mt-4 print:hidden">
           <WpsBuilderWorkspace
