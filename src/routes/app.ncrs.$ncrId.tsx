@@ -196,6 +196,9 @@ function NcrDetail() {
             <NcrAuditTimeline events={events.data ?? []} />
           </div>
         </TabsContent>
+        <TabsContent value="discussion" className="mt-4">
+          <CollaborationTab entityType="ncr" entityId={ncrId} />
+        </TabsContent>
         <TabsContent value="report" className="mt-4">
           <NcrReportDocument ncr={n} events={events.data ?? []} />
         </TabsContent>
