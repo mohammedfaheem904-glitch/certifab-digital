@@ -29,8 +29,9 @@ export function useActivity(entityType: CollabEntityType, entityId: string | nul
 
   useEffect(() => {
     if (!enabled) return;
+    const topic = `activity-${entityType}-${entityId}-${crypto.randomUUID()}`;
     const ch = supabase
-      .channel(`activity-${entityType}-${entityId}`)
+      .channel(topic)
       .on(
         "postgres_changes" as any,
         { event: "INSERT", schema: "public", table: "activity_events", filter: `entity_id=eq.${entityId}` },
@@ -38,7 +39,7 @@ export function useActivity(entityType: CollabEntityType, entityId: string | nul
       )
       .subscribe();
     return () => {
-      supabase.removeChannel(ch);
+      void supabase.removeChannel(ch);
     };
   }, [enabled, entityType, entityId, limit, qc]);
 
