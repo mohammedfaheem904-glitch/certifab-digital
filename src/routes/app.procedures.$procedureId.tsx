@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { HeatInputCalculator } from "@/components/HeatInputCalculator";
 import { FileUploader } from "@/components/FileUploader";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { WpsDocument } from "@/components/reports/WpsDocument";
 import { JointConfigList } from "@/components/procedures/JointConfigList";
 import { BaseMetalsTable } from "@/components/procedures/BaseMetalsTable";
