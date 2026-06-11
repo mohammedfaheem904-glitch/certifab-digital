@@ -158,6 +158,7 @@ function WeldDetail() {
           <TabsTrigger value="ncrs">NCRs ({ncrs.data?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="timeline"><History className="size-4 me-1.5" />Timeline</TabsTrigger>
           <TabsTrigger value="attachments">Attachments</TabsTrigger>
+          <TabsTrigger value="discussion"><History className="size-4 me-1.5" />Discussion</TabsTrigger>
           <TabsTrigger value="certificate"><FileText className="size-4 me-1.5" />Traceability Report</TabsTrigger>
         </TabsList>
 
