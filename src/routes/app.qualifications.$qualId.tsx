@@ -29,6 +29,7 @@ import {
   formatRange,
 } from "@/lib/qualification-intelligence";
 import { QualificationGuidanceStrip } from "@/components/qualifications/QualificationGuidanceStrip";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/qualifications/$qualId")({
   component: QualDetail,
