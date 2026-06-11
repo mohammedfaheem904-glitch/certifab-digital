@@ -4718,6 +4718,7 @@ export type Database = {
         | "capa"
         | "rework_job"
         | "instrument"
+        | "equipment"
       defect_category:
         | "Discontinuity"
         | "Geometric"
@@ -5005,6 +5006,7 @@ export const Constants = {
         "capa",
         "rework_job",
         "instrument",
+        "equipment",
       ],
       defect_category: [
         "Discontinuity",
