@@ -173,6 +173,11 @@ function EquipmentDetail() {
           </table>
         </div>
       </div>
+
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h3 className="text-sm font-semibold mb-3">Collaboration</h3>
+        <CollaborationTab entityType="equipment" entityId={equipmentId} />
+      </div>
     </div>
   );
 }
