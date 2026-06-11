@@ -154,6 +154,7 @@ function InstrumentDetail() {
           <TabsTrigger value="calibrations">Calibrations</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
           <TabsTrigger value="upload">Documents</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
         </TabsList>
 
         <TabsContent value="calibrations" className="space-y-4">
