@@ -9,7 +9,8 @@ export type CollabEntityType =
   | "project"
   | "capa"
   | "rework_job"
-  | "instrument";
+  | "instrument"
+  | "equipment";
 
 export type AppRole =
   | "super_admin"
