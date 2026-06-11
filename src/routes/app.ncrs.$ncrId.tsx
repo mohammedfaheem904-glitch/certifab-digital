@@ -23,6 +23,7 @@ import { GovernanceBanner } from "@/components/ncr/GovernanceBanner";
 import { CapaBoard } from "@/components/ncr/CapaBoard";
 import { ReInspectionPanel } from "@/components/ncr/ReInspectionPanel";
 import { NcrAuditTimeline } from "@/components/ncr/NcrAuditTimeline";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/ncrs/$ncrId")({
   component: NcrDetail,
