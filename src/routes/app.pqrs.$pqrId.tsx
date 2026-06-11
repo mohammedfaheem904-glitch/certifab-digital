@@ -179,6 +179,7 @@ function PqrDetailPage() {
           <TabsTrigger value="findings">Findings ({findings.filter((f: any) => !f.resolved).length})</TabsTrigger>
           <TabsTrigger value="ranges">Qualified Ranges</TabsTrigger>
           <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4 mt-4">
