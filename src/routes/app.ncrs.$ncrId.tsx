@@ -147,6 +147,7 @@ function NcrDetail() {
           <TabsTrigger value="rework">Rework</TabsTrigger>
           <TabsTrigger value="reinspect">Re-Inspection</TabsTrigger>
           <TabsTrigger value="audit">Audit timeline ({events.data?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="discussion">Discussion</TabsTrigger>
           <TabsTrigger value="report"><FileText className="size-4 me-1.5" />NCR Report</TabsTrigger>
         </TabsList>
         <TabsContent value="workflow" className="space-y-4">
