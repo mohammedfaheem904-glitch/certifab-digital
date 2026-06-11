@@ -20,6 +20,7 @@ import { QualifiedRangesForm } from "@/components/pqr/QualifiedRangesForm";
 import { PqrEvaluationPanel } from "@/components/pqr/PqrEvaluationPanel";
 import { PqrWorkflowStepper, type StepperStep } from "@/components/pqr/PqrWorkflowStepper";
 import { evaluatePqr } from "@/lib/pqr-evaluation";
+import { CollaborationTab } from "@/components/collab/CollaborationTab";
 
 export const Route = createFileRoute("/app/pqrs/$pqrId")({
   component: PqrDetailPage,
