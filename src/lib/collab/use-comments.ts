@@ -115,8 +115,9 @@ export function useComments(entityType: CollabEntityType, entityId: string | nul
   // Realtime
   useEffect(() => {
     if (!enabled) return;
+    const topic = `collab-${entityType}-${entityId}-${crypto.randomUUID()}`;
     const ch = supabase
-      .channel(`collab-${entityType}-${entityId}`)
+      .channel(topic)
       .on(
         "postgres_changes" as any,
         { event: "*", schema: "public", table: "comments", filter: `entity_id=eq.${entityId}` },
