@@ -1,73 +1,84 @@
-## Permanent fix plan
+## Current findings
 
-### What I found
-- The preview is **not currently down globally**: the marketing page renders, `/app` redirects to `/login`, and the hosted backend is healthy.
-- The recurring failure is most likely a **frontend boot/routing problem that happens after edits**, not a database outage.
-- The main structural risk is in `src/routes/app.tsx`: the protected `/app` route runs `supabase.auth.getSession()` inside TanStack Router `beforeLoad`.
-- When preview restarts or hot reload is in a fragile state, that route-level auth call can **throw or stall before the app renders**, which can make the whole preview appear as “Preview has not been built yet,” especially if the preview reopens on `/app` or another protected page.
-- The current backend client hardening helped, but it did **not remove the most brittle boot path**: route-level auth/network work before the app is fully mounted.
+- **Current status from my side:** the preview host is responding right now, `/` loads, and `/app` redirects to `/login` instead of crashing.
+- **Hosted backend status:** healthy.
+- **Latest available preview-server log in the sandbox:**
 
-### Root cause
-The recurring issue is most likely caused by a combination of:
-1. **Protected-route auth work in `beforeLoad`** (`src/routes/app.tsx`) that can fail during preview rebuild/HMR cycles.
-2. **Duplicate startup auth reads** in both the router guard and `AuthProvider`, which increases timing/race fragility after edits.
-3. **No dedicated recovery for route/chunk reload failures** after edits, so preview can collapse into the generic unavailable state instead of recovering cleanly.
+```text
+[stderr] $ vite --port "8080"
+[stdout]
+[stdout]   VITE v7.3.5  ready in 1558 ms
+[stdout]
+[stdout]   ➜  Local:   http://localhost:8080/
+[stdout]   ➜  Network: http://10.32.78.54:8080/
+```
 
-## Implementation
+- **Current preview network evidence:** the document, `src/main.tsx`, router files, and route modules are returning `200` from the preview host.
+- **Environment-variable evidence:** the public backend env values exist in `.env`, and `.gitignore` is **not** excluding `.env`.
+- **Most likely root cause:** **frontend dependency/codegen drift**, not a backend outage and not currently a missing-env failure.
 
-### 1) Remove network/auth dependency from route boot
-- Refactor `src/routes/app.tsx` so `beforeLoad` does **not** call the backend client.
-- Make `/app` rendering depend on mounted auth state from `AuthProvider` instead of a route-level async auth fetch.
-- Keep protected-page behavior the same: unauthenticated users still end up at `/login`, but only **after the app is mounted safely**.
+## Best diagnosis so far
 
-### 2) Centralize auth bootstrap in one place
-- Keep startup session loading inside `src/lib/auth.tsx` only.
-- Expose a stable auth readiness state so protected routes can distinguish:
-  - booting
-  - unauthenticated
-  - authenticated
-  - bootstrap error / degraded mode
-- Make redirects happen from mounted React code, not from router boot code.
+The strongest structural issue is a **TanStack Router version mismatch / drift** in the preview toolchain:
 
-### 3) Add a resilient protected-route shell
-- Add a small guarded layout/component for `/app` routes that:
-  - shows a loading shell while auth initializes
-  - redirects to `/login` when auth is known to be absent
-  - renders children only when auth is ready
-- This prevents preview death during rebuilds when session/client state is temporarily unavailable.
+- `package.json`
+  - `@tanstack/react-router`: `^1.168.25`
+  - `@tanstack/router-plugin`: `^1.167.28`
+- `bun.lock` currently resolves different versions again:
+  - `@tanstack/react-router@1.170.12`
+  - `@tanstack/router-plugin@1.168.15`
+  - plugin internals also reference older generator pieces
 
-### 4) Add recovery for post-edit preview breakage
-- Add app-level handling for route/chunk reload failures so a failed hot update does not leave the preview inaccessible.
-- If a route module or lazy chunk fails to load after edits, show a controlled recovery screen with reload action instead of letting preview appear unbuilt.
-- Keep this scoped to reliability only.
+That kind of mismatch can cause intermittent **route codegen / HMR / dynamic-module loading failures after edits**, which matches your symptom pattern much better than an infrastructure problem.
 
-### 5) Harden root bootstrap further
-- Review `src/main.tsx` and root bootstrap so entry mounting never fails harder than necessary.
-- Keep config/bootstrap errors visible inside the app UI instead of escaping as blank preview failures.
+## What I will do
 
-## Files to change
-- `src/routes/app.tsx`
-- `src/lib/auth.tsx`
-- `src/routes/__root.tsx`
-- `src/main.tsx`
-- Possibly one small new protected-route/recovery component
+1. **Normalize the router build toolchain**
+   - Pin `@tanstack/react-router` and `@tanstack/router-plugin` to the same compatible release family.
+   - Regenerate/refresh route artifacts so runtime and generated files agree.
+
+2. **Remove dependency graph drift**
+   - Make one lockfile the source of truth for this project.
+   - Eliminate stale dependency resolution that can cause preview builds to behave differently across rebuilds.
+
+3. **Execute a clean rebuild**
+   - Clear generated preview/build caches and stale install artifacts.
+   - Reinstall dependencies cleanly.
+   - Restart the preview from a clean state.
+
+4. **Re-validate the exact failure surfaces**
+   - Check `/` and `/app` after rebuild.
+   - Confirm there are no router/module/chunk errors in preview logs.
+   - Verify the preview remains accessible after an edit-triggered reload.
+
+5. **Keep the reliability guards already added**
+   - Preserve the app-side recovery screens and resilient auth bootstrap changes already made.
+   - Only change what is necessary for the recurring preview-build issue.
+
+## What this likely means
+
+- **Code compilation:** no active compile error is visible in the current available log.
+- **Missing environment variables:** **not the leading cause** from current evidence.
+- **Dependency issues:** **most likely yes**.
+- **Cache corruption / stale generated artifacts:** **very plausible secondary factor**.
+- **Lovable-side infrastructure problem:** **not supported by the current evidence** because the preview host and backend are both responding from my side.
+
+## Validation I will provide after implementation
+
+- The exact clean-rebuild result.
+- The post-fix preview status.
+- The concrete corrective change made.
+- Whether the issue was fully reproducible as dependency/codegen drift, cache staleness, or something else discovered during the rebuild.
 
 ## Technical details
-- I will specifically remove the `supabase.auth.getSession()` call from route `beforeLoad` in `src/routes/app.tsx`.
-- The router will stop doing backend-dependent work during navigation boot.
-- `AuthProvider` will become the single source of truth for startup auth state.
-- Recovery will target the exact failure mode that happens **mostly after edits**, which matches hot-reload/bootstrap instability rather than a permanent app bug.
 
-## Expected result
-After this change:
-- edits/rebuilds should no longer be able to take down the preview just because it opens on a protected route
-- the app should recover cleanly from auth/bootstrap timing issues
-- if a startup failure happens again, users should see a controlled in-app recovery state instead of the generic inaccessible preview message
-
-<presentation-actions>
-  <presentation-open-history>View History</presentation-open-history>
-</presentation-actions>
-
-<presentation-actions>
-<presentation-link url="https://docs.lovable.dev/tips-tricks/troubleshooting">Troubleshooting docs</presentation-link>
-</presentation-actions>
+- Files likely involved:
+  - `package.json`
+  - `bun.lock` / `package-lock.json`
+  - `vite.config.ts`
+  - `src/routeTree.gen.ts`
+  - router/bootstrap files already hardened earlier
+- Success criteria:
+  - preview opens reliably
+  - no generic “Preview has not been built yet” state after routine edits
+  - router-generated code and installed versions stay aligned
