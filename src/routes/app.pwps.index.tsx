@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/auth";
 import { PWPS_STATUS_TONE, type PwpsStatus } from "@/lib/pwps-workflow";
 import { toast } from "sonner";
 import { exportCsv, exportExcel } from "@/lib/export";
+import { BaseMaterialCombobox } from "@/components/procedures/BaseMaterialCombobox";
 
 type Row = {
   id: string;
