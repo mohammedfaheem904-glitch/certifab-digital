@@ -223,7 +223,17 @@ function PwpsIndexPage() {
                     <option value="5F (Fixed Horizontal Pipe Fillet)">5F (Fixed Horizontal Pipe Fillet)</option>
                   </select>
                 </F>
-                <F label="Base material"><Input value={values.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} placeholder="SA-106 Gr B" /></F>
+                <F label="Base material">
+                  <BaseMaterialCombobox
+                    value={values.base_material ?? ""}
+                    onChange={(v) => set("base_material", v)}
+                    onSelectMaterial={(m) => {
+                      set("base_material", `${m.spec} ${m.grade}`.trim());
+                      set("p_number", `P-${m.p_no}`);
+                      set("group_number", m.group_no ?? "");
+                    }}
+                  />
+                </F>
                 <F label="P-Number"><Input value={values.p_number ?? ""} onChange={(e) => set("p_number", e.target.value)} placeholder="P-1" /></F>
                 <F label="Group No."><Input value={values.group_number ?? ""} onChange={(e) => set("group_number", e.target.value)} placeholder="1" /></F>
                 <F label="Filler classification">
