@@ -98,6 +98,29 @@ function PwpsDetailPage() {
 
   const merged = useMemo(() => ({ ...(data ?? {}), ...draft }) as Pwps, [data, draft]);
   const set = (k: keyof Pwps, v: any) => setDraft((d) => ({ ...d, [k]: v }));
+  const setElectrical = (k: keyof Pwps, v: any) => {
+    setDraft((d) => {
+      const next: Partial<Pwps> = { ...d, [k]: v };
+      const cur = { ...(data ?? {}), ...next } as Pwps;
+      if (k === "voltage_min" || k === "current_min" || k === "travel_speed_min") {
+        const hi = calcHeatInput(
+          Number(cur.voltage_min) || 0,
+          Number(cur.current_min) || 0,
+          Number(cur.travel_speed_min) || 0,
+        );
+        next.heat_input_min = hi > 0 ? Number(hi.toFixed(3)) : null;
+      }
+      if (k === "voltage_max" || k === "current_max" || k === "travel_speed_max") {
+        const hi = calcHeatInput(
+          Number(cur.voltage_max) || 0,
+          Number(cur.current_max) || 0,
+          Number(cur.travel_speed_max) || 0,
+        );
+        next.heat_input_max = hi > 0 ? Number(hi.toFixed(3)) : null;
+      }
+      return next;
+    });
+  };
 
   if (isLoading) {
     return (
