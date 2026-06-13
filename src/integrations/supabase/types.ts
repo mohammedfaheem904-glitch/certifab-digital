@@ -4494,6 +4494,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      can_subscribe_realtime_topic: {
+        Args: { _topic: string }
+        Returns: boolean
+      }
       complete_rework_and_reinspect: {
         Args: { _notes?: string; _rework_id: string }
         Returns: string
