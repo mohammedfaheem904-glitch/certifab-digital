@@ -1,0 +1,1 @@
+ALTER TABLE public.pwps ADD COLUMN IF NOT EXISTS filler_diameter_mm text;

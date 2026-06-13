@@ -2717,6 +2717,7 @@ export type Database = {
           diameter_max_mm: number | null
           diameter_min_mm: number | null
           filler_classification: string | null
+          filler_diameter_mm: string | null
           filler_material: string | null
           groove_type: string | null
           group_number: string | null
@@ -2767,6 +2768,7 @@ export type Database = {
           diameter_max_mm?: number | null
           diameter_min_mm?: number | null
           filler_classification?: string | null
+          filler_diameter_mm?: string | null
           filler_material?: string | null
           groove_type?: string | null
           group_number?: string | null
@@ -2817,6 +2819,7 @@ export type Database = {
           diameter_max_mm?: number | null
           diameter_min_mm?: number | null
           filler_classification?: string | null
+          filler_diameter_mm?: string | null
           filler_material?: string | null
           groove_type?: string | null
           group_number?: string | null
