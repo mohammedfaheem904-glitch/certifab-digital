@@ -20,6 +20,7 @@ import {
   type PwpsStatus,
 } from "@/lib/pwps-workflow";
 import { CollaborationTab } from "@/components/collab/CollaborationTab";
+import { calcHeatInput } from "@/lib/heat-input";
 
 type Pwps = {
   id: string;
