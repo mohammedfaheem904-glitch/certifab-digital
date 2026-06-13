@@ -20,6 +20,7 @@ import {
   type PwpsStatus,
 } from "@/lib/pwps-workflow";
 import { CollaborationTab } from "@/components/collab/CollaborationTab";
+import { calcHeatInput } from "@/lib/heat-input";
 
 type Pwps = {
   id: string;
@@ -97,6 +98,29 @@ function PwpsDetailPage() {
 
   const merged = useMemo(() => ({ ...(data ?? {}), ...draft }) as Pwps, [data, draft]);
   const set = (k: keyof Pwps, v: any) => setDraft((d) => ({ ...d, [k]: v }));
+  const setElectrical = (k: keyof Pwps, v: any) => {
+    setDraft((d) => {
+      const next: Partial<Pwps> = { ...d, [k]: v };
+      const cur = { ...(data ?? {}), ...next } as Pwps;
+      if (k === "voltage_min" || k === "current_min" || k === "travel_speed_min") {
+        const hi = calcHeatInput(
+          Number(cur.voltage_min) || 0,
+          Number(cur.current_min) || 0,
+          Number(cur.travel_speed_min) || 0,
+        );
+        next.heat_input_min = hi > 0 ? Number(hi.toFixed(3)) : null;
+      }
+      if (k === "voltage_max" || k === "current_max" || k === "travel_speed_max") {
+        const hi = calcHeatInput(
+          Number(cur.voltage_max) || 0,
+          Number(cur.current_max) || 0,
+          Number(cur.travel_speed_max) || 0,
+        );
+        next.heat_input_max = hi > 0 ? Number(hi.toFixed(3)) : null;
+      }
+      return next;
+    });
+  };
 
   if (isLoading) {
     return (
@@ -441,12 +465,12 @@ function PwpsDetailPage() {
 
         <Section title="Electrical & thermal">
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Voltage min"><Input type="number" value={merged.voltage_min ?? ""} onChange={(e) => set("voltage_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
-            <Field label="Voltage max"><Input type="number" value={merged.voltage_max ?? ""} onChange={(e) => set("voltage_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
-            <Field label="Current min"><Input type="number" value={merged.current_min ?? ""} onChange={(e) => set("current_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
-            <Field label="Current max"><Input type="number" value={merged.current_max ?? ""} onChange={(e) => set("current_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
-            <Field label="Travel min"><Input type="number" value={merged.travel_speed_min ?? ""} onChange={(e) => set("travel_speed_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
-            <Field label="Travel max"><Input type="number" value={merged.travel_speed_max ?? ""} onChange={(e) => set("travel_speed_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Voltage min"><Input type="number" value={merged.voltage_min ?? ""} onChange={(e) => setElectrical("voltage_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Voltage max"><Input type="number" value={merged.voltage_max ?? ""} onChange={(e) => setElectrical("voltage_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Current min"><Input type="number" value={merged.current_min ?? ""} onChange={(e) => setElectrical("current_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Current max"><Input type="number" value={merged.current_max ?? ""} onChange={(e) => setElectrical("current_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Travel min"><Input type="number" value={merged.travel_speed_min ?? ""} onChange={(e) => setElectrical("travel_speed_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
+            <Field label="Travel max"><Input type="number" value={merged.travel_speed_max ?? ""} onChange={(e) => setElectrical("travel_speed_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
             <Field label="Heat input min (kJ/mm)"><Input type="number" step="0.01" value={merged.heat_input_min ?? ""} onChange={(e) => set("heat_input_min", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
             <Field label="Heat input max (kJ/mm)"><Input type="number" step="0.01" value={merged.heat_input_max ?? ""} onChange={(e) => set("heat_input_max", parseFloat(e.target.value) || null)} disabled={!isEditor} /></Field>
             <Field label="Polarity">
