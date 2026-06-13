@@ -1,25 +1,34 @@
 ## Objective
-Wire the existing `calcHeatInput` utility into the pWPS detail form so that **Heat Input Min** and **Heat Input Max** are computed automatically from the related voltage, current, and travel-speed fields.
+Add a new "Filler Metal Diameter" field to the pWPS detail form in the "Filler & gas" section, placed directly under "Filler classification". The field should be a searchable dropdown with a free-text fallback for custom values.
 
-## Changes
+## Proposed Changes
 
-### 1. Import `calcHeatInput` in `src/routes/app.pwps.$pwpsId.tsx`
+### 1. Database Migration
+- Add a new nullable `text` column `filler_diameter_mm` to the `public.pwps` table.
+- No RLS changes needed (existing table policies already cover the table).
 
-### 2. Replace direct `set(...)` calls for the 6 driving fields with a helper that:
-- writes the changed field into draft as before
-- whenever `voltage_min`, `current_min`, or `travel_speed_min` change, recalculates `heat_input_min = calcHeatInput(v_min, i_min, ts_min)` and writes it to draft
-- whenever `voltage_max`, `current_max`, or `travel_speed_max` change, recalculates `heat_input_max = calcHeatInput(v_max, i_max, ts_max)` and writes it to draft
-- rounds the result to 3 decimal places for clean display
-- skips the calculation if any of the three required values is missing or zero
+### 2. Frontend Type Update
+- Add `filler_diameter_mm: string | null` to the local `Pwps` type in `src/routes/app.pwps.$pwpsId.tsx`.
+- The Supabase types file will be auto-regenerated after the migration is applied.
 
-### 3. Keep the Heat Input inputs editable
-Users can still override the calculated value manually. The auto-calculation only fires when one of the 6 parent fields is edited.
+### 3. Reusable Combobox Component
+Create `src/components/procedures/FillerDiameterCombobox.tsx` that mirrors the existing `BaseMaterialCombobox` pattern:
+- Uses `Command` + `Popover` for a searchable dropdown.
+- Pre-populated options: `0.8 mm`, `1.0 mm`, `1.2 mm`, `1.6 mm`, `2.0 mm`, `2.4 mm`, `2.5 mm`, `3.2 mm`, `4.0 mm`, `5.0 mm`, `6.0 mm`.
+- Free-text fallback: if the user types a value not in the list, they can click "Use custom: …" to set the value manually.
+- Keeps the input editable so custom diameters (e.g. `1.8 mm`) are always allowed.
 
-## Formula
-```
-Heat Input Min = (Voltage Min × Current Min × 60) / (Travel Speed Min × 1000)
-Heat Input Max = (Voltage Max × Current Max × 60) / (Travel Speed Max × 1000)
-```
+### 4. Form Integration
+In `src/routes/app.pwps.$pwpsId.tsx`, inside the "Filler & gas" `<Section>`:
+- Insert a new `<Field label="Filler Metal Diameter (mm)">` directly below the "Filler classification" field.
+- Render the new `FillerDiameterCombobox` with `value={merged.filler_diameter_mm ?? ""}` and `onChange={(v) => set("filler_diameter_mm", v)}`.
+- Respect the `isEditor` read-only state.
 
-## Files to change
-- `src/routes/app.pwps.$pwpsId.tsx`
+## Files to Modify
+| File | Action |
+|---|---|
+| `supabase/migrations/` | New migration adding `filler_diameter_mm` column to `pwps` |
+| `src/routes/app.pwps.$pwpsId.tsx` | Add type field, render combobox in form |
+| `src/components/procedures/FillerDiameterCombobox.tsx` | New reusable component |
+
+No other tables, RLS policies, or workflows are affected.
