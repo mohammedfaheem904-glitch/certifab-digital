@@ -168,7 +168,15 @@ function PqrsIndexPage() {
                   />
                   <p className="text-[11px] text-muted-foreground mt-1">Inherited from the linked pWPS.</p>
                 </F>
-                <F label="Standard"><Input value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
+                <F label="Standard">
+                  <Input
+                    value={values.standard ?? ""}
+                    readOnly
+                    placeholder="Select a pWPS to set standard"
+                    className="bg-muted/40"
+                  />
+                  <p className="text-[11px] text-muted-foreground mt-1">Inherited from the linked pWPS.</p>
+                </F>
                 <F label="Test date"><Input type="date" value={values.test_date ?? ""} onChange={(e) => set("test_date", e.target.value || null)} /></F>
                 <F label="Revision"><Input value={values.revision ?? "Rev 0"} onChange={(e) => set("revision", e.target.value)} /></F>
               </div>
