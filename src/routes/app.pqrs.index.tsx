@@ -152,6 +152,7 @@ function PqrsIndexPage() {
                       set("pwps_id", id);
                       const opt = (pwpsOpts ?? []).find((o) => o.id === id);
                       set("code_family", opt?.code_family ?? "");
+                      set("standard", opt?.standard ?? "");
                     }}
                   >
                     <option value="">— Select pWPS —</option>
