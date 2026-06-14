@@ -29,7 +29,7 @@ type PqrRow = {
   resulting_wps_id: string | null;
   created_at: string;
 };
-type PwpsOpt = { id: string; pwps_no: string; code_family: string | null };
+type PwpsOpt = { id: string; pwps_no: string; code_family: string | null; standard: string | null };
 
 export const Route = createFileRoute("/app/pqrs/")({
   component: PqrsIndexPage,
@@ -77,7 +77,7 @@ function PqrsIndexPage() {
     enabled: !!cid,
     queryFn: async () => {
       const { data, error } = await (supabase.from("pwps" as any) as any)
-        .select("id,pwps_no,code_family").eq("company_id", cid!).is("deleted_at", null).order("pwps_no");
+        .select("id,pwps_no,code_family,standard").eq("company_id", cid!).is("deleted_at", null).order("pwps_no");
       if (error) throw error;
       return (data ?? []) as PwpsOpt[];
     },
@@ -152,6 +152,7 @@ function PqrsIndexPage() {
                       set("pwps_id", id);
                       const opt = (pwpsOpts ?? []).find((o) => o.id === id);
                       set("code_family", opt?.code_family ?? "");
+                      set("standard", opt?.standard ?? "");
                     }}
                   >
                     <option value="">— Select pWPS —</option>
@@ -167,7 +168,15 @@ function PqrsIndexPage() {
                   />
                   <p className="text-[11px] text-muted-foreground mt-1">Inherited from the linked pWPS.</p>
                 </F>
-                <F label="Standard"><Input value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
+                <F label="Standard">
+                  <Input
+                    value={values.standard ?? ""}
+                    readOnly
+                    placeholder="Select a pWPS to set standard"
+                    className="bg-muted/40"
+                  />
+                  <p className="text-[11px] text-muted-foreground mt-1">Inherited from the linked pWPS.</p>
+                </F>
                 <F label="Test date"><Input type="date" value={values.test_date ?? ""} onChange={(e) => set("test_date", e.target.value || null)} /></F>
                 <F label="Revision"><Input value={values.revision ?? "Rev 0"} onChange={(e) => set("revision", e.target.value)} /></F>
               </div>
