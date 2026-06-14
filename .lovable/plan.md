@@ -1,34 +1,29 @@
 ## Objective
-Add a new "Filler Metal Diameter" field to the pWPS detail form in the "Filler & gas" section, placed directly under "Filler classification". The field should be a searchable dropdown with a free-text fallback for custom values.
+In the "New PQR" dialog (PQR module), the "Code Family" field should be derived exclusively from the linked pWPS, not entered manually.
 
-## Proposed Changes
+## Changes
 
-### 1. Database Migration
-- Add a new nullable `text` column `filler_diameter_mm` to the `public.pwps` table.
-- No RLS changes needed (existing table policies already cover the table).
+### `src/routes/app.pqrs.index.tsx`
+1. **Extend the pWPS options query** (`pwps-options`) to also select `code_family` so we know each pWPS's code family:
+   - `select("id,pwps_no,code_family")`
+   - Update `PwpsOpt` type to include `code_family: string | null`.
 
-### 2. Frontend Type Update
-- Add `filler_diameter_mm: string | null` to the local `Pwps` type in `src/routes/app.pwps.$pwpsId.tsx`.
-- The Supabase types file will be auto-regenerated after the migration is applied.
+2. **Auto-populate on pWPS selection** in the New PQR dialog:
+   - In the `<select>` `onChange` for "Linked pWPS", after `set("pwps_id", ...)`, look up the selected pWPS and call `set("code_family", selected.code_family ?? "")`.
+   - When the selection is cleared, clear the code family too.
 
-### 3. Reusable Combobox Component
-Create `src/components/procedures/FillerDiameterCombobox.tsx` that mirrors the existing `BaseMaterialCombobox` pattern:
-- Uses `Command` + `Popover` for a searchable dropdown.
-- Pre-populated options: `0.8 mm`, `1.0 mm`, `1.2 mm`, `1.6 mm`, `2.0 mm`, `2.4 mm`, `2.5 mm`, `3.2 mm`, `4.0 mm`, `5.0 mm`, `6.0 mm`.
-- Free-text fallback: if the user types a value not in the list, they can click "Use custom: …" to set the value manually.
-- Keeps the input editable so custom diameters (e.g. `1.8 mm`) are always allowed.
+3. **Make the Code family field read-only and derived**:
+   - Replace the editable `<Input>` for "Code family" with a read-only input that shows `values.code_family` (or a muted placeholder like "Select a pWPS to set code family").
+   - Remove the default `code_family: "ASME IX"` from `NewRecordDialog` `defaults`, since it must come from the pWPS.
+   - Add a helper text under the field: "Inherited from the linked pWPS."
 
-### 4. Form Integration
-In `src/routes/app.pwps.$pwpsId.tsx`, inside the "Filler & gas" `<Section>`:
-- Insert a new `<Field label="Filler Metal Diameter (mm)">` directly below the "Filler classification" field.
-- Render the new `FillerDiameterCombobox` with `value={merged.filler_diameter_mm ?? ""}` and `onChange={(v) => set("filler_diameter_mm", v)}`.
-- Respect the `isEditor` read-only state.
+4. **Validation**: keep "Linked pWPS" effectively required for creating a PQR — if `pwps_id` is empty, the code family will be empty and the user should pick one. (No schema change required; the field already exists as a nullable FK.)
 
-## Files to Modify
-| File | Action |
+## Out of scope
+- The PQR detail page (`app.pqrs.$pqrId.tsx`) remains editable as today; only the creation dialog enforces inheritance.
+- No database migration, no RLS changes.
+
+## Files
+| File | Change |
 |---|---|
-| `supabase/migrations/` | New migration adding `filler_diameter_mm` column to `pwps` |
-| `src/routes/app.pwps.$pwpsId.tsx` | Add type field, render combobox in form |
-| `src/components/procedures/FillerDiameterCombobox.tsx` | New reusable component |
-
-No other tables, RLS policies, or workflows are affected.
+| `src/routes/app.pqrs.index.tsx` | Query `code_family` from pwps; auto-fill + lock Code family field in New PQR dialog |
