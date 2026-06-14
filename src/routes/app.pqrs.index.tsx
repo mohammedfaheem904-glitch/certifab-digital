@@ -77,7 +77,7 @@ function PqrsIndexPage() {
     enabled: !!cid,
     queryFn: async () => {
       const { data, error } = await (supabase.from("pwps" as any) as any)
-        .select("id,pwps_no").eq("company_id", cid!).is("deleted_at", null).order("pwps_no");
+        .select("id,pwps_no,code_family").eq("company_id", cid!).is("deleted_at", null).order("pwps_no");
       if (error) throw error;
       return (data ?? []) as PwpsOpt[];
     },
