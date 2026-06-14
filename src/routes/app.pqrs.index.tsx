@@ -29,7 +29,7 @@ type PqrRow = {
   resulting_wps_id: string | null;
   created_at: string;
 };
-type PwpsOpt = { id: string; pwps_no: string; code_family: string | null };
+type PwpsOpt = { id: string; pwps_no: string; code_family: string | null; standard: string | null };
 
 export const Route = createFileRoute("/app/pqrs/")({
   component: PqrsIndexPage,
