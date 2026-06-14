@@ -139,17 +139,34 @@ function PqrsIndexPage() {
         <div className="flex items-center gap-2">
           <Link to="/app/pqrs/dashboard"><Button variant="outline" size="sm"><LayoutDashboard className="size-4 me-1" /> Dashboard</Button></Link>
           {isAdmin && <Link to="/app/pqrs/trash"><Button variant="outline" size="sm"><Trash2 className="size-4 me-1" /> Trash</Button></Link>}
-          <NewRecordDialog table="pqrs" title="New PQR" trigger="New PQR" defaults={{ revision: "Rev 0", status: "Draft", code_family: "ASME IX", overall_result: "Pending", qualified_ranges: {} }}>
+          <NewRecordDialog table="pqrs" title="New PQR" trigger="New PQR" defaults={{ revision: "Rev 0", status: "Draft", overall_result: "Pending", qualified_ranges: {} }}>
             {({ values, set }) => (
               <div className="grid grid-cols-2 gap-3">
                 <F label="PQR number"><Input required value={values.pqr_no ?? ""} onChange={(e) => set("pqr_no", e.target.value)} placeholder="PQR-001" /></F>
                 <F label="Linked pWPS">
-                  <select className="h-9 rounded-md border border-input bg-background px-3 text-sm w-full" value={values.pwps_id ?? ""} onChange={(e) => set("pwps_id", e.target.value || null)}>
+                  <select
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm w-full"
+                    value={values.pwps_id ?? ""}
+                    onChange={(e) => {
+                      const id = e.target.value || null;
+                      set("pwps_id", id);
+                      const opt = (pwpsOpts ?? []).find((o) => o.id === id);
+                      set("code_family", opt?.code_family ?? "");
+                    }}
+                  >
                     <option value="">— Select pWPS —</option>
                     {(pwpsOpts ?? []).map((o) => <option key={o.id} value={o.id}>{o.pwps_no}</option>)}
                   </select>
                 </F>
-                <F label="Code family"><Input value={values.code_family ?? "ASME IX"} onChange={(e) => set("code_family", e.target.value)} /></F>
+                <F label="Code family">
+                  <Input
+                    value={values.code_family ?? ""}
+                    readOnly
+                    placeholder="Select a pWPS to set code family"
+                    className="bg-muted/40"
+                  />
+                  <p className="text-[11px] text-muted-foreground mt-1">Inherited from the linked pWPS.</p>
+                </F>
                 <F label="Standard"><Input value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX 2023" /></F>
                 <F label="Test date"><Input type="date" value={values.test_date ?? ""} onChange={(e) => set("test_date", e.target.value || null)} /></F>
                 <F label="Revision"><Input value={values.revision ?? "Rev 0"} onChange={(e) => set("revision", e.target.value)} /></F>
