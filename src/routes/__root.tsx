@@ -129,16 +129,18 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TenantBrandingProvider>
-          <I18nProvider>
-            <ConfirmDialogProvider>
-              <ErrorBoundary>
-                <Outlet />
-              </ErrorBoundary>
-              <Toaster richColors position="top-right" />
-            </ConfirmDialogProvider>
-          </I18nProvider>
-        </TenantBrandingProvider>
+        <ThemeProvider>
+          <TenantBrandingProvider>
+            <I18nProvider>
+              <ConfirmDialogProvider>
+                <ErrorBoundary>
+                  <Outlet />
+                </ErrorBoundary>
+                <Toaster richColors position="top-right" />
+              </ConfirmDialogProvider>
+            </I18nProvider>
+          </TenantBrandingProvider>
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
