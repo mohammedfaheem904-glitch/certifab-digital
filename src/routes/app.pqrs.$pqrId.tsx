@@ -150,6 +150,13 @@ function PqrDetailPage() {
 
   return (
     <div className="space-y-6">
+      <QualificationLineageStrip
+        current="pqr"
+        pwpsId={data.pwps_id}
+        pqrId={pqrId}
+        wpsId={data.resulting_wps_id}
+      />
+
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Button variant="ghost" size="sm" onClick={() => nav({ to: "/app/pqrs" })} className="mb-2 -ms-2">
