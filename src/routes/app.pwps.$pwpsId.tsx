@@ -216,6 +216,13 @@ function PwpsDetailPage() {
 
   return (
     <div className="space-y-6">
+      <QualificationLineageStrip
+        current="pwps"
+        pwpsId={pwpsId}
+        pqrIds={lineagePqrs.map((p) => p.id)}
+        wpsIds={lineagePqrs.map((p) => p.resulting_wps_id).filter(Boolean) as string[]}
+      />
+
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
