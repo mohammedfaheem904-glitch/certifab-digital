@@ -2512,6 +2512,7 @@ export type Database = {
           rejected_at: string | null
           rejected_by: string | null
           rejection_reason: string | null
+          theme_preference: string
           updated_at: string
         }
         Insert: {
@@ -2530,6 +2531,7 @@ export type Database = {
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
+          theme_preference?: string
           updated_at?: string
         }
         Update: {
@@ -2548,6 +2550,7 @@ export type Database = {
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
+          theme_preference?: string
           updated_at?: string
         }
         Relationships: [
