@@ -108,7 +108,58 @@ function SettingsPage() {
         )}
         {!isAdmin && <p className="text-xs text-muted-foreground">Only super admins can edit workspace branding.</p>}
       </div>
+
+      <ThemeSection />
     </ModulePage>
+  );
+}
+
+function ThemeSection() {
+  const { preference, resolved, setPreference } = useTheme();
+  const options: { value: ThemePreference; label: string; desc: string; Icon: typeof Sun }[] = [
+    { value: "light", label: "Light", desc: "Bright background, dark text.", Icon: Sun },
+    { value: "dark", label: "Dark", desc: "Low-glare dark interface.", Icon: Moon },
+    { value: "system", label: "Auto", desc: "Follow your device's theme.", Icon: Monitor },
+  ];
+  return (
+    <div className="p-5 border-t border-border max-w-2xl">
+      <div className="flex items-center gap-2 mb-3">
+        <Sun className="size-4 text-primary" />
+        <h3 className="text-sm font-semibold">Appearance</h3>
+        <span className="text-[11px] text-muted-foreground ms-1">
+          Currently showing {resolved === "light" ? "Light" : "Dark"}
+          {preference === "system" ? " (Auto)" : ""}
+        </span>
+      </div>
+      <div className="grid sm:grid-cols-3 gap-2">
+        {options.map(({ value, label, desc, Icon }) => {
+          const active = preference === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => {
+                setPreference(value);
+                toast.success(`Theme set to ${label}.`);
+              }}
+              className={`text-left rounded-lg border p-3 transition-colors ${
+                active
+                  ? "border-primary bg-primary/10 ring-1 ring-primary"
+                  : "border-border hover:bg-muted/30"
+              }`}
+              aria-pressed={active}
+            >
+              <Icon className="size-5 text-primary mb-2" />
+              <div className="font-medium text-sm">{label}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{desc}</div>
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-xs text-muted-foreground mt-2">
+        Your preference is saved to your account and restored automatically when you sign in.
+      </p>
+    </div>
   );
 }
 
