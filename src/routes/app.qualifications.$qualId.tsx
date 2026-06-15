@@ -30,6 +30,7 @@ import {
 } from "@/lib/qualification-intelligence";
 import { QualificationGuidanceStrip } from "@/components/qualifications/QualificationGuidanceStrip";
 import { CollaborationTab } from "@/components/collab/CollaborationTab";
+import { WelderQualificationLineageStrip } from "@/components/qualifications/WelderQualificationLineageStrip";
 
 export const Route = createFileRoute("/app/qualifications/$qualId")({
   component: QualDetail,
@@ -199,6 +200,12 @@ function QualDetail() {
         </div>
       </div>
       {!q.deleted_at && <QualificationGuidanceStrip qualification={merged} />}
+      <WelderQualificationLineageStrip
+        current="wpq"
+        qualId={qualId}
+        welderName={q.welder_name}
+        wpsNumber={q.wps_number}
+      />
 
       <Tabs defaultValue="overview">
         <TabsList className="flex-wrap h-auto">
