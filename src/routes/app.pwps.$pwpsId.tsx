@@ -95,6 +95,18 @@ function PwpsDetailPage() {
     },
   });
 
+  const { data: lineagePqrs = [] } = useQuery<{ id: string; resulting_wps_id: string | null }[]>({
+    queryKey: ["pwps-lineage-pqrs", pwpsId],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("pqrs" as any) as any)
+        .select("id,resulting_wps_id")
+        .eq("pwps_id", pwpsId)
+        .is("deleted_at", null);
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+
   const [draft, setDraft] = useState<Partial<Pwps>>({});
   const [saving, setSaving] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
