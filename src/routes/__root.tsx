@@ -8,6 +8,7 @@ import {
 
 import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
+import { ThemeProvider } from "@/lib/theme";
 import { TenantBrandingProvider } from "@/lib/tenant-branding";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
