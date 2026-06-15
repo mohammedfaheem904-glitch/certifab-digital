@@ -19,6 +19,7 @@ import { WeldStatusBadge } from "@/components/welds/WeldStatusBadge";
 import { WeldTimeline } from "@/components/welds/WeldTimeline";
 import { WeldGuidanceStrip } from "@/components/welds/WeldGuidanceStrip";
 import { CollaborationTab } from "@/components/collab/CollaborationTab";
+import { WelderQualificationLineageStrip } from "@/components/qualifications/WelderQualificationLineageStrip";
 import type { WeldWorkflowStatus } from "@/lib/weld-workflow";
 
 export const Route = createFileRoute("/app/welds/$weldId")({
@@ -103,6 +104,13 @@ function WeldDetail() {
       />
 
       <WeldGuidanceStrip weld={w} />
+
+      <WelderQualificationLineageStrip
+        current="weld"
+        weldId={weldId}
+        welderName={w.welder_name}
+        wpsId={w.procedure_id}
+      />
 
       <WeldWorkflowStepper status={(w.workflow_status ?? "Draft") as WeldWorkflowStatus} />
 
