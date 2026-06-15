@@ -3,6 +3,9 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
 import { getRouter } from "./router";
 import "./styles.css";
+import { initThemeEarly } from "./lib/theme";
+
+initThemeEarly();
 
 const router = getRouter();
 
