@@ -1,29 +1,42 @@
-## Objective
-In the "New PQR" dialog (PQR module), the "Code Family" field should be derived exclusively from the linked pWPS, not entered manually.
+# Add Qualification Lineage to pWPS and PQR
 
-## Changes
+Extend the existing `QualificationLineageStrip` (today shown only on WPS detail) so the full qualification chain — **pWPS → PQR → WPS** — is visible from any node in the chain.
 
-### `src/routes/app.pqrs.index.tsx`
-1. **Extend the pWPS options query** (`pwps-options`) to also select `code_family` so we know each pWPS's code family:
-   - `select("id,pwps_no,code_family")`
-   - Update `PwpsOpt` type to include `code_family: string | null`.
+## What the user will see
 
-2. **Auto-populate on pWPS selection** in the New PQR dialog:
-   - In the `<select>` `onChange` for "Linked pWPS", after `set("pwps_id", ...)`, look up the selected pWPS and call `set("code_family", selected.code_family ?? "")`.
-   - When the selection is cleared, clear the code family too.
+On every detail page (pWPS, PQR, WPS) a lineage strip renders the full chain, with the current record highlighted as "this …" and the other nodes as clickable links with status/result badges.
 
-3. **Make the Code family field read-only and derived**:
-   - Replace the editable `<Input>` for "Code family" with a read-only input that shows `values.code_family` (or a muted placeholder like "Select a pWPS to set code family").
-   - Remove the default `code_family: "ASME IX"` from `NewRecordDialog` `defaults`, since it must come from the pWPS.
-   - Add a helper text under the field: "Inherited from the linked pWPS."
+```text
+pWPS-SMAW-026  →  PQR-SMAW-026 (Passed, qualified 6/10/2026)  →  WPS-SMAW-026
+```
 
-4. **Validation**: keep "Linked pWPS" effectively required for creating a PQR — if `pwps_id` is empty, the code family will be empty and the user should pick one. (No schema change required; the field already exists as a nullable FK.)
+- **pWPS detail page**: shows `this pWPS → linked PQR(s) → resulting WPS(s)`. If no PQR has been raised yet, shows `this pWPS → (Awaiting qualification)`.
+- **PQR detail page**: shows `linked pWPS → this PQR → resulting WPS` (resulting WPS only when present).
+- **WPS detail page**: unchanged — already shows `pWPS → PQR → this WPS`.
+
+Each node remains a link to its own detail page, so users can traverse the chain in either direction for full traceability.
+
+## Technical changes
+
+1. **`src/components/procedures/QualificationLineageStrip.tsx`**
+   - Add a `current: "pwps" | "pqr" | "wps"` prop (default `"wps"` for back-compat).
+   - Add optional `wpsId` prop and a query for the resulting WPS (`procedures.id, code/wps_no, status`) so the WPS node can render outside the WPS page.
+   - Support multiple PQRs / multiple resulting WPSs as arrays (a pWPS may have several PQR attempts; a PQR may spawn one resulting WPS). Render each as its own chip; arrow separators between chain segments.
+   - The node matching `current` renders as bold "this pWPS / this PQR / this WPS" (non-link) instead of a link, keeping today's visual style.
+   - When a chain segment is missing, render a muted placeholder ("Awaiting qualification", "No resulting WPS yet") instead of hiding the strip.
+
+2. **`src/routes/app.pwps.$pwpsId.tsx`**
+   - Query PQRs where `pwps_id = pwpsId` (id, pqr_no, overall_result, qualification_date, status, resulting_wps_id), and the resulting WPS rows for any non-null `resulting_wps_id`.
+   - Render `<QualificationLineageStrip current="pwps" pwpsId={pwpsId} pqrIds={[...]} wpsIds={[...]} />` near the top of the detail body (same placement pattern as the WPS page).
+
+3. **`src/routes/app.pqrs.$pqrId.tsx`**
+   - Use the already-loaded `pwps_id` and `resulting_wps_id` from the PQR row.
+   - Render `<QualificationLineageStrip current="pqr" pwpsId={data.pwps_id} pqrId={pqrId} wpsId={data.resulting_wps_id} />` near the top of the detail body.
+
+4. **`src/routes/app.procedures.$procedureId.tsx`**
+   - Pass `current="wps"` explicitly (no behavior change).
 
 ## Out of scope
-- The PQR detail page (`app.pqrs.$pqrId.tsx`) remains editable as today; only the creation dialog enforces inheritance.
-- No database migration, no RLS changes.
 
-## Files
-| File | Change |
-|---|---|
-| `src/routes/app.pqrs.index.tsx` | Query `code_family` from pwps; auto-fill + lock Code family field in New PQR dialog |
+- No database/schema changes — all linkage fields (`pwps.id`, `pqrs.pwps_id`, `pqrs.resulting_wps_id`) already exist.
+- No new "supporting documents" upload feature; existing attachments tabs on each module remain the source of supporting documents and are reachable via the lineage links.

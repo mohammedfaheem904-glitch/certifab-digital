@@ -22,6 +22,7 @@ import {
 import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { calcHeatInput } from "@/lib/heat-input";
 import { FillerDiameterCombobox } from "@/components/procedures/FillerDiameterCombobox";
+import { QualificationLineageStrip } from "@/components/procedures/QualificationLineageStrip";
 
 type Pwps = {
   id: string;
@@ -91,6 +92,18 @@ function PwpsDetailPage() {
         .maybeSingle();
       if (error) throw error;
       return data as Pwps | null;
+    },
+  });
+
+  const { data: lineagePqrs = [] } = useQuery<{ id: string; resulting_wps_id: string | null }[]>({
+    queryKey: ["pwps-lineage-pqrs", pwpsId],
+    queryFn: async () => {
+      const { data, error } = await (supabase.from("pqrs" as any) as any)
+        .select("id,resulting_wps_id")
+        .eq("pwps_id", pwpsId)
+        .is("deleted_at", null);
+      if (error) throw error;
+      return (data ?? []) as any[];
     },
   });
 
@@ -203,6 +216,13 @@ function PwpsDetailPage() {
 
   return (
     <div className="space-y-6">
+      <QualificationLineageStrip
+        current="pwps"
+        pwpsId={pwpsId}
+        pqrIds={lineagePqrs.map((p) => p.id)}
+        wpsIds={lineagePqrs.map((p) => p.resulting_wps_id).filter(Boolean) as string[]}
+      />
+
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
