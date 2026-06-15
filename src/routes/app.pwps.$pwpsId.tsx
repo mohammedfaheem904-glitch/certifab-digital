@@ -22,6 +22,7 @@ import {
 import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { calcHeatInput } from "@/lib/heat-input";
 import { FillerDiameterCombobox } from "@/components/procedures/FillerDiameterCombobox";
+import { QualificationLineageStrip } from "@/components/procedures/QualificationLineageStrip";
 
 type Pwps = {
   id: string;
