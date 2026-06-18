@@ -10,6 +10,7 @@ import { Loader2, ChevronRight, Eye, Trash2, BarChart3, Download, X } from "luci
 import { bulkExportProceduresCsv, bulkExportProceduresXlsx } from "@/lib/wps-export";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SupportingPqrSelect } from "@/components/procedures/SupportingPqrSelect";
 
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
