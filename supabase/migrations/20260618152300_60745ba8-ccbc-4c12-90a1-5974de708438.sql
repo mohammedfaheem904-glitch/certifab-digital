@@ -1,0 +1,1 @@
+ALTER TABLE public.procedures ADD COLUMN IF NOT EXISTS supporting_pqr_ids uuid[] NOT NULL DEFAULT '{}';

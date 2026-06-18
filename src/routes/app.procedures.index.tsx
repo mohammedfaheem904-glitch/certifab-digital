@@ -10,6 +10,7 @@ import { Loader2, ChevronRight, Eye, Trash2, BarChart3, Download, X } from "luci
 import { bulkExportProceduresCsv, bulkExportProceduresXlsx } from "@/lib/wps-export";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SupportingPqrSelect } from "@/components/procedures/SupportingPqrSelect";
 
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -160,7 +161,7 @@ function ProceduresPage() {
           quota="procedures"
           title="  WPS (Welding Procedure Specification) "
           trigger="New WPS"
-          defaults={{ revision: "Rev 0", status: "Draft" }}
+          defaults={{ revision: "Rev 0", status: "Draft", supporting_pqr_ids: [] }}
         >
           {({ values, set }) => (
             <div className="grid grid-cols-2 gap-3">
@@ -277,6 +278,14 @@ function ProceduresPage() {
               <F label="Current max"><Input type="number" value={values.current_max ?? ""} onChange={(e) => set("current_max", parseFloat(e.target.value) || null)} /></F>
               <F label="Heat input min (kJ/mm)"><Input type="number" step="0.01" value={values.heat_input_min ?? ""} onChange={(e) => set("heat_input_min", parseFloat(e.target.value) || null)} /></F>
               <F label="Heat input max (kJ/mm)"><Input type="number" step="0.01" value={values.heat_input_max ?? ""} onChange={(e) => set("heat_input_max", parseFloat(e.target.value) || null)} /></F>
+              <div className="col-span-2">
+                <F label="Supporting PQR(s)">
+                  <SupportingPqrSelect
+                    value={(values.supporting_pqr_ids as string[]) ?? []}
+                    onChange={(next) => set("supporting_pqr_ids", next)}
+                  />
+                </F>
+              </div>
             </div>
           )}
         </NewRecordDialog>

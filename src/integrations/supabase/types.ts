@@ -2334,6 +2334,7 @@ export type Database = {
           status: Database["public"]["Enums"]["procedure_status"]
           submitted_by: string | null
           submitted_for_review_at: string | null
+          supporting_pqr_ids: string[]
           technique_notes: string | null
           technique_string_weave: string | null
           thermal_notes: string | null
@@ -2396,6 +2397,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["procedure_status"]
           submitted_by?: string | null
           submitted_for_review_at?: string | null
+          supporting_pqr_ids?: string[]
           technique_notes?: string | null
           technique_string_weave?: string | null
           thermal_notes?: string | null
@@ -2458,6 +2460,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["procedure_status"]
           submitted_by?: string | null
           submitted_for_review_at?: string | null
+          supporting_pqr_ids?: string[]
           technique_notes?: string | null
           technique_string_weave?: string | null
           thermal_notes?: string | null
