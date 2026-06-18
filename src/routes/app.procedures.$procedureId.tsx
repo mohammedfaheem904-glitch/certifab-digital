@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { QualificationLineageStrip } from "@/components/procedures/QualificationLineageStrip";
 import { SupportingPqrList } from "@/components/procedures/SupportingPqrList";
+import { LinkedPwpsList } from "@/components/procedures/LinkedPwpsList";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, Printer, Trash2, Download, GitBranch, Layers, Boxes, Wrench, Zap, Sparkles, PenLine, GitCompare } from "lucide-react";
@@ -287,6 +288,7 @@ function ProcedureDetailPage() {
         <QualificationLineageStrip pwpsId={proc.pwps_id} pqrId={proc.pqr_id} />
       )}
       <SupportingPqrList ids={(proc as any).supporting_pqr_ids} />
+      <LinkedPwpsList ids={(proc as any).linked_pwps_ids} />
       <div className="flex flex-wrap items-end justify-between gap-3 print:hidden">
         <div>
           <Button variant="ghost" size="sm" onClick={() => nav({ to: "/app/procedures" })} className="mb-2 -ms-2">
