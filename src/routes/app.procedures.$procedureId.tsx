@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { QualificationLineageStrip } from "@/components/procedures/QualificationLineageStrip";
+import { SupportingPqrList } from "@/components/procedures/SupportingPqrList";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, ArrowLeft, FileText, History, Paperclip, ShieldCheck, Flame, Printer, Trash2, Download, GitBranch, Layers, Boxes, Wrench, Zap, Sparkles, PenLine, GitCompare } from "lucide-react";
