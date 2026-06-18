@@ -523,6 +523,8 @@ function PwpsAutofill({
               ? `${tMax} mm`
               : null;
       const apply: Record<string, unknown> = {
+        standard: p.standard ?? "",
+        supporting_pqr_ids: p.supporting_pqr_ids ?? [],
         process: p.process ?? "",
         joint_type: p.joint_type ?? "",
         position: p.position ?? "",
