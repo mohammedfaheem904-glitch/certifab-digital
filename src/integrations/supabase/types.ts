@@ -2751,6 +2751,7 @@ export type Database = {
           standard: string | null
           status: Database["public"]["Enums"]["pwps_status"]
           submitted_at: string | null
+          supporting_pqr_ids: string[]
           technique_notes: string | null
           thickness_max_mm: number | null
           thickness_min_mm: number | null
@@ -2802,6 +2803,7 @@ export type Database = {
           standard?: string | null
           status?: Database["public"]["Enums"]["pwps_status"]
           submitted_at?: string | null
+          supporting_pqr_ids?: string[]
           technique_notes?: string | null
           thickness_max_mm?: number | null
           thickness_min_mm?: number | null
@@ -2853,6 +2855,7 @@ export type Database = {
           standard?: string | null
           status?: Database["public"]["Enums"]["pwps_status"]
           submitted_at?: string | null
+          supporting_pqr_ids?: string[]
           technique_notes?: string | null
           thickness_max_mm?: number | null
           thickness_min_mm?: number | null

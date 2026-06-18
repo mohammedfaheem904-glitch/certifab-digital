@@ -505,7 +505,7 @@ function PwpsAutofill({
       const { data, error } = await supabase
         .from("pwps")
         .select(
-          "process, joint_type, position, base_material, filler_material, shielding_gas, thickness_min_mm, thickness_max_mm, voltage_min, voltage_max, current_min, current_max, heat_input_min, heat_input_max",
+          "standard, supporting_pqr_ids, process, joint_type, position, base_material, filler_material, shielding_gas, thickness_min_mm, thickness_max_mm, voltage_min, voltage_max, current_min, current_max, heat_input_min, heat_input_max",
         )
         .eq("id", pwpsId)
         .maybeSingle();
@@ -523,6 +523,8 @@ function PwpsAutofill({
               ? `${tMax} mm`
               : null;
       const apply: Record<string, unknown> = {
+        standard: p.standard ?? "",
+        supporting_pqr_ids: p.supporting_pqr_ids ?? [],
         process: p.process ?? "",
         joint_type: p.joint_type ?? "",
         position: p.position ?? "",
