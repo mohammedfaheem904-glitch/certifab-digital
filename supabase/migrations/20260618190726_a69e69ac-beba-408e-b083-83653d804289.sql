@@ -1,0 +1,1 @@
+ALTER TABLE public.procedures ADD COLUMN IF NOT EXISTS linked_pwps_ids uuid[] NOT NULL DEFAULT '{}';
