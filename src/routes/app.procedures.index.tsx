@@ -11,6 +11,7 @@ import { bulkExportProceduresCsv, bulkExportProceduresXlsx } from "@/lib/wps-exp
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SupportingPqrSelect } from "@/components/procedures/SupportingPqrSelect";
+import { LinkedPwpsSelect } from "@/components/procedures/LinkedPwpsSelect";
 
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -161,11 +162,17 @@ function ProceduresPage() {
           quota="procedures"
           title="  WPS (Welding Procedure Specification) "
           trigger="New WPS"
-          defaults={{ revision: "Rev 0", status: "Draft", supporting_pqr_ids: [] }}
+          defaults={{ revision: "Rev 0", status: "Draft", supporting_pqr_ids: [], linked_pwps_ids: [] }}
         >
           {({ values, set }) => (
             <div className="grid grid-cols-2 gap-3">
               <F label="WPS Number"><Input required value={values.code ?? ""} onChange={(e) => set("code", e.target.value)} placeholder="WPS-GTAW-042" /></F>
+              <F label="Linked pWPS">
+                <LinkedPwpsSelect
+                  value={(values.linked_pwps_ids as string[]) ?? []}
+                  onChange={(next) => set("linked_pwps_ids", next)}
+                />
+              </F>
               <F label="Standard"><Input required value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX" /></F>
               <F label="Process">
                 <select required className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
