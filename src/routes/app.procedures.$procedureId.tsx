@@ -286,6 +286,7 @@ function ProcedureDetailPage() {
       {(proc.pwps_id || proc.pqr_id) && (
         <QualificationLineageStrip pwpsId={proc.pwps_id} pqrId={proc.pqr_id} />
       )}
+      <SupportingPqrList ids={(proc as any).supporting_pqr_ids} />
       <div className="flex flex-wrap items-end justify-between gap-3 print:hidden">
         <div>
           <Button variant="ghost" size="sm" onClick={() => nav({ to: "/app/procedures" })} className="mb-2 -ms-2">
