@@ -161,7 +161,7 @@ function ProceduresPage() {
           quota="procedures"
           title="  WPS (Welding Procedure Specification) "
           trigger="New WPS"
-          defaults={{ revision: "Rev 0", status: "Draft" }}
+          defaults={{ revision: "Rev 0", status: "Draft", supporting_pqr_ids: [] }}
         >
           {({ values, set }) => (
             <div className="grid grid-cols-2 gap-3">
