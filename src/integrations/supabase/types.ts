@@ -2310,6 +2310,7 @@ export type Database = {
           interpass_temp: string | null
           joint_notes: string | null
           joint_type: string | null
+          linked_pwps_ids: string[]
           notes: string | null
           pass_type: string | null
           peening: string | null
@@ -2373,6 +2374,7 @@ export type Database = {
           interpass_temp?: string | null
           joint_notes?: string | null
           joint_type?: string | null
+          linked_pwps_ids?: string[]
           notes?: string | null
           pass_type?: string | null
           peening?: string | null
@@ -2436,6 +2438,7 @@ export type Database = {
           interpass_temp?: string | null
           joint_notes?: string | null
           joint_type?: string | null
+          linked_pwps_ids?: string[]
           notes?: string | null
           pass_type?: string | null
           peening?: string | null
