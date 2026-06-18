@@ -278,6 +278,14 @@ function ProceduresPage() {
               <F label="Current max"><Input type="number" value={values.current_max ?? ""} onChange={(e) => set("current_max", parseFloat(e.target.value) || null)} /></F>
               <F label="Heat input min (kJ/mm)"><Input type="number" step="0.01" value={values.heat_input_min ?? ""} onChange={(e) => set("heat_input_min", parseFloat(e.target.value) || null)} /></F>
               <F label="Heat input max (kJ/mm)"><Input type="number" step="0.01" value={values.heat_input_max ?? ""} onChange={(e) => set("heat_input_max", parseFloat(e.target.value) || null)} /></F>
+              <div className="col-span-2">
+                <F label="Supporting PQR(s)">
+                  <SupportingPqrSelect
+                    value={(values.supporting_pqr_ids as string[]) ?? []}
+                    onChange={(next) => set("supporting_pqr_ids", next)}
+                  />
+                </F>
+              </div>
             </div>
           )}
         </NewRecordDialog>
