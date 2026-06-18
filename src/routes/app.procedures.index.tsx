@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SupportingPqrSelect } from "@/components/procedures/SupportingPqrSelect";
 import { LinkedPwpsSelect } from "@/components/procedures/LinkedPwpsSelect";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -166,6 +167,10 @@ function ProceduresPage() {
         >
           {({ values, set }) => (
             <div className="grid grid-cols-2 gap-3">
+              <PwpsAutofill
+                pwpsId={((values.linked_pwps_ids as string[]) ?? [])[0] ?? null}
+                set={set}
+              />
               <F label="WPS Number"><Input required value={values.code ?? ""} onChange={(e) => set("code", e.target.value)} placeholder="WPS-GTAW-042" /></F>
               <F label="Linked pWPS">
                 <LinkedPwpsSelect
@@ -173,6 +178,7 @@ function ProceduresPage() {
                   onChange={(next) => set("linked_pwps_ids", next)}
                 />
               </F>
+
               <F label="Standard"><Input required value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX" /></F>
               <F label="Process">
                 <select required className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
@@ -479,6 +485,69 @@ function F({ label, children }: { label: string; children: React.ReactNode }) {
     <div className="space-y-1.5"><Label className="text-xs">{label}</Label>{children}</div>
   );
 }
+
+function PwpsAutofill({
+  pwpsId,
+  set,
+}: {
+  pwpsId: string | null;
+  set: (key: string, value: unknown) => void;
+}) {
+  const lastApplied = useRef<string | null>(null);
+  useEffect(() => {
+    if (!pwpsId) {
+      lastApplied.current = null;
+      return;
+    }
+    if (lastApplied.current === pwpsId) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("pwps")
+        .select(
+          "process, joint_type, position, base_material, filler_material, shielding_gas, thickness_min_mm, thickness_max_mm, voltage_min, voltage_max, current_min, current_max, heat_input_min, heat_input_max",
+        )
+        .eq("id", pwpsId)
+        .maybeSingle();
+      if (cancelled || error || !data) return;
+      lastApplied.current = pwpsId;
+      const p = data as any;
+      const tMin = p.thickness_min_mm;
+      const tMax = p.thickness_max_mm;
+      const thicknessRange =
+        tMin != null && tMax != null
+          ? `${tMin}–${tMax} mm`
+          : tMin != null
+            ? `${tMin} mm`
+            : tMax != null
+              ? `${tMax} mm`
+              : null;
+      const apply: Record<string, unknown> = {
+        process: p.process ?? "",
+        joint_type: p.joint_type ?? "",
+        position: p.position ?? "",
+        base_material: p.base_material ?? "",
+        filler_material: p.filler_material ?? "",
+        shielding_gas: p.shielding_gas ?? "",
+        thickness_range: thicknessRange ?? "",
+        voltage_min: p.voltage_min ?? null,
+        voltage_max: p.voltage_max ?? null,
+        current_min: p.current_min ?? null,
+        current_max: p.current_max ?? null,
+        heat_input_min: p.heat_input_min ?? null,
+        heat_input_max: p.heat_input_max ?? null,
+      };
+      Object.entries(apply).forEach(([k, v]) => set(k, v));
+      toast.success("Fields populated from linked pWPS");
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [pwpsId, set]);
+  return null;
+}
+
+
 function FilterSelect({
   label,
   value,
