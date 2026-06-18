@@ -167,6 +167,10 @@ function ProceduresPage() {
         >
           {({ values, set }) => (
             <div className="grid grid-cols-2 gap-3">
+              <PwpsAutofill
+                pwpsId={((values.linked_pwps_ids as string[]) ?? [])[0] ?? null}
+                set={set}
+              />
               <F label="WPS Number"><Input required value={values.code ?? ""} onChange={(e) => set("code", e.target.value)} placeholder="WPS-GTAW-042" /></F>
               <F label="Linked pWPS">
                 <LinkedPwpsSelect
@@ -174,6 +178,7 @@ function ProceduresPage() {
                   onChange={(next) => set("linked_pwps_ids", next)}
                 />
               </F>
+
               <F label="Standard"><Input required value={values.standard ?? ""} onChange={(e) => set("standard", e.target.value)} placeholder="ASME IX" /></F>
               <F label="Process">
                 <select required className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
