@@ -2,39 +2,31 @@ import logoAsset from "@/assets/weld-yard-logo.png.asset.json";
 import { cn } from "@/lib/utils";
 
 type LogoProps = {
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   className?: string;
-  /**
-   * Renders the logo on a light chip so the dark wordmark stays legible
-   * on dark surfaces (sidebar, marketing hero, etc.). Defaults to true.
-   */
-  chip?: boolean;
 };
 
 const HEIGHTS = {
-  sm: "h-8",
-  md: "h-10",
-  lg: "h-14",
+  sm: "h-10",
+  md: "h-14",
+  lg: "h-20",
+  xl: "h-28",
 } as const;
 
-export function Logo({ size = "sm", className, chip = true }: LogoProps) {
-  const img = (
+export function Logo({ size = "sm", className }: LogoProps) {
+  return (
     <img
       src={logoAsset.url}
       alt="Weld Yard"
-      className={cn(HEIGHTS[size], "w-auto select-none")}
       draggable={false}
-    />
-  );
-  if (!chip) return <span className={className}>{img}</span>;
-  return (
-    <span
       className={cn(
-        "inline-flex items-center justify-center rounded-md bg-white px-2 py-1 border border-border/60",
+        HEIGHTS[size],
+        "w-auto select-none object-contain",
+        // Brighten the dark wordmark on dark surfaces while preserving the
+        // yellow mark hue, so the logo reads on the site's dark palette.
+        "[filter:drop-shadow(0_1px_0_hsl(var(--background)/0.4))]",
         className,
       )}
-    >
-      {img}
-    </span>
+    />
   );
 }
