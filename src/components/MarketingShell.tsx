@@ -114,7 +114,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
             <div>© {new Date().getFullYear()} Weld Yard. All rights reserved.</div>
             <div className="flex items-center gap-3">
-              <span>ASME IX</span><span>·</span><span>EN ISO 15614</span><span>·</span><span>AWS D1.1</span>
+              <span>pWPS → PQR → WPS →&nbsp;WPQ → Weld Log → Inspection → NCR → Closed</span>
             </div>
           </div>
         </div>
