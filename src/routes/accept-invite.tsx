@@ -4,7 +4,8 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Loader2, Flame, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Loader2, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
 
 const search = z.object({ token: z.string().min(8).max(128).optional() });
@@ -69,11 +70,8 @@ function AcceptInvite() {
   return (
     <div className="min-h-screen grid place-items-center p-6 bg-[image:var(--gradient-surface)]">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 shadow-[var(--shadow-elegant)]">
-        <Link to="/" className="flex items-center gap-2 mb-6">
-          <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-            <Flame className="size-5 text-primary-foreground" />
-          </div>
-          <div className="font-semibold">Weld Yard</div>
+        <Link to="/" className="flex items-center mb-6" aria-label="Weld Yard — home">
+          <Logo size="sm" />
         </Link>
 
         {checking || loading ? (
