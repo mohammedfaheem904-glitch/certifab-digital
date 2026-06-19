@@ -103,7 +103,7 @@ function Landing() {
         </div>
         <div className="mt-12 grid md:grid-cols-3 gap-5">
           {[
-            { icon: FileText, title: "WPS & PQR control", body: "Author, revise and lock procedures. Heat-input engine validates every weld against the qualified range." },
+            { icon: FileText, title: "pWPS & WPS & PQR control", body: "Author, revise and lock procedures. Heat-input engine validates every weld against the qualified range." },
             { icon: ClipboardCheck, title: "WPQ (Welder Performance Qualification)", body: "Track WPQ/PQR, expiry, scope of approval and continuity. Email reminders before lapses." },
             { icon: QrCode, title: "Weld traceability", body: "Every joint has a QR token linking welder, WPS, heat numbers, NDT results and NCRs." },
             { icon: ShieldCheck, title: "Inspections & NCRs workflow", body: "VT, RT, UT, PT, MT outcomes feed a status-driven NCR pipeline with root cause and CA/PA." },
