@@ -34,7 +34,7 @@ function Landing() {
       {/* HERO — dark */}
       <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
-          <Eyebrow>pWPS → PQR → WPS</Eyebrow>
+          <Eyebrow>pWPS → PQR → WPS → WPQ → Weld Log → Inspection → NCR → Closed</Eyebrow>
           <h1 className="text-4xl md:text-6xl font-semibold tracking-tight max-w-4xl">
             The operating system for{" "}
             <span className="bg-clip-text text-transparent bg-[image:var(--gradient-primary)]">
