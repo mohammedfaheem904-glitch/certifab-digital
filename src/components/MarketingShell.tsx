@@ -1,7 +1,8 @@
 import { ReactNode, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Flame, Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 const NAV = [
   { to: "/features", label: "Features" },
@@ -18,14 +19,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
         <div className="max-w-7xl mx-auto h-16 px-6 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-              <Flame className="size-5 text-primary-foreground" />
-            </div>
-            <div className="leading-tight">
-              <div className="font-semibold tracking-tight">Weld Yard</div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">DWMS</div>
-            </div>
+          <Link to="/" className="flex items-center" aria-label="Weld Yard — home">
+            <Logo size="sm" />
           </Link>
           <nav className="hidden lg:flex items-center gap-1">
             {NAV.map((n) => (
@@ -82,11 +77,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
       <footer className="border-t border-border bg-background">
         <div className="max-w-7xl mx-auto px-6 py-12 grid gap-10 md:grid-cols-4 text-sm">
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="size-8 rounded-md grid place-items-center bg-[image:var(--gradient-primary)]">
-                <Flame className="size-4 text-primary-foreground" />
-              </div>
-              <span className="font-semibold">Weld Yard</span>
+            <div className="mb-3">
+              <Logo size="sm" />
             </div>
             <p className="text-muted-foreground">
               The operating system for industrial welding QA/QC.
