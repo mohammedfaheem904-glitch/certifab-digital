@@ -90,7 +90,7 @@ function Signup() {
             {branding && !isInvite
               ? `Join ${branding.name}.`
               : isInvite
-                ? "You've been invited to a Weld Yard workspace."
+                ? <>You've been invited to a <Wordmark /> workspace.</>
                 : "Spin up a workspace for your fabrication yard."}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-md">
