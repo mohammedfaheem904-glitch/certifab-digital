@@ -27,7 +27,7 @@ const TIERS = [
   },
   {
     name: "Professional",
-    price: "$1,490",
+    price: "$199",
     period: "/ month",
     desc: "For active fabrication shops and single-project EPC teams.",
     highlight: true,
