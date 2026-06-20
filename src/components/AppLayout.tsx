@@ -146,9 +146,7 @@ export function AppLayout() {
       {/* Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r border-sidebar-border bg-sidebar">
         <div className="flex items-center gap-2 px-5 h-16 border-b border-sidebar-border">
-          <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-            <Flame className="size-5 text-primary-foreground" />
-          </div>
+          <BrandLogo className="size-9" />
           <div className="leading-tight">
             <div className="font-semibold tracking-tight"><Wordmark>{t("appName")}</Wordmark></div>
             <div className="text-[11px] text-muted-foreground">{t("tagline")}</div>
