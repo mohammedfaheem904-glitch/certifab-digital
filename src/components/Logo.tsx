@@ -7,10 +7,10 @@ type LogoProps = {
 };
 
 const HEIGHTS = {
-  sm: "h-12",
-  md: "h-16",
-  lg: "h-24",
-  xl: "h-32",
+  sm: "h-14",
+  md: "h-20",
+  lg: "h-28",
+  xl: "h-36",
 } as const;
 
 export function Logo({ size = "sm", className }: LogoProps) {
