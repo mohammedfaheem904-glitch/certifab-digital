@@ -178,9 +178,7 @@ export function AppLayout() {
             <SheetContent side="left" className="w-72 p-0 flex flex-col bg-sidebar">
               <SheetTitle className="sr-only">Navigation</SheetTitle>
               <div className="flex items-center gap-2 px-5 h-16 border-b border-sidebar-border">
-                <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)]">
-                  <Flame className="size-5 text-primary-foreground" />
-                </div>
+                <BrandLogo className="size-9" />
                 <div className="leading-tight">
                   <div className="font-semibold tracking-tight"><Wordmark>{t("appName")}</Wordmark></div>
                   <div className="text-[11px] text-muted-foreground">{companyName ?? t("tagline")}</div>
