@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Wordmark } from "@/components/Wordmark";
+import { BrandLogo } from "@/components/BrandLogo";
 
 import { useTenantBranding } from "@/lib/tenant-branding";
 import { toast } from "sonner";
@@ -78,9 +79,7 @@ function Login() {
           {branding?.logo_url ? (
             <img src={branding.logo_url} alt={branding.name} className="size-9 rounded-md object-cover bg-card border border-border" />
           ) : (
-            <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-              <Flame className="size-5 text-primary-foreground" />
-            </div>
+            <BrandLogo className="size-9" />
           )}
           <div>
             <div className="font-semibold tracking-tight">{branding?.name ?? <Wordmark>{t("appName")}</Wordmark>}</div>

@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenantBranding } from "@/lib/tenant-branding";
 import { Wordmark } from "@/components/Wordmark";
+import { BrandLogo } from "@/components/BrandLogo";
 import { toast } from "sonner";
 
 const search = z.object({

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Flame, ShieldCheck, AlertTriangle } from "lucide-react";
 import { daysUntil } from "@/lib/format";
 import { Wordmark } from "@/components/Wordmark";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export const Route = createFileRoute("/verify/instrument/$token")({
   component: VerifyInstrument,
@@ -31,7 +32,7 @@ function VerifyInstrument() {
     <div className="min-h-screen grid place-items-center bg-background p-4">
       <div className="max-w-md w-full rounded-2xl border border-border bg-card p-6 shadow-lg">
         <div className="flex items-center gap-2 mb-6">
-          <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)]"><Flame className="size-5 text-primary-foreground" /></div>
+          <BrandLogo className="size-9" />
           <div>
             <div className="font-semibold"><Wordmark /></div>
             <div className="text-[11px] text-muted-foreground">Instrument calibration verification</div>

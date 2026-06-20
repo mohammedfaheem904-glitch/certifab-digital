@@ -4,6 +4,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Wordmark } from "@/components/Wordmark";
+import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { Loader2, Flame, CheckCircle2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -71,9 +72,7 @@ function AcceptInvite() {
     <div className="min-h-screen grid place-items-center p-6 bg-[image:var(--gradient-surface)]">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 shadow-[var(--shadow-elegant)]">
         <Link to="/" className="flex items-center gap-2 mb-6">
-          <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-            <Flame className="size-5 text-primary-foreground" />
-          </div>
+          <BrandLogo className="size-9" />
           <div className="font-semibold"><Wordmark /></div>
         </Link>
 
