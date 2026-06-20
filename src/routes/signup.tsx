@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { Logo } from "@/components/Logo";
+import { Flame, ArrowRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -72,18 +71,18 @@ function Signup() {
     <div className="min-h-screen grid lg:grid-cols-2">
       <div className="hidden lg:flex flex-col justify-between p-10 bg-[image:var(--gradient-surface)] border-e border-border relative overflow-hidden">
         <div className="absolute -top-32 -end-32 size-96 rounded-full bg-primary/10 blur-3xl" />
-        <Link to="/" className="flex items-center gap-3 relative" aria-label="Weld Yard — home">
+        <Link to="/" className="flex items-center gap-2 relative">
           {branding?.logo_url ? (
-            <>
-              <img src={branding.logo_url} alt={branding.name} className="size-10 rounded-md object-cover bg-card border border-border" />
-              <div>
-                <div className="font-semibold tracking-tight">{branding.name}</div>
-                <div className="text-[11px] text-muted-foreground">Welding QA/QC workspace</div>
-              </div>
-            </>
+            <img src={branding.logo_url} alt={branding.name} className="size-9 rounded-md object-cover bg-card border border-border" />
           ) : (
-            <Logo size="md" />
+            <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
+              <Flame className="size-5 text-primary-foreground" />
+            </div>
           )}
+          <div>
+            <div className="font-semibold tracking-tight">{branding?.name ?? t("appName")}</div>
+            <div className="text-[11px] text-muted-foreground">{branding ? "Welding QA/QC workspace" : t("tagline")}</div>
+          </div>
         </Link>
         <div className="relative">
           <h2 className="text-3xl font-semibold tracking-tight max-w-md">
