@@ -20,9 +20,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
         <div className="max-w-7xl mx-auto h-16 px-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-              <Flame className="size-5 text-primary-foreground" />
-            </div>
+            <BrandLogo className="size-9" />
             <div className="leading-tight">
               <div className="font-semibold tracking-tight"><Wordmark /></div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">DWMS</div>
