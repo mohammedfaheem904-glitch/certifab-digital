@@ -2,6 +2,7 @@ import { Flame, Clock, XCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { Wordmark } from "@/components/Wordmark";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export function PendingApprovalScreen() {
   const { signOut, user } = useAuth();
@@ -43,9 +44,7 @@ function Shell({ icon, title, children }: { icon: React.ReactNode; title: string
     <div className="min-h-screen grid place-items-center p-6 bg-[image:var(--gradient-surface)]">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 shadow-[var(--shadow-elegant)] space-y-5">
         <div className="flex items-center gap-2">
-          <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
-            <Flame className="size-5 text-primary-foreground" />
-          </div>
+          <BrandLogo className="size-9" />
           <div className="font-semibold tracking-tight"><Wordmark /></div>
         </div>
         <div className="flex items-start gap-3">
