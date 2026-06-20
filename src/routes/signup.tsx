@@ -9,6 +9,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenantBranding } from "@/lib/tenant-branding";
+import { Wordmark } from "@/components/Wordmark";
 import { toast } from "sonner";
 
 const search = z.object({
@@ -80,7 +81,7 @@ function Signup() {
             </div>
           )}
           <div>
-            <div className="font-semibold tracking-tight">{branding?.name ?? t("appName")}</div>
+            <div className="font-semibold tracking-tight">{branding?.name ?? <Wordmark>{t("appName")}</Wordmark>}</div>
             <div className="text-[11px] text-muted-foreground">{branding ? "Welding QA/QC workspace" : t("tagline")}</div>
           </div>
         </Link>

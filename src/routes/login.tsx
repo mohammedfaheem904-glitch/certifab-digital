@@ -9,6 +9,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { Wordmark } from "@/components/Wordmark";
 
 import { useTenantBranding } from "@/lib/tenant-branding";
 import { toast } from "sonner";
@@ -82,7 +83,7 @@ function Login() {
             </div>
           )}
           <div>
-            <div className="font-semibold tracking-tight">{branding?.name ?? t("appName")}</div>
+            <div className="font-semibold tracking-tight">{branding?.name ?? <Wordmark>{t("appName")}</Wordmark>}</div>
             <div className="text-[11px] text-muted-foreground">{branding ? "Welding QA/QC workspace" : t("tagline")}</div>
           </div>
         </Link>
@@ -138,7 +139,7 @@ function Login() {
             {busy ? <Loader2 className="size-4 animate-spin" /> : <>{t("signIn")} <ArrowRight className="size-4 ms-1" /></>}
           </Button>
           <p className="text-xs text-muted-foreground text-center">
-            New to Weld Yard?{" "}
+            New to <Wordmark />?{" "}
             <Link to="/signup" className="text-primary hover:underline">Create a workspace</Link>
           </p>
         </form>
