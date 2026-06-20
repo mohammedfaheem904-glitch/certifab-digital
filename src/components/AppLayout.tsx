@@ -149,7 +149,7 @@ export function AppLayout() {
             <Flame className="size-5 text-primary-foreground" />
           </div>
           <div className="leading-tight">
-            <div className="font-semibold tracking-tight">{t("appName")}</div>
+            <div className="font-semibold tracking-tight"><Wordmark>{t("appName")}</Wordmark></div>
             <div className="text-[11px] text-muted-foreground">{t("tagline")}</div>
           </div>
         </div>
@@ -182,7 +182,7 @@ export function AppLayout() {
                   <Flame className="size-5 text-primary-foreground" />
                 </div>
                 <div className="leading-tight">
-                  <div className="font-semibold tracking-tight">{t("appName")}</div>
+                  <div className="font-semibold tracking-tight"><Wordmark>{t("appName")}</Wordmark></div>
                   <div className="text-[11px] text-muted-foreground">{companyName ?? t("tagline")}</div>
                 </div>
               </div>
