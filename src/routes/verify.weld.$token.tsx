@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Flame, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Wordmark } from "@/components/Wordmark";
 
 export const Route = createFileRoute("/verify/weld/$token")({
   component: VerifyWeld,
@@ -27,7 +28,7 @@ function VerifyWeld() {
         <div className="flex items-center gap-2 mb-6">
           <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)]"><Flame className="size-5 text-primary-foreground" /></div>
           <div>
-            <div className="font-semibold">Weld Yard</div>
+            <div className="font-semibold"><Wordmark /></div>
             <div className="text-[11px] text-muted-foreground">Weld traceability verification</div>
           </div>
         </div>

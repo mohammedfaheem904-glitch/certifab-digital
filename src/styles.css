@@ -385,3 +385,11 @@
   body[data-wps-print-mode="client"] .doc-sheet::before { content: "CLIENT COPY"; color: rgba(15, 118, 110, 0.10); position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 120px; font-weight: 700; transform: rotate(-30deg); pointer-events: none; z-index: 9999; }
   body[data-wps-print-mode="shop_floor"] .doc-sheet { font-size: 13pt !important; }
 }
+
+/* Brand wordmark — "Weld Yard" only. */
+.brand-wordmark {
+  font-family: "Rakkas", serif;
+  color: #FF914D;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}

@@ -1,6 +1,7 @@
 import { Flame, Clock, XCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
+import { Wordmark } from "@/components/Wordmark";
 
 export function PendingApprovalScreen() {
   const { signOut, user } = useAuth();
@@ -45,7 +46,7 @@ function Shell({ icon, title, children }: { icon: React.ReactNode; title: string
           <div className="size-9 rounded-md grid place-items-center bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
             <Flame className="size-5 text-primary-foreground" />
           </div>
-          <div className="font-semibold tracking-tight">Weld Yard</div>
+          <div className="font-semibold tracking-tight"><Wordmark /></div>
         </div>
         <div className="flex items-start gap-3">
           {icon}

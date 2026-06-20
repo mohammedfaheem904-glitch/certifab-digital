@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Flame, Menu, X, ArrowRight } from "lucide-react";
+import { Wordmark } from "@/components/Wordmark";
 
 const NAV = [
   { to: "/features", label: "Features" },
@@ -23,7 +24,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
               <Flame className="size-5 text-primary-foreground" />
             </div>
             <div className="leading-tight">
-              <div className="font-semibold tracking-tight">Weld Yard</div>
+              <div className="font-semibold tracking-tight"><Wordmark /></div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">DWMS</div>
             </div>
           </Link>
@@ -86,7 +87,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
               <div className="size-8 rounded-md grid place-items-center bg-[image:var(--gradient-primary)]">
                 <Flame className="size-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold">Weld Yard</span>
+              <span className="font-semibold"><Wordmark /></span>
             </div>
             <p className="text-muted-foreground">
               The operating system for industrial welding QA/QC.
@@ -112,7 +113,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         </div>
         <div className="border-t border-border">
           <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-            <div>© {new Date().getFullYear()} Weld Yard. All rights reserved.</div>
+            <div>© {new Date().getFullYear()} <Wordmark />. All rights reserved.</div>
             <div className="flex items-center gap-3">
               <span>pWPS → PQR → WPS →&nbsp;WPQ → Weld Log → Inspection → NCR → Closed</span>
             </div>
