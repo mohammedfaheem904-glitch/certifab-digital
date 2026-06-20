@@ -83,9 +83,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         <div className="max-w-7xl mx-auto px-6 py-12 grid gap-10 md:grid-cols-4 text-sm">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-3">
-              <div className="size-8 rounded-md grid place-items-center bg-[image:var(--gradient-primary)]">
-                <Flame className="size-4 text-primary-foreground" />
-              </div>
+              <BrandLogo className="size-8" />
               <span className="font-semibold"><Wordmark /></span>
             </div>
             <p className="text-muted-foreground">
