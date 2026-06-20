@@ -1,4 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { Wordmark } from "@/components/Wordmark";
 import {
   LayoutDashboard,
   FileText,
