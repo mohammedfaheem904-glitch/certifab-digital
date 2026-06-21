@@ -393,7 +393,7 @@ function ProcessStep({ proc, canEdit, qc }: { proc: any; canEdit: boolean; qc: R
       <InlineField label="Joint type" field="joint_type" proc={proc} canEdit={canEdit} qc={qc} placeholder="Butt / Fillet" />
       <InlineSelect label="Groove type" field="groove_type" proc={proc} canEdit={canEdit} qc={qc}
         options={["Square Groove","V-Groove","Bevel Groove","U-Groove","J-Groove","Flare-V Groove","Flare-Bevel Groove","Scarf Groove","Other"]} />
-      <InlineField label="Progression" field="welding_progression" proc={proc} canEdit={canEdit} qc={qc} placeholder="Uphill / Downhill" />
+      <InlineSelect label="Progression" field="welding_progression" proc={proc} canEdit={canEdit} qc={qc} options={["Uphill (Vertical Up)", "Downhill (Vertical Down)"]} />
     </div>
   );
 }
