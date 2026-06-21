@@ -58,7 +58,7 @@ export function TechniquesTable({ procedureId, canEdit }: { procedureId: string;
         { key: "peening", label: "Peening" },
         { key: "pass_type", label: "Pass type" },
         { key: "electrode_mode", label: "Electrode mode" },
-        { key: "automation", label: "Automation" },
+        { key: "automation", label: "Automation", kind: "select", selectOptions: ["Manual", "Semi-Automatic", "Mechanized", "Automatic"], placeholder: "— Select —" },
         { key: "oscillation", label: "Oscillation" },
         { key: "multi_or_single_pass", label: "Single / Multi pass" },
         { key: "notes", label: "Notes" },
