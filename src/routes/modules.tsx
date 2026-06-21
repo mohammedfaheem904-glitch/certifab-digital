@@ -6,8 +6,8 @@ import { FileText, ClipboardCheck, Activity, ShieldCheck, AlertTriangle, Wrench,
 export const Route = createFileRoute("/modules")({
   head: () => ({
     meta: [
-      { title: "Modules — Weld Yard DWMS" },
-      { name: "description", content: "Procedures, Qualifications, Welds, Inspections, NCRs, Equipment, Instruments, Reports, Team and Audit. Modular DWMS, deploy what you need." },
+      { title: "Modules — Weld Yard DWM" },
+      { name: "description", content: "Procedures, Qualifications, Welds, Inspections, NCRs, Equipment, Instruments, Reports, Team and Audit. Modular DWM, deploy what you need." },
       { property: "og:title", content: "Modules — Weld Yard" },
       { property: "og:url", content: "https://weldyard.com/modules" },
     ],

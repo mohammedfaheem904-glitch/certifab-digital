@@ -6,7 +6,7 @@ import { Building2, Wrench, Activity, Cpu, Anchor, Factory, Zap, Hammer } from "
 export const Route = createFileRoute("/industries")({
   head: () => ({
     meta: [
-      { title: "Industries — Weld Yard DWMS" },
+      { title: "Industries — Weld Yard DWM" },
       { name: "description", content: "Weld Yard powers welding QA/QC across oil & gas, EPC, fabrication shops, power generation, shipbuilding and heavy structural steel." },
       { property: "og:title", content: "Industries — Weld Yard" },
       { property: "og:url", content: "https://weldyard.com/industries" },

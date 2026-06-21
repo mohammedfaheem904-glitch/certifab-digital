@@ -24,7 +24,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
             <BrandLogo className="size-9" />
             <div className="leading-tight">
               <div className="font-semibold tracking-tight"><Wordmark /></div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">DWMS</div>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">DWM</div>
             </div>
           </Link>
           <nav className="hidden lg:flex items-center gap-1">
