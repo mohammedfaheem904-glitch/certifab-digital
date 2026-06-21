@@ -176,6 +176,21 @@ export function RelationalTable({
                           updatePatch(row.id, patch);
                         }}
                       />
+                    ) : c.kind === "select" ? (
+                      <select
+                        defaultValue={row[c.key] ?? ""}
+                        disabled={!canEdit}
+                        className="h-8 w-full min-w-[180px] rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          if (String(v ?? "") !== String(row[c.key] ?? "")) updateField(row.id, c.key, v);
+                        }}
+                      >
+                        <option value="">{c.placeholder ?? "— Select —"}</option>
+                        {(c.selectOptions ?? []).map((o) => (
+                          <option key={o} value={o}>{o}</option>
+                        ))}
+                      </select>
                     ) : (
                       <Input
                         defaultValue={row[c.key] ?? ""}
@@ -189,6 +204,7 @@ export function RelationalTable({
                         }}
                       />
                     )}
+
                   </td>
                 ))}
                 {canEdit && (
