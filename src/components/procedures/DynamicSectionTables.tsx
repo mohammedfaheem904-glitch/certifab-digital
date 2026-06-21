@@ -12,7 +12,7 @@ export function PositionsTable({ procedureId, canEdit }: { procedureId: string; 
       columns={[
         { key: "position", label: "Position", placeholder: "e.g. 6G, 3G, 2F" },
         { key: "qualified_range", label: "Qualified range", placeholder: "All / Flat+Horizontal" },
-        { key: "progression", label: "Progression", placeholder: "Uphill / Downhill" },
+        { key: "progression", label: "Progression", kind: "select", selectOptions: ["Uphill (Vertical Up)", "Downhill (Vertical Down)"], placeholder: "— Select —" },
         { key: "notes", label: "Notes" },
       ]}
     />
