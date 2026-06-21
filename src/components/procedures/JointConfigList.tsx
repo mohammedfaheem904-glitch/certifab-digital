@@ -154,7 +154,7 @@ function JointCard({ joint, canEdit, onChange }: { joint: any; canEdit: boolean;
         <SelectField label="Groove type" defaultValue={joint.groove_type} disabled={!canEdit} onSave={(v) => update({ groove_type: v })}
           options={["Square Groove","V-Groove","Bevel Groove","U-Groove","J-Groove","Flare-V Groove","Flare-Bevel Groove","Scarf Groove","Other"]} />
         <Field label="Joint type" defaultValue={joint.joint_type} disabled={!canEdit} onSave={(v) => update({ joint_type: v })} />
-        <Field label="Progression" defaultValue={joint.welding_progression} disabled={!canEdit} onSave={(v) => update({ welding_progression: v })} />
+        <SelectField label="Progression" defaultValue={joint.welding_progression} disabled={!canEdit} onSave={(v) => update({ welding_progression: v })} options={["Uphill (Vertical Up)", "Downhill (Vertical Down)"]} />
         <SelectField label="Position" defaultValue={joint.position_qualified} disabled={!canEdit} onSave={(v) => update({ position_qualified: v })} options={positionOptions} />
         <Field label="Pipe / Plate" defaultValue={joint.pipe_or_plate} disabled={!canEdit} onSave={(v) => update({ pipe_or_plate: v })} />
       </div>
