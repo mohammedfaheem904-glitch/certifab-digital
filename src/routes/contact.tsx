@@ -65,7 +65,7 @@ function ContactPage() {
               { icon: Mail, n: "Email", v: "system@weldyard.com", d: "All sales and support inquiries." },
               { icon: LifeBuoy, n: "Customer support", v: "support@weldyard.com", d: "Existing customers — response within 4 business hours." },
               { icon: MessageSquare, n: "Partnerships", v: "partners@weldyard.com", d: "Resellers, integrators, training providers." },
-              { icon: MapPin, n: "Headquarters", v: "Riyadh, Saudi Arabia", d: "Serving the GCC, MENA and global EPC supply chain." },
+              { icon: MapPin, n: "Headquarters", v: "Cairo, Egypt", d: "Serving the GCC, MENA and global EPC supply chain." },
             ].map((c) => (
               <div key={c.n} className="rounded-xl border border-border bg-card p-5 flex items-start gap-4">
                 <div className="size-10 rounded-md grid place-items-center bg-primary/10 text-primary shrink-0"><c.icon className="size-5" /></div>
