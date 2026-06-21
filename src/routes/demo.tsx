@@ -13,7 +13,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/demo")({
   head: () => ({
     meta: [
-      { title: "Request a demo — Weld Yard DWMS" },
+      { title: "Request a demo — Weld Yard DWM" },
       { name: "description", content: "Book a 30-minute personalized demo of Weld Yard. We'll walk through WPS control, weld traceability and NCR closeout on a project that looks like yours." },
       { property: "og:title", content: "Request a demo — Weld Yard" },
       { property: "og:url", content: "https://weldyard.com/demo" },

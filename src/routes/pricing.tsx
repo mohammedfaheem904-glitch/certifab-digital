@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Weld Yard DWMS" },
+      { title: "Pricing — Weld Yard DWM" },
       { name: "description", content: "Simple, per-project pricing for industrial welding QA/QC. Pilot, Professional and Enterprise plans. Custom on-prem deployments available." },
       { property: "og:title", content: "Pricing — Weld Yard" },
       { property: "og:url", content: "https://weldyard.com/pricing" },

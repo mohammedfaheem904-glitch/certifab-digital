@@ -7,8 +7,8 @@ export const Route = createFileRoute("/")({
   head: () => ({
     links: [{ rel: "canonical", href: "https://weldyard.com/" }],
     meta: [
-      { title: "Weld Yard — Digital Welding Management System (DWMS)" },
-      { name: "description", content: "Cloud DWMS for industrial welding QA/QC. Manage WPS/PQR, welders qualifications, weld traceability, NDT inspections, NCRs and equipment calibration in one platform." },
+      { title: "Weld Yard — Digital Welding Management (DWM)" },
+      { name: "description", content: "Cloud DWM for industrial welding QA/QC. Manage WPS/PQR, welders qualifications, weld traceability, NDT inspections, NCRs and equipment calibration in one platform." },
       { property: "og:title", content: "Weld Yard — Digital Welding Management" },
       { property: "og:description", content: "Replace paper and Excel with a modern industrial SaaS for welding QA/QC." },
       { property: "og:url", content: "https://weldyard.com/" },

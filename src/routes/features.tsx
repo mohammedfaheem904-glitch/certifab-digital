@@ -6,7 +6,7 @@ import { ShieldCheck, FileText, ClipboardCheck, QrCode, Activity, Gauge, BarChar
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
-      { title: "Features — Weld Yard DWMS" },
+      { title: "Features — Weld Yard DWM" },
       { name: "description", content: "Every capability you need for industrial welding QA/QC: WPS control, weld traceability, NDT inspections, NCR workflow, calibration register and realtime dashboards." },
       { property: "og:title", content: "Features — Weld Yard" },
       { property: "og:url", content: "https://weldyard.com/features" },
