@@ -23,10 +23,12 @@ export type ColumnDef = {
   type?: "text" | "number";
   width?: string;
   placeholder?: string;
-  kind?: "input" | "combobox";
+  kind?: "input" | "combobox" | "select";
   options?: ComboOption[];
+  selectOptions?: string[];
   onOptionSelected?: (option: ComboOption, row: any) => Record<string, any>;
 };
+
 
 type Props = {
   title: string;
