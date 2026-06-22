@@ -55,7 +55,7 @@ export function TechniquesTable({ procedureId, canEdit }: { procedureId: string;
         { key: "string_or_weave", label: "String / Weave", kind: "select", selectOptions: ["Stringer Bead", "Weave Bead", "Oscillation", "Whip and Pause"], placeholder: "— Select —" },
         { key: "cleaning_method", label: "Cleaning", kind: "select", selectOptions: ["Wire Brushing", "Grinding", "Chipping", "Solvent Cleaning", "None"], placeholder: "— Select —" },
         { key: "back_gouging", label: "Back gouging", kind: "select", selectOptions: ["None", "Grinding", "CAC-A", "Plasma Gouging", "Machining"], placeholder: "— Select —" },
-        { key: "peening", label: "Peening" },
+        { key: "peening", label: "Peening", kind: "select", selectOptions: ["Not Permitted", "Permitted", "Root Pass Only", "Fill Passes Only"], placeholder: "— Select —" },
         { key: "pass_type", label: "Pass type" },
         { key: "electrode_mode", label: "Electrode mode" },
         { key: "automation", label: "Automation", kind: "select", selectOptions: ["Manual", "Semi-Automatic", "Mechanized", "Automatic"], placeholder: "— Select —" },
