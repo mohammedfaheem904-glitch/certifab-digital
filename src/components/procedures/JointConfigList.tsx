@@ -153,7 +153,7 @@ function JointCard({ joint, canEdit, onChange }: { joint: any; canEdit: boolean;
       <div className="grid grid-cols-2 gap-2">
         <SelectField label="Groove type" defaultValue={joint.groove_type} disabled={!canEdit} onSave={(v) => update({ groove_type: v })}
           options={["Square Groove","V-Groove","Bevel Groove","U-Groove","J-Groove","Flare-V Groove","Flare-Bevel Groove","Scarf Groove","Other"]} />
-        <Field label="Joint type" defaultValue={joint.joint_type} disabled={!canEdit} onSave={(v) => update({ joint_type: v })} />
+        <SelectField label="Joint type" defaultValue={joint.joint_type} disabled={!canEdit} onSave={(v) => update({ joint_type: v })} options={["Butt Joint", "Lap Joint", "T-Joint", "Corner Joint", "Edge Joint", "Flare Bevel Joint", "Flare V-Groove Joint", "Slot Joint", "Plug Joint", "Scarf Joint", "Seam Joint", "Spot Joint", "Other"]} />
         <SelectField label="Progression" defaultValue={joint.welding_progression} disabled={!canEdit} onSave={(v) => update({ welding_progression: v })} options={["Uphill (Vertical Up)", "Downhill (Vertical Down)"]} />
         <SelectField label="Position" defaultValue={joint.position_qualified} disabled={!canEdit} onSave={(v) => update({ position_qualified: v })} options={positionOptions} />
         <SelectField label="Pipe / Plate" defaultValue={joint.pipe_or_plate} disabled={!canEdit} onSave={(v) => update({ pipe_or_plate: v })} options={["Pipe", "Plate"]} />
