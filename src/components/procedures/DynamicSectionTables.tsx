@@ -52,7 +52,7 @@ export function TechniquesTable({ procedureId, canEdit }: { procedureId: string;
       emptyMessage="No technique entries yet."
       columns={[
         { key: "process", label: "Process", placeholder: "GTAW / SMAW…" },
-        { key: "string_or_weave", label: "String / Weave" },
+        { key: "string_or_weave", label: "String / Weave", kind: "select", selectOptions: ["Stringer Bead", "Weave Bead", "Oscillation", "Whip and Pause"], placeholder: "— Select —" },
         { key: "cleaning_method", label: "Cleaning" },
         { key: "back_gouging", label: "Back gouging" },
         { key: "peening", label: "Peening" },
