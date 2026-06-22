@@ -389,7 +389,7 @@ function ProcessStep({ proc, canEdit, qc }: { proc: any; canEdit: boolean; qc: R
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       <InlineField label="Process(es)" field="process" proc={proc} canEdit={canEdit} qc={qc} placeholder="GTAW + SMAW" />
       <InlineSelect label="Automation" field="automation" proc={proc} canEdit={canEdit} qc={qc} options={["Manual", "Semi-Automatic", "Mechanized", "Automatic"]} />
-      <InlineField label="Pipe or plate" field="pipe_or_plate" proc={proc} canEdit={canEdit} qc={qc} placeholder="Pipe / Plate" />
+      <InlineSelect label="Pipe or plate" field="pipe_or_plate" proc={proc} canEdit={canEdit} qc={qc} options={["Pipe", "Plate"]} />
       <InlineField label="Joint type" field="joint_type" proc={proc} canEdit={canEdit} qc={qc} placeholder="Butt / Fillet" />
       <InlineSelect label="Groove type" field="groove_type" proc={proc} canEdit={canEdit} qc={qc}
         options={["Square Groove","V-Groove","Bevel Groove","U-Groove","J-Groove","Flare-V Groove","Flare-Bevel Groove","Scarf Groove","Other"]} />
