@@ -46,6 +46,8 @@ type Pwps = {
   diameter_max_mm: number | null;
   filler_material: string | null;
   filler_classification: string | null;
+  f_no: string | null;
+  a_no: string | null;
   filler_diameter_mm: string | null;
   shielding_gas: string | null;
   backing: string | null;
