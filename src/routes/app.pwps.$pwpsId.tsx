@@ -23,6 +23,12 @@ import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { calcHeatInput } from "@/lib/heat-input";
 import { FillerDiameterCombobox } from "@/components/procedures/FillerDiameterCombobox";
 import { QualificationLineageStrip } from "@/components/procedures/QualificationLineageStrip";
+import {
+  fillerClassificationsByGroup,
+  lookupFillerClassification,
+} from "@/lib/filler-classifications";
+
+const FILLER_CLASS_GROUPS = fillerClassificationsByGroup();
 
 type Pwps = {
   id: string;
@@ -435,7 +441,29 @@ function PwpsDetailPage() {
               <option value="Oxy-Fuel Rods">Oxy-Fuel Rods</option>
             </select>
           </Field>
-          <Field label="Filler classification"><Input value={merged.filler_classification ?? ""} onChange={(e) => set("filler_classification", e.target.value)} disabled={!isEditor} /></Field>
+          <Field label="Filler classification">
+            <select
+              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              value={merged.filler_classification ?? ""}
+              disabled={!isEditor}
+              onChange={(e) => {
+                const v = e.target.value;
+                set("filler_classification", v);
+                const entry = lookupFillerClassification(v);
+                if (entry) {
+                  set("f_no", entry.f_no);
+                  set("a_no", entry.a_no ?? "");
+                }
+              }}
+            >
+              <option value="">— Select filler classification —</option>
+              {FILLER_CLASS_GROUPS.map((g) => (
+                <optgroup key={g.group} label={g.group}>
+                  {g.codes.map((c) => <option key={c} value={c}>{c}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </Field>
           <div className="grid grid-cols-2 gap-2">
             <Field label="F-No"><Input value={merged.f_no ?? ""} onChange={(e) => set("f_no", e.target.value)} disabled={!isEditor} /></Field>
             <Field label="A-No"><Input value={merged.a_no ?? ""} onChange={(e) => set("a_no", e.target.value)} disabled={!isEditor} /></Field>
