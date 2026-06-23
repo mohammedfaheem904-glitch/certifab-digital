@@ -2711,6 +2711,7 @@ export type Database = {
       }
       pwps: {
         Row: {
+          a_no: string | null
           backing: string | null
           base_material: string | null
           code_family: string
@@ -2725,6 +2726,7 @@ export type Database = {
           deleted_by: string | null
           diameter_max_mm: number | null
           diameter_min_mm: number | null
+          f_no: string | null
           filler_classification: string | null
           filler_diameter_mm: string | null
           filler_material: string | null
@@ -2763,6 +2765,7 @@ export type Database = {
           voltage_min: number | null
         }
         Insert: {
+          a_no?: string | null
           backing?: string | null
           base_material?: string | null
           code_family?: string
@@ -2777,6 +2780,7 @@ export type Database = {
           deleted_by?: string | null
           diameter_max_mm?: number | null
           diameter_min_mm?: number | null
+          f_no?: string | null
           filler_classification?: string | null
           filler_diameter_mm?: string | null
           filler_material?: string | null
@@ -2815,6 +2819,7 @@ export type Database = {
           voltage_min?: number | null
         }
         Update: {
+          a_no?: string | null
           backing?: string | null
           base_material?: string | null
           code_family?: string
@@ -2829,6 +2834,7 @@ export type Database = {
           deleted_by?: string | null
           diameter_max_mm?: number | null
           diameter_min_mm?: number | null
+          f_no?: string | null
           filler_classification?: string | null
           filler_diameter_mm?: string | null
           filler_material?: string | null
