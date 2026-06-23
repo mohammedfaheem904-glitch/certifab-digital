@@ -244,29 +244,22 @@ function PwpsIndexPage() {
                 <F label="Group No."><Input value={values.group_number ?? ""} onChange={(e) => set("group_number", e.target.value)} placeholder="1" /></F>
                 <F label="Filler classification">
                   <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
-                    value={values.filler_classification ?? ""} onChange={(e) => set("filler_classification", e.target.value)}>
+                    value={values.filler_classification ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      set("filler_classification", v);
+                      const entry = lookupFillerClassification(v);
+                      if (entry) {
+                        set("f_no", entry.f_no);
+                        set("a_no", entry.a_no ?? "");
+                      }
+                    }}>
                     <option value="">— Select filler classification —</option>
-                    <optgroup label="Carbon Steel Electrodes">
-                      {["E6010","E6011","E6013","E7016","E7018","E7024","ER70S-2","ER70S-3","ER70S-6","E71T-1","E71T-9","E71T-11"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </optgroup>
-                    <optgroup label="Stainless Steel Electrodes">
-                      {["E308L-16","E309L-16","E316L-16","ER308L","ER308LSi","ER309L","ER316L","ER316LSi","E308LT1-1","E316LT1-1"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </optgroup>
-                    <optgroup label="Aluminum Fillers">
-                      {["ER4043","ER5356","ER4047"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </optgroup>
-                    <optgroup label="Nickel Alloy Fillers">
-                      {["ERNiCr-3","ERNiCrMo-3","ERNi-1"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </optgroup>
-                    <optgroup label="Low Alloy / Cr-Mo Steel Fillers">
-                      {["ER80S-B2","ER90S-B3","E8018-B2","E8018-B3"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </optgroup>
-                    <optgroup label="Submerged Arc Welding (SAW) Wires & Flux">
-                      {["EM12K","EH14","F7A2-EM12K","F8A2-EH14"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </optgroup>
-                    <optgroup label="Oxy-Fuel Rods">
-                      {["RG45","RG60"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </optgroup>
+                    {FILLER_CLASS_GROUPS.map((g) => (
+                      <optgroup key={g.group} label={g.group}>
+                        {g.codes.map((c) => <option key={c} value={c}>{c}</option>)}
+                      </optgroup>
+                    ))}
                   </select>
                 </F>
                 <F label="Thickness min (mm)"><Input type="number" step="0.1" value={values.thickness_min_mm ?? ""} onChange={(e) => set("thickness_min_mm", parseFloat(e.target.value) || null)} /></F>
