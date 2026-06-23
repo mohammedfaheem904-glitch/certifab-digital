@@ -1,4 +1,15 @@
 import { RelationalTable } from "./RelationalTable";
+import {
+  FILLER_CLASSIFICATIONS,
+  lookupFillerClassification,
+} from "@/lib/filler-classifications";
+
+const FILLER_CLASS_OPTIONS = FILLER_CLASSIFICATIONS.map((c) => ({
+  value: c.code,
+  label: c.code,
+  description: `F-No ${c.f_no} · A-No ${c.a_no ?? "N/A"} — ${c.group}`,
+  keywords: c.group,
+}));
 
 export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
   return (
@@ -13,7 +24,17 @@ export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: strin
         { key: "process", label: "Process", placeholder: "e.g. GTAW" },
         { key: "filler_type", label: "Type" },
         { key: "sfa_no", label: "SFA No" },
-        { key: "aws_classification", label: "AWS class" },
+        {
+          key: "aws_classification",
+          label: "AWS class",
+          kind: "combobox",
+          options: FILLER_CLASS_OPTIONS,
+          placeholder: "Select classification…",
+          onOptionSelected: (opt) => {
+            const entry = lookupFillerClassification(opt.value);
+            return entry ? { f_no: entry.f_no, a_no: entry.a_no } : {};
+          },
+        },
         { key: "electrode_brand", label: "Brand" },
         { key: "f_no", label: "F-No" },
         { key: "a_no", label: "A-No" },
