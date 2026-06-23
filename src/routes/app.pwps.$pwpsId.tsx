@@ -23,6 +23,12 @@ import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { calcHeatInput } from "@/lib/heat-input";
 import { FillerDiameterCombobox } from "@/components/procedures/FillerDiameterCombobox";
 import { QualificationLineageStrip } from "@/components/procedures/QualificationLineageStrip";
+import {
+  fillerClassificationsByGroup,
+  lookupFillerClassification,
+} from "@/lib/filler-classifications";
+
+const FILLER_CLASS_GROUPS = fillerClassificationsByGroup();
 
 type Pwps = {
   id: string;
