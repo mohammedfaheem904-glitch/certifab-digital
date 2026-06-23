@@ -16,6 +16,12 @@ import { PWPS_STATUS_TONE, type PwpsStatus } from "@/lib/pwps-workflow";
 import { toast } from "sonner";
 import { exportCsv, exportExcel } from "@/lib/export";
 import { BaseMaterialCombobox } from "@/components/procedures/BaseMaterialCombobox";
+import {
+  fillerClassificationsByGroup,
+  lookupFillerClassification,
+} from "@/lib/filler-classifications";
+
+const FILLER_CLASS_GROUPS = fillerClassificationsByGroup();
 
 type Row = {
   id: string;
