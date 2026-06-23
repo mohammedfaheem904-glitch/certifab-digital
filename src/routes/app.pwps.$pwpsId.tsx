@@ -46,6 +46,8 @@ type Pwps = {
   diameter_max_mm: number | null;
   filler_material: string | null;
   filler_classification: string | null;
+  f_no: string | null;
+  a_no: string | null;
   filler_diameter_mm: string | null;
   shielding_gas: string | null;
   backing: string | null;
@@ -434,6 +436,10 @@ function PwpsDetailPage() {
             </select>
           </Field>
           <Field label="Filler classification"><Input value={merged.filler_classification ?? ""} onChange={(e) => set("filler_classification", e.target.value)} disabled={!isEditor} /></Field>
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="F-No"><Input value={merged.f_no ?? ""} onChange={(e) => set("f_no", e.target.value)} disabled={!isEditor} /></Field>
+            <Field label="A-No"><Input value={merged.a_no ?? ""} onChange={(e) => set("a_no", e.target.value)} disabled={!isEditor} /></Field>
+          </div>
           <Field label="Filler Metal Diameter (mm)">
             <FillerDiameterCombobox
               value={merged.filler_diameter_mm ?? ""}
