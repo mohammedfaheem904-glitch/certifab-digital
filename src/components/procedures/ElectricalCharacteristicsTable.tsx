@@ -1,5 +1,7 @@
 import { RelationalTable } from "./RelationalTable";
 import { FILLER_DIAMETER_OPTIONS } from "@/lib/filler-diameters";
+import { WELD_LAYER_OPTIONS } from "@/lib/weld-pass-layers";
+
 
 export function ElectricalCharacteristicsTable({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
   return (
@@ -11,7 +13,14 @@ export function ElectricalCharacteristicsTable({ procedureId, canEdit }: { proce
       canEdit={canEdit}
       emptyMessage="No electrical parameters defined. Add a row per weld pass / layer."
       columns={[
-        { key: "weld_layer", label: "Layer / pass", placeholder: "Root / Hot / Fill / Cap" },
+        {
+          key: "weld_layer",
+          label: "Layer / pass",
+          kind: "combobox",
+          options: WELD_LAYER_OPTIONS,
+          placeholder: "Select layer / pass…",
+        },
+
         { key: "process", label: "Process" },
         { key: "filler_class", label: "Filler class" },
         {
