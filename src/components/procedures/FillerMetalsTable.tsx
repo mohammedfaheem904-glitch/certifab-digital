@@ -11,6 +11,10 @@ const FILLER_CLASS_OPTIONS = FILLER_CLASSIFICATIONS.map((c) => ({
   keywords: c.group,
 }));
 
+const FILLER_DIAMETER_OPTIONS = [
+  "0.8", "1.0", "1.2", "1.6", "2.0", "2.4", "2.5", "3.2", "4.0", "5.0", "6.0",
+].map((v) => ({ value: v, label: `${v} mm`, keywords: "diameter mm" }));
+
 export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
   return (
     <RelationalTable
