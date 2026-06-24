@@ -3,6 +3,7 @@ import {
   FILLER_CLASSIFICATIONS,
   lookupFillerClassification,
 } from "@/lib/filler-classifications";
+import { FILLER_DIAMETER_OPTIONS } from "@/lib/filler-diameters";
 
 const FILLER_CLASS_OPTIONS = FILLER_CLASSIFICATIONS.map((c) => ({
   value: c.code,
@@ -10,10 +11,6 @@ const FILLER_CLASS_OPTIONS = FILLER_CLASSIFICATIONS.map((c) => ({
   description: `F-No ${c.f_no} · A-No ${c.a_no ?? "N/A"} — ${c.group}`,
   keywords: c.group,
 }));
-
-const FILLER_DIAMETER_OPTIONS = [
-  "0.8", "1.0", "1.2", "1.6", "2.0", "2.4", "2.5", "3.2", "4.0", "5.0", "6.0",
-].map((v) => ({ value: v, label: `${v} mm`, keywords: "diameter mm" }));
 
 export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
   return (
