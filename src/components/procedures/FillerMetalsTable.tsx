@@ -11,6 +11,10 @@ const FILLER_CLASS_OPTIONS = FILLER_CLASSIFICATIONS.map((c) => ({
   keywords: c.group,
 }));
 
+const FILLER_DIAMETER_OPTIONS = [
+  "0.8", "1.0", "1.2", "1.6", "2.0", "2.4", "2.5", "3.2", "4.0", "5.0", "6.0",
+].map((v) => ({ value: v, label: `${v} mm`, keywords: "diameter mm" }));
+
 export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
   return (
     <RelationalTable
@@ -38,7 +42,13 @@ export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: strin
         { key: "electrode_brand", label: "Brand" },
         { key: "f_no", label: "F-No" },
         { key: "a_no", label: "A-No" },
-        { key: "electrode_diameter_mm", label: "Dia (mm)", type: "number" },
+        {
+          key: "electrode_diameter_mm",
+          label: "Dia (mm)",
+          kind: "combobox",
+          options: FILLER_DIAMETER_OPTIONS,
+          placeholder: "Select diameter…",
+        },
         { key: "qualified_thickness_mm", label: "Qual. thk (mm)", type: "number" },
         { key: "flux_wire_class", label: "Flux/wire class" },
         { key: "flux_brand", label: "Flux brand" },
