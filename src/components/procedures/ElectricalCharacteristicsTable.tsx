@@ -1,4 +1,5 @@
 import { RelationalTable } from "./RelationalTable";
+import { FILLER_DIAMETER_OPTIONS } from "@/lib/filler-diameters";
 
 export function ElectricalCharacteristicsTable({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
   return (
@@ -13,7 +14,13 @@ export function ElectricalCharacteristicsTable({ procedureId, canEdit }: { proce
         { key: "weld_layer", label: "Layer / pass", placeholder: "Root / Hot / Fill / Cap" },
         { key: "process", label: "Process" },
         { key: "filler_class", label: "Filler class" },
-        { key: "electrode_diameter_mm", label: "Dia (mm)", type: "number" },
+        {
+          key: "electrode_diameter_mm",
+          label: "Dia (mm)",
+          kind: "combobox",
+          options: FILLER_DIAMETER_OPTIONS,
+          placeholder: "Select diameter…",
+        },
         { key: "polarity", label: "Polarity" },
         { key: "amperage_min", label: "Amps min", type: "number" },
         { key: "amperage_max", label: "Amps max", type: "number" },
