@@ -258,6 +258,9 @@ export function AppLayout() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => nav({ to: "/app/profile" })}>
+                <UserCircle2 className="size-4 me-2" /> My profile
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => nav({ to: "/app/settings" })}>
                 <Settings className="size-4 me-2" /> Settings
               </DropdownMenuItem>
