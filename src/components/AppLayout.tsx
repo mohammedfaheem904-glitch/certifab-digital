@@ -233,11 +233,13 @@ export function AppLayout() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 ps-2 border-s border-border outline-none">
-                <Avatar className="size-8">
-                  <AvatarFallback className="bg-accent text-accent-foreground text-xs">
-                    {initials || "U"}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  src={profile?.avatar_url}
+                  name={profile?.display_name}
+                  email={user?.email}
+                  className="size-8"
+                />
+
                 <div className="hidden sm:block text-xs leading-tight text-start">
                   <div className="font-medium">{profile?.display_name || user?.email}</div>
                   <div className="text-muted-foreground truncate max-w-[140px]">
