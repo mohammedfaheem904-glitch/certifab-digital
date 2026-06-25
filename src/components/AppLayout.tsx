@@ -21,6 +21,7 @@ import {
   Menu,
   ShieldCheck,
   Building2,
+  UserCircle2,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { PlanBadge } from "@/components/PlanBadge";
@@ -29,7 +30,7 @@ import { NotificationsBell } from "@/components/NotificationsBell";
 import { useI18n } from "@/lib/i18n";
 
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/UserAvatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,12 +68,7 @@ export function AppLayout() {
     return () => window.removeEventListener("cf:discovery-changed", refresh);
   }, []);
 
-  const initials = (profile?.display_name || user?.email || "U")
-    .split(/[ @.]/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((s) => s[0]?.toUpperCase())
-    .join("");
+
 
   const handleSeed = async () => {
     if (!profile?.company_id) return;
@@ -232,11 +228,13 @@ export function AppLayout() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 ps-2 border-s border-border outline-none">
-                <Avatar className="size-8">
-                  <AvatarFallback className="bg-accent text-accent-foreground text-xs">
-                    {initials || "U"}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  src={profile?.avatar_url}
+                  name={profile?.display_name}
+                  email={user?.email}
+                  className="size-8"
+                />
+
                 <div className="hidden sm:block text-xs leading-tight text-start">
                   <div className="font-medium">{profile?.display_name || user?.email}</div>
                   <div className="text-muted-foreground truncate max-w-[140px]">
@@ -254,6 +252,9 @@ export function AppLayout() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => nav({ to: "/app/profile" })}>
+                <UserCircle2 className="size-4 me-2" /> My profile
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => nav({ to: "/app/settings" })}>
                 <Settings className="size-4 me-2" /> Settings
               </DropdownMenuItem>

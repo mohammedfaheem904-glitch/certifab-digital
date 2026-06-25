@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Paperclip, MessageSquare, Pencil, Trash2, Check, X } from "lucide-react";
@@ -49,14 +49,16 @@ export function CommentItem({ comment, entityType, entityId, depth, highlighted 
     try { await deleteComment(comment.id); } catch (e: any) { toast.error(e?.message ?? "Could not delete"); }
   };
 
-  const initials = (comment.author_name ?? "U").split(/[ .]/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("");
+  // initials handled by UserAvatar fallback
   const isHighlighted = highlighted === comment.id;
 
   return (
     <div id={`comment-${comment.id}`} className="flex gap-3" style={{ marginInlineStart: `${indent * 24}px` }}>
-      <Avatar className="size-8 shrink-0">
-        <AvatarFallback className="text-xs bg-accent text-accent-foreground">{initials || "U"}</AvatarFallback>
-      </Avatar>
+      <UserAvatar
+        src={comment.author_avatar}
+        name={comment.author_name}
+        className="size-8 shrink-0"
+      />
       <div className="flex-1 min-w-0">
         <div
           className={`rounded-lg border bg-card p-3 transition-colors ${

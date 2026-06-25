@@ -27,6 +27,7 @@ import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppQualificationsRouteImport } from './routes/app.qualifications'
 import { Route as AppPwpsRouteImport } from './routes/app.pwps'
 import { Route as AppProjectsRouteImport } from './routes/app.projects'
+import { Route as AppProfileRouteImport } from './routes/app.profile'
 import { Route as AppProceduresRouteImport } from './routes/app.procedures'
 import { Route as AppPqrsRouteImport } from './routes/app.pqrs'
 import { Route as AppNcrsRouteImport } from './routes/app.ncrs'
@@ -170,6 +171,11 @@ const AppPwpsRoute = AppPwpsRouteImport.update({
 const AppProjectsRoute = AppProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProceduresRoute = AppProceduresRouteImport.update({
@@ -468,6 +474,7 @@ export interface FileRoutesByFullPath {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/pqrs': typeof AppPqrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
+  '/app/profile': typeof AppProfileRoute
   '/app/projects': typeof AppProjectsRouteWithChildren
   '/app/pwps': typeof AppPwpsRouteWithChildren
   '/app/qualifications': typeof AppQualificationsRouteWithChildren
@@ -536,6 +543,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/app/audit': typeof AppAuditRoute
   '/app/billing': typeof AppBillingRoute
+  '/app/profile': typeof AppProfileRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/team': typeof AppTeamRoute
   '/app': typeof AppIndexRoute
@@ -608,6 +616,7 @@ export interface FileRoutesById {
   '/app/ncrs': typeof AppNcrsRouteWithChildren
   '/app/pqrs': typeof AppPqrsRouteWithChildren
   '/app/procedures': typeof AppProceduresRouteWithChildren
+  '/app/profile': typeof AppProfileRoute
   '/app/projects': typeof AppProjectsRouteWithChildren
   '/app/pwps': typeof AppPwpsRouteWithChildren
   '/app/qualifications': typeof AppQualificationsRouteWithChildren
@@ -684,6 +693,7 @@ export interface FileRouteTypes {
     | '/app/ncrs'
     | '/app/pqrs'
     | '/app/procedures'
+    | '/app/profile'
     | '/app/projects'
     | '/app/pwps'
     | '/app/qualifications'
@@ -752,6 +762,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/app/audit'
     | '/app/billing'
+    | '/app/profile'
     | '/app/settings'
     | '/app/team'
     | '/app'
@@ -823,6 +834,7 @@ export interface FileRouteTypes {
     | '/app/ncrs'
     | '/app/pqrs'
     | '/app/procedures'
+    | '/app/profile'
     | '/app/projects'
     | '/app/pwps'
     | '/app/qualifications'
@@ -1023,6 +1035,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/app/projects'
       preLoaderRoute: typeof AppProjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/profile': {
+      id: '/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/procedures': {
@@ -1548,6 +1567,7 @@ interface AppRouteChildren {
   AppNcrsRoute: typeof AppNcrsRouteWithChildren
   AppPqrsRoute: typeof AppPqrsRouteWithChildren
   AppProceduresRoute: typeof AppProceduresRouteWithChildren
+  AppProfileRoute: typeof AppProfileRoute
   AppProjectsRoute: typeof AppProjectsRouteWithChildren
   AppPwpsRoute: typeof AppPwpsRouteWithChildren
   AppQualificationsRoute: typeof AppQualificationsRouteWithChildren
@@ -1578,6 +1598,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppNcrsRoute: AppNcrsRouteWithChildren,
   AppPqrsRoute: AppPqrsRouteWithChildren,
   AppProceduresRoute: AppProceduresRouteWithChildren,
+  AppProfileRoute: AppProfileRoute,
   AppProjectsRoute: AppProjectsRouteWithChildren,
   AppPwpsRoute: AppPwpsRouteWithChildren,
   AppQualificationsRoute: AppQualificationsRouteWithChildren,
