@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Users, Bell, ShieldCheck, ScrollText, Sparkles, Lock, Sun, Moon, Monitor } from "lucide-react";
+import { Users, Bell, ShieldCheck, ScrollText, Sparkles, Lock, Sun, Moon, Monitor, UserCircle2 } from "lucide-react";
 import { useTheme, type ThemePreference } from "@/lib/theme";
 import { usePlan } from "@/lib/use-plan";
 import { UsageMeter } from "@/components/UsageMeter";
