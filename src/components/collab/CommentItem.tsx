@@ -49,7 +49,7 @@ export function CommentItem({ comment, entityType, entityId, depth, highlighted 
     try { await deleteComment(comment.id); } catch (e: any) { toast.error(e?.message ?? "Could not delete"); }
   };
 
-  const initials = (comment.author_name ?? "U").split(/[ .]/).filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("");
+  // initials handled by UserAvatar fallback
   const isHighlighted = highlighted === comment.id;
 
   return (
