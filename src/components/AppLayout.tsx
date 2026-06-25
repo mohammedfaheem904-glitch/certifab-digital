@@ -68,12 +68,7 @@ export function AppLayout() {
     return () => window.removeEventListener("cf:discovery-changed", refresh);
   }, []);
 
-  const initials = (profile?.display_name || user?.email || "U")
-    .split(/[ @.]/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((s) => s[0]?.toUpperCase())
-    .join("");
+
 
   const handleSeed = async () => {
     if (!profile?.company_id) return;
