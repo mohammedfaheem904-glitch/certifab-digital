@@ -54,9 +54,11 @@ export function CommentItem({ comment, entityType, entityId, depth, highlighted 
 
   return (
     <div id={`comment-${comment.id}`} className="flex gap-3" style={{ marginInlineStart: `${indent * 24}px` }}>
-      <Avatar className="size-8 shrink-0">
-        <AvatarFallback className="text-xs bg-accent text-accent-foreground">{initials || "U"}</AvatarFallback>
-      </Avatar>
+      <UserAvatar
+        src={comment.author_avatar}
+        name={comment.author_name}
+        className="size-8 shrink-0"
+      />
       <div className="flex-1 min-w-0">
         <div
           className={`rounded-lg border bg-card p-3 transition-colors ${
