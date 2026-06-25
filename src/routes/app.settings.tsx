@@ -62,6 +62,7 @@ function SettingsPage() {
       )}
 
       <div className="p-5 grid lg:grid-cols-3 gap-3">
+        <Tile to="/app/profile" icon={UserCircle2} title="My Profile" desc="Personal details and profile picture." />
         <Tile to="/app/team" icon={Users} title="Team & Roles" desc="Invite members, assign roles." />
         <Tile to="/app/audit" icon={ScrollText} title="Audit Log" desc="Tamper-evident change history." />
         <Tile to="/app/billing" icon={Sparkles} title="Billing & Plan" desc="Subscription, usage and feature access." />
