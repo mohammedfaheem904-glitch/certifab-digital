@@ -21,6 +21,7 @@ import {
   Menu,
   ShieldCheck,
   Building2,
+  UserCircle2,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { PlanBadge } from "@/components/PlanBadge";
