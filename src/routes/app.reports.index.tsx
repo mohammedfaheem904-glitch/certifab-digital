@@ -11,7 +11,7 @@ const REPORTS = [
   { slug: "calibration", title: "Equipment & Instruments Calibration", desc: "Calibration due / overdue across the fleet." },
 ];
 
-export const Route = createFileRoute("/app/reports")({
+export const Route = createFileRoute("/app/reports/")({
   component: () => (
     <ModulePage title="Reports" subtitle="Audit-ready industrial reports — print to PDF or export to Excel.">
       <ul className="divide-y divide-border">
