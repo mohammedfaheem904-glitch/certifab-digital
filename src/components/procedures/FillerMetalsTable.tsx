@@ -1,15 +1,18 @@
 import { RelationalTable } from "./RelationalTable";
 import {
   FILLER_CLASSIFICATIONS,
+  SFA_NO_OPTIONS,
   lookupFillerClassification,
+  lookupAwsClassesForSfa,
+  isValidAwsSfaPair,
 } from "@/lib/filler-classifications";
 import { FILLER_DIAMETER_OPTIONS } from "@/lib/filler-diameters";
 
 const FILLER_CLASS_OPTIONS = FILLER_CLASSIFICATIONS.map((c) => ({
   value: c.code,
   label: c.code,
-  description: `F-No ${c.f_no} · A-No ${c.a_no ?? "N/A"} — ${c.group}`,
-  keywords: c.group,
+  description: `F-No ${c.f_no} · A-No ${c.a_no ?? "N/A"} · ${c.sfa_no} — ${c.group}`,
+  keywords: `${c.group} ${c.sfa_no}`,
 }));
 
 export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
@@ -24,7 +27,44 @@ export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: strin
       columns={[
         { key: "process", label: "Process", placeholder: "e.g. GTAW" },
         { key: "filler_type", label: "Type" },
-        { key: "sfa_no", label: "SFA No" },
+        {
+          key: "sfa_no",
+          label: "SFA No",
+          kind: "combobox",
+          placeholder: "Select SFA…",
+          // Per-row: if AWS class is set, restrict SFA options to the catalog match.
+          options: (row) => {
+            const aws = row?.aws_classification?.trim();
+            if (aws) {
+              const entry = lookupFillerClassification(aws);
+              if (entry) {
+                return [
+                  {
+                    value: entry.sfa_no,
+                    label: entry.sfa_no,
+                    description: `Matches AWS ${aws}`,
+                  },
+                ];
+              }
+            }
+            return SFA_NO_OPTIONS;
+          },
+          onOptionSelected: (opt, row) => {
+            // If only one AWS class belongs to this SFA, autofill it.
+            const codes = lookupAwsClassesForSfa(opt.value);
+            if (codes.length === 1 && !row?.aws_classification) {
+              const entry = lookupFillerClassification(codes[0]);
+              return entry
+                ? { aws_classification: codes[0], f_no: entry.f_no, a_no: entry.a_no }
+                : { aws_classification: codes[0] };
+            }
+            return {};
+          },
+          validate: (row) =>
+            isValidAwsSfaPair(row?.aws_classification, row?.sfa_no)
+              ? null
+              : "AWS / SFA mismatch per ASME II-C",
+        },
         {
           key: "aws_classification",
           label: "AWS class",
@@ -33,8 +73,14 @@ export function FillerMetalsTable({ procedureId, canEdit }: { procedureId: strin
           placeholder: "Select classification…",
           onOptionSelected: (opt) => {
             const entry = lookupFillerClassification(opt.value);
-            return entry ? { f_no: entry.f_no, a_no: entry.a_no } : {};
+            return entry
+              ? { f_no: entry.f_no, a_no: entry.a_no, sfa_no: entry.sfa_no }
+              : {};
           },
+          validate: (row) =>
+            isValidAwsSfaPair(row?.aws_classification, row?.sfa_no)
+              ? null
+              : "AWS / SFA mismatch per ASME II-C",
         },
         { key: "electrode_brand", label: "Brand" },
         { key: "f_no", label: "F-No" },
