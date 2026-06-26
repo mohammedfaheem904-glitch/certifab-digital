@@ -160,7 +160,9 @@ export function RelationalTable({
             )}
             {(q.data ?? []).map((row: any) => (
               <tr key={row.id} className="border-t border-border/60 align-top">
-                {columns.map((c) => (
+                {columns.map((c) => {
+                  const warning = c.validate?.(row) ?? null;
+                  return (
                   <td key={c.key} className="px-2 py-1.5">
                     {c.kind === "combobox" ? (
                       <ComboboxCell
@@ -206,9 +208,12 @@ export function RelationalTable({
                         }}
                       />
                     )}
-
+                    {warning && (
+                      <div className="mt-1 text-[11px] text-amber-600 dark:text-amber-400">{warning}</div>
+                    )}
                   </td>
-                ))}
+                  );
+                })}
                 {canEdit && (
                   <td className="px-2 py-1.5">
                     <div className="flex items-center gap-1">
