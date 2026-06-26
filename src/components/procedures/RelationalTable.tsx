@@ -24,9 +24,11 @@ export type ColumnDef = {
   width?: string;
   placeholder?: string;
   kind?: "input" | "combobox" | "select";
-  options?: ComboOption[];
+  options?: ComboOption[] | ((row: any) => ComboOption[]);
   selectOptions?: string[];
   onOptionSelected?: (option: ComboOption, row: any) => Record<string, any>;
+  /** Optional per-row warning text (e.g. invalid combination). */
+  validate?: (row: any) => string | null;
 };
 
 
@@ -158,7 +160,9 @@ export function RelationalTable({
             )}
             {(q.data ?? []).map((row: any) => (
               <tr key={row.id} className="border-t border-border/60 align-top">
-                {columns.map((c) => (
+                {columns.map((c) => {
+                  const warning = c.validate?.(row) ?? null;
+                  return (
                   <td key={c.key} className="px-2 py-1.5">
                     {c.kind === "combobox" ? (
                       <ComboboxCell
@@ -204,9 +208,12 @@ export function RelationalTable({
                         }}
                       />
                     )}
-
+                    {warning && (
+                      <div className="mt-1 text-[11px] text-amber-600 dark:text-amber-400">{warning}</div>
+                    )}
                   </td>
-                ))}
+                  );
+                })}
                 {canEdit && (
                   <td className="px-2 py-1.5">
                     <div className="flex items-center gap-1">
@@ -239,7 +246,7 @@ function ComboboxCell({
   const current = String(row[column.key] ?? "");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const options = column.options ?? [];
+  const options = typeof column.options === "function" ? column.options(row) : (column.options ?? []);
   const trimmed = query.trim();
   const hasExact = trimmed
     ? options.some((o) => o.value.toLowerCase() === trimmed.toLowerCase())
