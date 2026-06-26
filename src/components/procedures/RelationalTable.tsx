@@ -241,7 +241,7 @@ function ComboboxCell({
   const current = String(row[column.key] ?? "");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const options = column.options ?? [];
+  const options = typeof column.options === "function" ? column.options(row) : (column.options ?? []);
   const trimmed = query.trim();
   const hasExact = trimmed
     ? options.some((o) => o.value.toLowerCase() === trimmed.toLowerCase())
