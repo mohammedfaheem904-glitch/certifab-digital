@@ -24,9 +24,11 @@ export type ColumnDef = {
   width?: string;
   placeholder?: string;
   kind?: "input" | "combobox" | "select";
-  options?: ComboOption[];
+  options?: ComboOption[] | ((row: any) => ComboOption[]);
   selectOptions?: string[];
   onOptionSelected?: (option: ComboOption, row: any) => Record<string, any>;
+  /** Optional per-row warning text (e.g. invalid combination). */
+  validate?: (row: any) => string | null;
 };
 
 
