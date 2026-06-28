@@ -296,3 +296,199 @@ export function isWithinRange(value: number, r: NumericRange): boolean {
   if (r.max != null && value > r.max) return false;
   return true;
 }
+
+/* ================================================================== */
+/* Per-variable derivers — used by WPQ Variables matrix                */
+/* ================================================================== */
+
+export interface VariableDerivation {
+  qualifiedFor: string;
+  codeRef: string;
+  warning?: string;
+}
+
+const EMPTY: VariableDerivation = { qualifiedFor: "", codeRef: "" };
+
+function parseNum(v: unknown): number | null {
+  if (v === null || v === undefined || v === "") return null;
+  const n = typeof v === "number" ? v : parseFloat(String(v));
+  return Number.isFinite(n) ? n : null;
+}
+
+export function derivePNumberRange(value: unknown): VariableDerivation {
+  const p = parseNum(value);
+  if (p == null) return { ...EMPTY, codeRef: "QW-423.1" };
+  const list = PNUM_TRANSFERABILITY[p];
+  if (!list) {
+    return {
+      qualifiedFor: `P-${p} only`,
+      codeRef: "QW-423.1",
+      warning: `P-No ${p} not in transferability table — qualifies itself only.`,
+    };
+  }
+  const others = list.filter((x) => x !== p);
+  const txt = others.length
+    ? `P-${p} (also covers ${others.map((x) => `P-${x}`).join(", ")})`
+    : `P-${p} only`;
+  return { qualifiedFor: txt, codeRef: "QW-423.1" };
+}
+
+export function deriveFNumberRange(value: unknown): VariableDerivation {
+  const f = parseNum(value);
+  if (f == null) return { ...EMPTY, codeRef: "QW-433" };
+  // QW-433: change in F-No is essential — qualifies same F-No only.
+  // Special: F-6 austenitic SS qualifies F-6 only; F-43 NiCrMo covers some lower per QW-433.
+  let note = `F-${f} only`;
+  if (f === 6) note = `F-6 only (austenitic SS — no transferability)`;
+  return { qualifiedFor: note, codeRef: "QW-433" };
+}
+
+export function deriveCouponThicknessDerivation(
+  value: unknown,
+  withBacking = false,
+): VariableDerivation {
+  const t = parseNum(value);
+  if (t == null) return { ...EMPTY, codeRef: "QW-452.1(b)" };
+  const base = asmeBaseThickness(t, withBacking);
+  const dep = asmeDepositThickness(t);
+  return {
+    qualifiedFor: `Base: ${formatRange(base)} · Deposit: ${formatRange(dep)}`,
+    codeRef: "QW-452.1(b)",
+  };
+}
+
+export function derivePipeDiameterRange(value: unknown): VariableDerivation {
+  const d = parseNum(value);
+  if (d == null) return { ...EMPTY, codeRef: "QW-403.16 / QW-452.3" };
+  const r = asmeDiameter(d, true);
+  return { qualifiedFor: formatRange(r), codeRef: "QW-403.16 / QW-452.3" };
+}
+
+export function derivePositionRangeFromKey(
+  value: unknown,
+  isPipe = false,
+): VariableDerivation {
+  const raw = (value ?? "").toString().trim();
+  if (!raw) return { ...EMPTY, codeRef: "QW-461.9" };
+  const key = normalisePositionKey(raw, isPipe);
+  const rule = key ? POSITION_RULES[key] : undefined;
+  if (!rule) {
+    return {
+      qualifiedFor: raw,
+      codeRef: "QW-461.9",
+      warning: `Position "${raw}" is not in QW-461.9 table — qualifies tested position only.`,
+    };
+  }
+  return { qualifiedFor: rule.positions.join(", "), codeRef: "QW-461.9" };
+}
+
+export function deriveProgressionRange(value: unknown): VariableDerivation {
+  const v = (value ?? "").toString().trim().toLowerCase();
+  if (!v) return { ...EMPTY, codeRef: "QW-405.3" };
+  if (v.startsWith("up")) return { qualifiedFor: "Uphill only", codeRef: "QW-405.3" };
+  if (v.startsWith("down")) return { qualifiedFor: "Downhill only", codeRef: "QW-405.3" };
+  if (v.startsWith("n")) return { qualifiedFor: "N/A", codeRef: "QW-405.3" };
+  return {
+    qualifiedFor: v,
+    codeRef: "QW-405.3",
+    warning: "Unknown progression — qualifies tested progression only.",
+  };
+}
+
+export function deriveBackingRangeText(value: unknown): VariableDerivation {
+  const v = (value ?? "").toString().trim().toLowerCase();
+  if (!v) return { ...EMPTY, codeRef: "QW-402.4 / QW-350" };
+  if (v.startsWith("with") && !v.startsWith("without")) {
+    return {
+      qualifiedFor: "With backing only (does NOT qualify without backing)",
+      codeRef: "QW-402.4 / QW-350",
+    };
+  }
+  if (v.startsWith("without") || v.startsWith("no")) {
+    return {
+      qualifiedFor: "With and without backing",
+      codeRef: "QW-402.4 / QW-350",
+    };
+  }
+  return { qualifiedFor: v, codeRef: "QW-402.4 / QW-350" };
+}
+
+export function deriveCurrentPolarityRange(value: unknown): VariableDerivation {
+  const v = (value ?? "").toString().trim();
+  if (!v) return { ...EMPTY, codeRef: "QW-409.4" };
+  return {
+    qualifiedFor: `${v} only (change in current / polarity is essential)`,
+    codeRef: "QW-409.4",
+  };
+}
+
+/** Registry consumed by the WPQ Variables matrix. */
+export const VARIABLE_DERIVERS: Record<
+  string,
+  {
+    label: string;
+    codeRef: string;
+    kind: "number" | "select" | "text";
+    options?: string[];
+    derive: (value: unknown, extra?: { withBacking?: boolean; isPipe?: boolean }) => VariableDerivation;
+    placeholder?: string;
+  }
+> = {
+  p_no: {
+    label: "P-Number (Base)",
+    codeRef: "QW-423.1",
+    kind: "number",
+    placeholder: "e.g. 1",
+    derive: (v) => derivePNumberRange(v),
+  },
+  f_no: {
+    label: "F-Number (Filler)",
+    codeRef: "QW-433",
+    kind: "number",
+    placeholder: "e.g. 6",
+    derive: (v) => deriveFNumberRange(v),
+  },
+  thickness: {
+    label: "Coupon Thickness (mm)",
+    codeRef: "QW-452.1(b)",
+    kind: "number",
+    placeholder: "mm",
+    derive: (v, extra) => deriveCouponThicknessDerivation(v, extra?.withBacking),
+  },
+  diameter: {
+    label: "Pipe Diameter (mm OD)",
+    codeRef: "QW-403.16 / QW-452.3",
+    kind: "number",
+    placeholder: "mm",
+    derive: (v) => derivePipeDiameterRange(v),
+  },
+  position: {
+    label: "Position",
+    codeRef: "QW-461.9",
+    kind: "select",
+    options: Object.keys(POSITION_RULES),
+    derive: (v, extra) => derivePositionRangeFromKey(v, extra?.isPipe),
+  },
+  progression: {
+    label: "Progression",
+    codeRef: "QW-405.3",
+    kind: "select",
+    options: ["Uphill", "Downhill", "N/A"],
+    derive: (v) => deriveProgressionRange(v),
+  },
+  backing: {
+    label: "Backing",
+    codeRef: "QW-402.4 / QW-350",
+    kind: "select",
+    options: ["With backing", "Without backing"],
+    derive: (v) => deriveBackingRangeText(v),
+  },
+  current: {
+    label: "Current / Polarity",
+    codeRef: "QW-409.4",
+    kind: "select",
+    options: ["AC", "DCEN", "DCEP", "Pulsed"],
+    derive: (v) => deriveCurrentPolarityRange(v),
+  },
+};
+
