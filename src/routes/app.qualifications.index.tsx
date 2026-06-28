@@ -220,7 +220,16 @@ function QualificationsPage() {
                   </select>
                 </F>
                 <F label="Process Type">
-                  <Input value={values.process_type ?? ""} onChange={(e) => set("process_type", e.target.value)} placeholder="Manual" />
+                  <select
+                    className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                    value={values.process_type ?? "Manual"}
+                    onChange={(e) => set("process_type", e.target.value)}
+                  >
+                    <option value="Manual">Manual</option>
+                    <option value="Semi-Automatic">Semi-Automatic</option>
+                    <option value="Mechanized">Mechanized</option>
+                    <option value="Automatic">Automatic</option>
+                  </select>
                 </F>
                 <F label="Code Family">
                   <select
