@@ -1,47 +1,53 @@
+
 ## Goal
-Auto-link **AWS Class ↔ SFA No.** in the WPS Filler Metals table so selecting one populates/filters the other, using an ASME II-C mapping.
+In the WPQ → Variables tab, make **Qualified For (Range)** auto-calculated from **Qualified With**, using ASME Section IX rules (QW-403, 404, 405, 408, 409, 410, 423, 433, 452, 461). Read-only output, instant recalculation, code references visible, validation messages when input combinations are invalid.
+
+## Approach
+Reuse the existing engine `src/lib/qualification-intelligence.ts` (`deriveQualificationRanges`, POSITION_RULES, PNUM_TRANSFERABILITY, ISO_MATERIAL_GROUPS, thickness/diameter rules) instead of duplicating ASME logic. Extend it with small per-variable helpers for F-Number, Progression, Backing, Current/Polarity that aren't yet exposed standalone.
 
 ## Changes
 
-### 1. Extend the classification catalog — `src/lib/filler-classifications.ts`
-Add an `sfa_no: string` field to every entry in `FILLER_CLASSIFICATIONS` using the standard ASME Section II-C mapping, e.g.:
-- E60xx / E70xx SMAW C-steel → `SFA-5.1`
-- ER70S-x / E7xT-x C-steel wires → `SFA-5.18` / `SFA-5.20`
-- E3xxL-xx SS SMAW → `SFA-5.4`; ER3xxL SS wires → `SFA-5.9`; E3xxLT1-1 → `SFA-5.22`
-- ER40xx / ER50xx Al wires → `SFA-5.10`
-- ERNiCr-3 / ERNiCrMo-3 / ERNi-1 → `SFA-5.14`
-- ER80S-B2 / ER90S-B3 → `SFA-5.28`; E80xx-B2/B3 → `SFA-5.5`
-- EM12K / EH14 SAW wires → `SFA-5.17`; F7A2/F8A2 flux-wire combos → `SFA-5.17`
-- RG45 / RG60 → `SFA-5.2`
+### 1. `src/lib/qualification-intelligence.ts` — add per-variable derivers
+Add pure helpers returning `{ qualifiedFor: string; codeRef: string; warning?: string }`:
+- `derivePNumberRange(pNo)` → uses `PNUM_TRANSFERABILITY` → "P-1 (also covers …)" + QW-423.1
+- `deriveFNumberRange(fNo)` → F-No qualifies same F-No only (with notes for F-6 covering lower F-Nos per QW-433) + QW-433
+- `deriveCouponThicknessRange(t, withBacking)` → wraps `asmeBaseThickness` + `asmeDepositThickness`, formatted string + QW-452.1(b)
+- `derivePipeDiameterRange(d)` → wraps `asmeDiameter` + QW-452.3 / QW-403.16
+- `derivePositionRange(posKey, isPipe)` → uses `POSITION_RULES` + QW-461.9
+- `deriveProgressionRange(progression)` → uphill qualifies uphill+downhill is FALSE — uphill qualifies uphill only; downhill qualifies downhill only (QW-405.3)
+- `deriveBackingRange(withBacking)` → QW-402.4 / QW-350: with backing does NOT qualify without; without backing qualifies both
+- `deriveCurrentPolarityRange(value)` → QW-409.4: change in current/polarity is essential — qualifies only the tested type
 
-Add helpers:
-- `lookupSfaForAwsClass(code)` → `string | string[] | null`
-- `lookupAwsClassesForSfa(sfa)` → `string[]`
-- `SFA_NO_OPTIONS` derived list for SFA dropdowns
+Each returns the formatted text plus the canonical code reference, so the matrix can render both the value and the QW paragraph.
 
-Update `lookupFillerClassification` return type to include `sfa_no`.
+### 2. `src/components/qualifications/QualificationVariablesMatrix.tsx` — wire engine into the table
 
-### 2. Auto-populate SFA from AWS class — `src/components/procedures/FillerMetalsTable.tsx`
-In the existing `aws_classification` combobox `onOptionSelected` handler, return `sfa_no` alongside `f_no`/`a_no`. If the lookup yields a single SFA → set the value directly. (Catalog is 1:1 today, so single-value path covers all current rows.)
+Add a registry keyed by `variable_key`:
 
-### 3. Make SFA a combobox with reverse filtering — `src/components/procedures/FillerMetalsTable.tsx`
-Convert the `sfa_no` column from plain text to `kind: "combobox"`:
-- Options: full `SFA_NO_OPTIONS`.
-- When the row already has an `aws_classification`, the options for SFA are restricted to the SFA(s) valid for that AWS class.
-- Selecting an SFA with only one AWS class auto-fills `aws_classification` (+ `f_no`, `a_no`) via `onOptionSelected`.
-- Free-text entry still allowed (combobox supports custom value) so non-catalog SFA/AWS pairs aren't blocked but trigger a soft validation warning.
+```
+qualified_with input kind  →  deriver  →  formatted "Qualified For" + code ref
+```
 
-### 4. Cross-field validation
-In `FillerMetalsTable`, add a lightweight inline validator: when both `aws_classification` and `sfa_no` are set and don't match the catalog, render a small "Invalid AWS/SFA combination per ASME II-C" hint under the row (no hard block, consistent with the rest of the WPS builder's advisory style).
+For each known preset row (`p_no`, `f_no`, `thickness`, `diameter`, `position`, `progression`, `backing`, `current`):
+- Replace the free-text **Qualified With** input with the right control:
+  - `p_no`, `f_no`: numeric input
+  - `thickness`, `diameter`: numeric input (mm) + (for thickness) a "with backing" checkbox
+  - `position`: select populated from `POSITION_RULES` keys
+  - `progression`: select (Uphill / Downhill / N/A)
+  - `backing`: select (With backing / Without backing)
+  - `current`: select (AC / DCEN / DCEP / Pulsed)
+- Render **Qualified For (Range)** as a read-only field, recomputed live from `qualified_with` via the deriver. Display the QW code ref as a small badge under the cell when it differs from the row's `code_reference`.
+- Show inline validation warning (red helper text) when the deriver returns a `warning` (e.g. missing thickness, unsupported position key).
+- For unknown/custom rows (no preset key) keep the current free-text behavior — no auto-derivation, so users can still capture non-coded variables.
+- Persist both `qualified_with` (raw input) and `qualified_for` (computed string) to the DB on blur/change, so PDF certificate output stays unchanged.
 
-### 5. Reuse in pWPS dialog
-`src/routes/app.pwps.$pwpsId.tsx` and the New pWPS dialog already use `lookupFillerClassification`; extend their handlers to also set `sfa_no` when populated from AWS class (mirrors the WPS behavior so pWPS → WPS autofill stays consistent).
+### 3. Certificate / compliance reuse
+No schema change required (`qualification_variables.qualified_with` / `qualified_for` already exist as text). The PDF (`QualificationComplianceReport.tsx`) keeps reading the stored `qualified_for` string.
+
+### 4. WPS/PQR reuse
+Expose the same derivers from `qualification-intelligence.ts` so the WPS Variables Matrix (`WpsVariablesMatrix.tsx`) and PQR `QualifiedRangesForm.tsx` can adopt them in a follow-up — out of scope for this change, but the engine is shared.
 
 ## Out of scope
-- No DB migration needed — `wps_filler_metals.sfa_no` already exists.
-- No changes to Electrical Characteristics table (no SFA column there).
-- No bulk backfill of existing rows.
-
-## Technical notes
-- `RelationalTable`'s `combobox` column kind and `onOptionSelected` callback are already used elsewhere (Base Material, AWS class), so no new infrastructure.
-- Dynamic option filtering per-row will use a new `getOptions(row)` hook on the combobox column; if `RelationalTable` doesn't yet support per-row options, add a small extension (`options` may be a function of the row).
+- Multi-process combination tests (QW-306) — engine already handles via `deriveQualificationRanges`; not surfaced per-row in this iteration.
+- Editing the ASME rule tables through the UI.
+- ISO 9606-1 toggle inside the WPQ matrix (engine supports it; UI stays ASME IX for this change since the matrix's code refs are QW-*).
