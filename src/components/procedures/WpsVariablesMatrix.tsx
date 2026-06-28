@@ -328,94 +328,16 @@ export function WpsVariablesMatrix({
                         </td>
                       </tr>
                     )}
-                    {items.map((r) => {
-                      const meta = CAT_META[r.category as Cat];
-                      return (
-                        <tr key={r.id} className="border-t border-border/60">
-                          <td className="px-3 py-1.5">
-                            {canEdit ? (
-                              <Select
-                                defaultValue={r.category}
-                                onValueChange={(v) => update(r.id, { category: v })}
-                              >
-                                <SelectTrigger className="h-8 text-xs">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="essential">Essential</SelectItem>
-                                  <SelectItem value="supplementary_essential">Supplementary Essential</SelectItem>
-                                  <SelectItem value="non_essential">Non-Essential</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            ) : (
-                              <Badge variant="outline" className={`text-[10px] ${meta.tone}`}>{meta.short}</Badge>
-                            )}
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.variable_label}
-                              disabled={!canEdit}
-                              className="h-8 text-sm"
-                              onBlur={(e) =>
-                                e.target.value !== r.variable_label && update(r.id, { variable_label: e.target.value })
-                              }
-                            />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.code_reference ?? ""}
-                              disabled={!canEdit}
-                              className="h-8 text-xs font-mono"
-                              onBlur={(e) =>
-                                e.target.value !== (r.code_reference ?? "") &&
-                                update(r.id, { code_reference: e.target.value })
-                              }
-                            />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.process_ref ?? ""}
-                              disabled={!canEdit}
-                              placeholder="any"
-                              className="h-8 text-xs"
-                              onBlur={(e) =>
-                                e.target.value !== (r.process_ref ?? "") &&
-                                update(r.id, { process_ref: e.target.value || null })
-                              }
-                            />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.qualified_value ?? ""}
-                              disabled={!canEdit}
-                              className="h-8 text-sm"
-                              onBlur={(e) =>
-                                e.target.value !== (r.qualified_value ?? "") &&
-                                update(r.id, { qualified_value: e.target.value })
-                              }
-                            />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.actual_range ?? ""}
-                              disabled={!canEdit}
-                              className="h-8 text-sm"
-                              onBlur={(e) =>
-                                e.target.value !== (r.actual_range ?? "") &&
-                                update(r.id, { actual_range: e.target.value })
-                              }
-                            />
-                          </td>
-                          {canEdit && (
-                            <td className="px-2 py-1.5">
-                              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => remove(r.id)}>
-                                <Trash2 className="size-4 text-destructive" />
-                              </Button>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
+                    {items.map((r) => (
+                      <VariableRow
+                        key={r.id}
+                        row={r}
+                        canEdit={canEdit}
+                        onUpdate={(patch) => update(r.id, patch)}
+                        onRemove={() => remove(r.id)}
+                      />
+                    ))}
+
                   </tbody>
                 </table>
               </div>
