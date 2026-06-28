@@ -492,3 +492,367 @@ export const VARIABLE_DERIVERS: Record<
   },
 };
 
+/* ================================================================== */
+/* WPS variable derivers — used by the WPS Variables matrix            */
+/* ================================================================== */
+
+export interface WpsVarSpec {
+  /** Input control type for the Qualified Value cell. */
+  kind: "number" | "select" | "text";
+  /** Options for select kind. */
+  options?: string[];
+  /** Optional placeholder / unit hint. */
+  placeholder?: string;
+  /** Show a "Tested with backing" checkbox alongside the input. */
+  withBackingToggle?: boolean;
+  /** Default code reference (used when no value entered). */
+  codeRef: string;
+  /** Compute the range string + code ref + warning from the value. */
+  derive: (
+    value: unknown,
+    extra?: { withBacking?: boolean; isPipe?: boolean },
+  ) => VariableDerivation;
+}
+
+const numFmt = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(2));
+
+function pmTemp(value: unknown, deltaLow: number, deltaHigh: number, ref: string): VariableDerivation {
+  const t = parseNum(value);
+  if (t == null) return { qualifiedFor: "", codeRef: ref };
+  return { qualifiedFor: `${numFmt(t - deltaLow)} – ${numFmt(t + deltaHigh)} °C`, codeRef: ref };
+}
+
+function maxOnly(value: unknown, ref: string, unit: string): VariableDerivation {
+  const v = parseNum(value);
+  if (v == null) return { qualifiedFor: "", codeRef: ref };
+  return { qualifiedFor: `≤ ${numFmt(v)} ${unit}`, codeRef: ref };
+}
+
+function minOnly(value: unknown, ref: string, unit: string, delta = 0): VariableDerivation {
+  const v = parseNum(value);
+  if (v == null) return { qualifiedFor: "", codeRef: ref };
+  return { qualifiedFor: `≥ ${numFmt(v - delta)} ${unit}`, codeRef: ref };
+}
+
+function plusMinusPct(value: unknown, pct: number, ref: string, unit: string): VariableDerivation {
+  const v = parseNum(value);
+  if (v == null) return { qualifiedFor: "", codeRef: ref };
+  const lo = v * (1 - pct / 100);
+  const hi = v * (1 + pct / 100);
+  return {
+    qualifiedFor: `${numFmt(lo)} – ${numFmt(hi)} ${unit} (±${pct}%)`,
+    codeRef: ref,
+  };
+}
+
+function asListed(value: unknown, ref: string): VariableDerivation {
+  const v = (value ?? "").toString().trim();
+  if (!v) return { qualifiedFor: "", codeRef: ref };
+  return { qualifiedFor: `As qualified: ${v}`, codeRef: ref };
+}
+
+/** Registry keyed by WpsVariablesMatrix preset `variable_key`. */
+export const WPS_VARIABLE_SPECS: Record<string, WpsVarSpec> = {
+  // ----- Welding Process
+  process: {
+    kind: "select",
+    options: ["SMAW", "GTAW", "GMAW", "FCAW", "SAW", "PAW", "ESW"],
+    codeRef: "QW-401.1",
+    derive: (v) => asListed(v, "QW-401.1"),
+  },
+  process_type: {
+    kind: "select",
+    options: ["Manual", "Semi-Automatic", "Mechanized", "Automatic"],
+    codeRef: "QW-410",
+    derive: (v) => asListed(v, "QW-410"),
+  },
+
+  // ----- Joint Design
+  joint_groove: {
+    kind: "text",
+    codeRef: "QW-402.1",
+    derive: (v) => asListed(v, "QW-402.1"),
+  },
+  joint_backing: {
+    kind: "select",
+    options: ["With backing", "Without backing"],
+    codeRef: "QW-402.4",
+    derive: (v) => deriveBackingRangeText(v),
+  },
+  joint_root_spacing: {
+    kind: "text",
+    codeRef: "QW-402.10",
+    derive: (v) => asListed(v, "QW-402.10"),
+  },
+
+  // ----- Base Metal
+  bm_pno: {
+    kind: "number",
+    placeholder: "e.g. 1",
+    codeRef: "QW-403.11",
+    derive: (v) => ({ ...derivePNumberRange(v), codeRef: "QW-403.11" }),
+  },
+  bm_group: {
+    kind: "number",
+    placeholder: "e.g. 1",
+    codeRef: "QW-403.16",
+    derive: (v) => {
+      const g = parseNum(v);
+      if (g == null) return { qualifiedFor: "", codeRef: "QW-403.16" };
+      return { qualifiedFor: `Group ${g} only`, codeRef: "QW-403.16" };
+    },
+  },
+  bm_thickness: {
+    kind: "number",
+    placeholder: "mm",
+    withBackingToggle: true,
+    codeRef: "QW-451.1",
+    derive: (v, extra) => ({
+      ...deriveCouponThicknessDerivation(v, extra?.withBacking),
+      codeRef: "QW-403.6 / QW-451.1",
+    }),
+  },
+  bm_diameter: {
+    kind: "number",
+    placeholder: "mm OD",
+    codeRef: "QW-403.13",
+    derive: (v) => ({ ...derivePipeDiameterRange(v), codeRef: "QW-403.13" }),
+  },
+  bm_pwht_cond: {
+    kind: "text",
+    codeRef: "QW-403.8",
+    derive: (v) => asListed(v, "QW-403.8"),
+  },
+
+  // ----- Filler Metal
+  fm_fno: {
+    kind: "number",
+    placeholder: "e.g. 6",
+    codeRef: "QW-404.4",
+    derive: (v) => ({ ...deriveFNumberRange(v), codeRef: "QW-404.4" }),
+  },
+  fm_ano: {
+    kind: "number",
+    placeholder: "e.g. 8",
+    codeRef: "QW-404.5",
+    derive: (v) => {
+      const a = parseNum(v);
+      if (a == null) return { qualifiedFor: "", codeRef: "QW-404.5" };
+      return { qualifiedFor: `A-${a} only`, codeRef: "QW-404.5" };
+    },
+  },
+  fm_sfa: {
+    kind: "text",
+    codeRef: "QW-404.4",
+    derive: (v) => asListed(v, "QW-404.4"),
+  },
+  fm_diameter: {
+    kind: "number",
+    placeholder: "mm",
+    codeRef: "QW-404.6",
+    derive: (v) => {
+      const d = parseNum(v);
+      if (d == null) return { qualifiedFor: "", codeRef: "QW-404.6" };
+      return { qualifiedFor: `≤ ${numFmt(d)} mm (qualified diameter and smaller)`, codeRef: "QW-404.6" };
+    },
+  },
+  fm_deposit_thk: {
+    kind: "number",
+    placeholder: "mm",
+    codeRef: "QW-404.32",
+    derive: (v) => {
+      const t = parseNum(v);
+      if (t == null) return { qualifiedFor: "", codeRef: "QW-404.32" };
+      const r = asmeDepositThickness(t);
+      return { qualifiedFor: formatRange(r), codeRef: "QW-404.32" };
+    },
+  },
+  fm_supplemental: {
+    kind: "text",
+    codeRef: "QW-404.23",
+    derive: (v) => asListed(v, "QW-404.23"),
+  },
+
+  // ----- Electrical
+  el_current: {
+    kind: "select",
+    options: ["AC", "DCEN", "DCEP", "Pulsed"],
+    codeRef: "QW-409.4",
+    derive: (v) => deriveCurrentPolarityRange(v),
+  },
+  el_amperage: {
+    kind: "number",
+    placeholder: "A",
+    codeRef: "QW-409.8",
+    derive: (v) => plusMinusPct(v, 10, "QW-409.8", "A"),
+  },
+  el_voltage: {
+    kind: "number",
+    placeholder: "V",
+    codeRef: "QW-409.8",
+    derive: (v) => plusMinusPct(v, 10, "QW-409.8", "V"),
+  },
+  el_heat_input: {
+    kind: "number",
+    placeholder: "kJ/mm",
+    codeRef: "QW-409.1",
+    derive: (v) => maxOnly(v, "QW-409.1", "kJ/mm"),
+  },
+  el_travel_speed: {
+    kind: "number",
+    placeholder: "mm/min",
+    codeRef: "QW-410.5",
+    derive: (v) => plusMinusPct(v, 10, "QW-410.5", "mm/min"),
+  },
+
+  // ----- Position
+  pos_qualified: {
+    kind: "select",
+    options: Object.keys(POSITION_RULES),
+    codeRef: "QW-405.1",
+    derive: (v, extra) => ({
+      ...derivePositionRangeFromKey(v, extra?.isPipe),
+      codeRef: "QW-405.1",
+    }),
+  },
+  pos_progression: {
+    kind: "select",
+    options: ["Uphill", "Downhill", "N/A"],
+    codeRef: "QW-405.3",
+    derive: (v) => deriveProgressionRange(v),
+  },
+
+  // ----- Preheat / Interpass
+  pre_min_temp: {
+    kind: "number",
+    placeholder: "°C",
+    codeRef: "QW-406.1",
+    derive: (v) => minOnly(v, "QW-406.1", "°C", 55),
+  },
+  pre_interpass: {
+    kind: "number",
+    placeholder: "°C",
+    codeRef: "QW-406.2",
+    derive: (v) => {
+      const t = parseNum(v);
+      if (t == null) return { qualifiedFor: "", codeRef: "QW-406.2" };
+      return { qualifiedFor: `≤ ${numFmt(t + 55)} °C`, codeRef: "QW-406.2" };
+    },
+  },
+  pre_maintenance: {
+    kind: "text",
+    codeRef: "QW-406.3",
+    derive: (v) => asListed(v, "QW-406.3"),
+  },
+
+  // ----- PWHT
+  pwht_type: {
+    kind: "select",
+    options: ["None", "Below lower transformation", "Above upper transformation", "Solution anneal", "Other"],
+    codeRef: "QW-407.1",
+    derive: (v) => asListed(v, "QW-407.1"),
+  },
+  pwht_temp_time: {
+    kind: "number",
+    placeholder: "°C",
+    codeRef: "QW-407.2",
+    derive: (v) => pmTemp(v, 15, 15, "QW-407.2"),
+  },
+  pwht_thickness: {
+    kind: "number",
+    placeholder: "mm",
+    codeRef: "QW-407.4",
+    derive: (v) => {
+      const t = parseNum(v);
+      if (t == null) return { qualifiedFor: "", codeRef: "QW-407.4" };
+      return { qualifiedFor: `≤ ${numFmt(1.1 * t)} mm`, codeRef: "QW-407.4" };
+    },
+  },
+
+  // ----- Shielding Gas
+  gas_type: {
+    kind: "text",
+    codeRef: "QW-408.2",
+    derive: (v) => asListed(v, "QW-408.2"),
+  },
+  gas_flow: {
+    kind: "number",
+    placeholder: "L/min",
+    codeRef: "QW-408.3",
+    derive: (v) => plusMinusPct(v, 10, "QW-408.3", "L/min"),
+  },
+  gas_backing: {
+    kind: "select",
+    options: ["With backing gas", "Without backing gas"],
+    codeRef: "QW-408.5",
+    derive: (v) => {
+      const s = (v ?? "").toString().toLowerCase();
+      if (!s) return { qualifiedFor: "", codeRef: "QW-408.5" };
+      if (s.includes("without")) {
+        return { qualifiedFor: "With and without backing gas", codeRef: "QW-408.5" };
+      }
+      return {
+        qualifiedFor: "With backing gas only (does NOT qualify without)",
+        codeRef: "QW-408.5",
+      };
+    },
+  },
+
+  // ----- Backing
+  back_type: {
+    kind: "select",
+    options: ["With backing", "Without backing"],
+    codeRef: "QW-402.4",
+    derive: (v) => deriveBackingRangeText(v),
+  },
+
+  // ----- Technique
+  tech_string_weave: {
+    kind: "select",
+    options: ["String", "Weave", "Both"],
+    codeRef: "QW-410.1",
+    derive: (v) => asListed(v, "QW-410.1"),
+  },
+  tech_cleaning: {
+    kind: "text",
+    codeRef: "QW-410.5",
+    derive: (v) => asListed(v, "QW-410.5"),
+  },
+  tech_oscillation: {
+    kind: "text",
+    codeRef: "QW-410.7",
+    derive: (v) => asListed(v, "QW-410.7"),
+  },
+  tech_peening: {
+    kind: "select",
+    options: ["None", "Manual", "Mechanical"],
+    codeRef: "QW-410.9",
+    derive: (v) => asListed(v, "QW-410.9"),
+  },
+  tech_back_gouge: {
+    kind: "select",
+    options: ["None", "Grinding", "Air Carbon Arc", "Machining"],
+    codeRef: "QW-410.6",
+    derive: (v) => asListed(v, "QW-410.6"),
+  },
+
+  // ----- Material Compatibility
+  mat_dissimilar: {
+    kind: "text",
+    codeRef: "QW-403.20",
+    derive: (v) => asListed(v, "QW-403.20"),
+  },
+};
+
+/** Dispatcher used by the WPS Variables matrix. */
+export function deriveWpsRange(
+  variableKey: string,
+  value: unknown,
+  extra?: { withBacking?: boolean; isPipe?: boolean },
+): VariableDerivation {
+  const spec = WPS_VARIABLE_SPECS[variableKey];
+  if (!spec) return { qualifiedFor: "", codeRef: "" };
+  return spec.derive(value, extra);
+}
+
+

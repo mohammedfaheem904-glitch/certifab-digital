@@ -7,10 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Loader2, Sparkles, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Loader2, Sparkles, ChevronDown, ChevronRight, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { WPS_VARIABLE_SPECS, deriveWpsRange } from "@/lib/qualification-intelligence";
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 // ---------------------------------------------------------------------------
 // Engineering taxonomy — Essential / Non-Essential / Supplementary Essential
@@ -325,94 +328,16 @@ export function WpsVariablesMatrix({
                         </td>
                       </tr>
                     )}
-                    {items.map((r) => {
-                      const meta = CAT_META[r.category as Cat];
-                      return (
-                        <tr key={r.id} className="border-t border-border/60">
-                          <td className="px-3 py-1.5">
-                            {canEdit ? (
-                              <Select
-                                defaultValue={r.category}
-                                onValueChange={(v) => update(r.id, { category: v })}
-                              >
-                                <SelectTrigger className="h-8 text-xs">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="essential">Essential</SelectItem>
-                                  <SelectItem value="supplementary_essential">Supplementary Essential</SelectItem>
-                                  <SelectItem value="non_essential">Non-Essential</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            ) : (
-                              <Badge variant="outline" className={`text-[10px] ${meta.tone}`}>{meta.short}</Badge>
-                            )}
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.variable_label}
-                              disabled={!canEdit}
-                              className="h-8 text-sm"
-                              onBlur={(e) =>
-                                e.target.value !== r.variable_label && update(r.id, { variable_label: e.target.value })
-                              }
-                            />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.code_reference ?? ""}
-                              disabled={!canEdit}
-                              className="h-8 text-xs font-mono"
-                              onBlur={(e) =>
-                                e.target.value !== (r.code_reference ?? "") &&
-                                update(r.id, { code_reference: e.target.value })
-                              }
-                            />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.process_ref ?? ""}
-                              disabled={!canEdit}
-                              placeholder="any"
-                              className="h-8 text-xs"
-                              onBlur={(e) =>
-                                e.target.value !== (r.process_ref ?? "") &&
-                                update(r.id, { process_ref: e.target.value || null })
-                              }
-                            />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.qualified_value ?? ""}
-                              disabled={!canEdit}
-                              className="h-8 text-sm"
-                              onBlur={(e) =>
-                                e.target.value !== (r.qualified_value ?? "") &&
-                                update(r.id, { qualified_value: e.target.value })
-                              }
-                            />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <Input
-                              defaultValue={r.actual_range ?? ""}
-                              disabled={!canEdit}
-                              className="h-8 text-sm"
-                              onBlur={(e) =>
-                                e.target.value !== (r.actual_range ?? "") &&
-                                update(r.id, { actual_range: e.target.value })
-                              }
-                            />
-                          </td>
-                          {canEdit && (
-                            <td className="px-2 py-1.5">
-                              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => remove(r.id)}>
-                                <Trash2 className="size-4 text-destructive" />
-                              </Button>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
+                    {items.map((r) => (
+                      <VariableRow
+                        key={r.id}
+                        row={r}
+                        canEdit={canEdit}
+                        onUpdate={(patch) => update(r.id, patch)}
+                        onRemove={() => remove(r.id)}
+                      />
+                    ))}
+
                   </tbody>
                 </table>
               </div>
@@ -430,3 +355,216 @@ export function WpsVariablesMatrix({
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Per-row component with ASME IX auto-derivation                      */
+/* ------------------------------------------------------------------ */
+
+// Persisted as "<value>" or "<value>|wb" when the row toggles "tested with backing".
+function decodeStored(raw: string | null | undefined): { value: string; withBacking: boolean } {
+  const s = (raw ?? "").toString();
+  if (s.endsWith("|wb")) return { value: s.slice(0, -3), withBacking: true };
+  return { value: s, withBacking: false };
+}
+
+function encodeStored(value: string, withBacking: boolean): string {
+  if (!value) return "";
+  return withBacking ? `${value}|wb` : value;
+}
+
+function VariableRow({
+  row,
+  canEdit,
+  onUpdate,
+  onRemove,
+}: {
+  row: any;
+  canEdit: boolean;
+  onUpdate: (patch: Record<string, any>) => void;
+  onRemove: () => void;
+}) {
+  const meta = CAT_META[row.category as Cat];
+  const spec = WPS_VARIABLE_SPECS[row.variable_key];
+  const initial = decodeStored(row.qualified_value);
+  const [rawValue, setRawValue] = useState<string>(initial.value);
+  const [withBacking, setWithBacking] = useState<boolean>(initial.withBacking);
+
+  const derived = useMemo(() => {
+    if (!spec) return null;
+    return deriveWpsRange(row.variable_key, rawValue, { withBacking });
+  }, [spec, row.variable_key, rawValue, withBacking]);
+
+  const commit = (nextValue: string, nextWb: boolean) => {
+    const stored = encodeStored(nextValue, nextWb);
+    const patch: Record<string, any> = { qualified_value: stored };
+    if (spec) {
+      const d = deriveWpsRange(row.variable_key, nextValue, { withBacking: nextWb });
+      patch.actual_range = d.qualifiedFor || null;
+      if (d.codeRef) patch.code_reference = d.codeRef;
+    }
+    onUpdate(patch);
+  };
+
+  const renderQualifiedInput = () => {
+    if (!spec) {
+      return (
+        <Input
+          defaultValue={row.qualified_value ?? ""}
+          disabled={!canEdit}
+          className="h-8 text-sm"
+          onBlur={(e) =>
+            e.target.value !== (row.qualified_value ?? "") &&
+            onUpdate({ qualified_value: e.target.value })
+          }
+        />
+      );
+    }
+    if (spec.kind === "select") {
+      return (
+        <Select
+          value={rawValue || undefined}
+          disabled={!canEdit}
+          onValueChange={(v) => {
+            setRawValue(v);
+            commit(v, withBacking);
+          }}
+        >
+          <SelectTrigger className="h-8 text-sm">
+            <SelectValue placeholder={spec.placeholder ?? "Select…"} />
+          </SelectTrigger>
+          <SelectContent>
+            {spec.options?.map((opt) => (
+              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      );
+    }
+    return (
+      <div className="flex items-center gap-2">
+        <Input
+          type={spec.kind === "number" ? "number" : "text"}
+          step="any"
+          value={rawValue}
+          placeholder={spec.placeholder}
+          disabled={!canEdit}
+          className="h-8 text-sm"
+          onChange={(e) => setRawValue(e.target.value)}
+          onBlur={() => commit(rawValue, withBacking)}
+        />
+        {spec.withBackingToggle && (
+          <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground whitespace-nowrap">
+            <Checkbox
+              checked={withBacking}
+              disabled={!canEdit}
+              onCheckedChange={(v) => {
+                const next = !!v;
+                setWithBacking(next);
+                commit(rawValue, next);
+              }}
+            />
+            with backing
+          </label>
+        )}
+      </div>
+    );
+  };
+
+  const displayCodeRef = spec ? (derived?.codeRef || spec.codeRef) : (row.code_reference ?? "");
+  const displayRange = spec ? (derived?.qualifiedFor ?? "") : (row.actual_range ?? "");
+
+  return (
+    <tr className="border-t border-border/60 align-top">
+      <td className="px-3 py-1.5">
+        {canEdit ? (
+          <Select
+            defaultValue={row.category}
+            onValueChange={(v) => onUpdate({ category: v })}
+          >
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="essential">Essential</SelectItem>
+              <SelectItem value="supplementary_essential">Supplementary Essential</SelectItem>
+              <SelectItem value="non_essential">Non-Essential</SelectItem>
+            </SelectContent>
+          </Select>
+        ) : (
+          <Badge variant="outline" className={`text-[10px] ${meta.tone}`}>{meta.short}</Badge>
+        )}
+      </td>
+      <td className="px-3 py-1.5">
+        <Input
+          defaultValue={row.variable_label}
+          disabled={!canEdit}
+          className="h-8 text-sm"
+          onBlur={(e) =>
+            e.target.value !== row.variable_label && onUpdate({ variable_label: e.target.value })
+          }
+        />
+      </td>
+      <td className="px-3 py-1.5">
+        {spec ? (
+          <Badge variant="outline" className="text-[10px] font-mono">{displayCodeRef}</Badge>
+        ) : (
+          <Input
+            defaultValue={row.code_reference ?? ""}
+            disabled={!canEdit}
+            className="h-8 text-xs font-mono"
+            onBlur={(e) =>
+              e.target.value !== (row.code_reference ?? "") &&
+              onUpdate({ code_reference: e.target.value })
+            }
+          />
+        )}
+      </td>
+      <td className="px-3 py-1.5">
+        <Input
+          defaultValue={row.process_ref ?? ""}
+          disabled={!canEdit}
+          placeholder="any"
+          className="h-8 text-xs"
+          onBlur={(e) =>
+            e.target.value !== (row.process_ref ?? "") &&
+            onUpdate({ process_ref: e.target.value || null })
+          }
+        />
+      </td>
+      <td className="px-3 py-1.5">{renderQualifiedInput()}</td>
+      <td className="px-3 py-1.5">
+        {spec ? (
+          <div className="space-y-1">
+            <div className="h-8 px-2 flex items-center text-sm rounded-md bg-muted/50 border border-border/60 text-foreground">
+              <Lock className="size-3 me-1.5 text-muted-foreground shrink-0" />
+              <span className="truncate" title={displayRange}>
+                {displayRange || <span className="text-muted-foreground">—</span>}
+              </span>
+            </div>
+            {derived?.warning && (
+              <p className="text-[10px] text-amber-600 dark:text-amber-400">{derived.warning}</p>
+            )}
+          </div>
+        ) : (
+          <Input
+            defaultValue={row.actual_range ?? ""}
+            disabled={!canEdit}
+            className="h-8 text-sm"
+            onBlur={(e) =>
+              e.target.value !== (row.actual_range ?? "") &&
+              onUpdate({ actual_range: e.target.value })
+            }
+          />
+        )}
+      </td>
+      {canEdit && (
+        <td className="px-2 py-1.5">
+          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={onRemove}>
+            <Trash2 className="size-4 text-destructive" />
+          </Button>
+        </td>
+      )}
+    </tr>
+  );
+}
+
