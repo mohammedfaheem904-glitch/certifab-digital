@@ -7,10 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Loader2, Sparkles, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Loader2, Sparkles, ChevronDown, ChevronRight, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { WPS_VARIABLE_SPECS, deriveWpsRange } from "@/lib/qualification-intelligence";
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 // ---------------------------------------------------------------------------
 // Engineering taxonomy — Essential / Non-Essential / Supplementary Essential
