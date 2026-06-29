@@ -244,7 +244,7 @@ function VariableRow({
                 className="h-8 text-sm"
               />
             )}
-            {row.variable_key === "thickness" && (
+            {(row.variable_key === "thickness" || row.variable_key === "weld_deposit") && (
               <label className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Checkbox
                   checked={withBacking}
