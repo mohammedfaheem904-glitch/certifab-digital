@@ -20,6 +20,15 @@ const PRESETS: Array<{ key: string; label: string; ref: string }> = [
   { key: "progression", label: "Progression", ref: "QW-405.3" },
   { key: "backing", label: "Backing", ref: "QW-402.4" },
   { key: "current", label: "Current / Polarity", ref: "QW-409.4" },
+  { key: "inert_gas_backing", label: "Inert Gas Backing", ref: "QW-408.5" },
+  { key: "aws_spec", label: "AWS Specification", ref: "QW-404.4" },
+  { key: "insert_ring", label: "Consumable Insert", ref: "QW-402.10" },
+  { key: "weld_deposit", label: "T Weld Deposit Thickness", ref: "QW-452.1(b)" },
+  { key: "test_specimen", label: "Test Specimen", ref: "QW-452" },
+  { key: "sfa", label: "SFA Classification", ref: "QW-404.4" },
+  { key: "filler_metal", label: "Filler Metal Form", ref: "QW-404.23" },
+  { key: "transfer_mode", label: "Transfer Mode (GMAW)", ref: "QW-409.2" },
+  { key: "joint_type", label: "Joint Type", ref: "QW-402.1" },
 ];
 
 export function QualificationVariablesMatrix({
