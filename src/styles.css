@@ -257,6 +257,25 @@
   [data-app-chrome], aside, nav[aria-label="Primary"],
   .print\:hidden { display: none !important; }
 
+  /* Isolate the printed document: hide everything except the doc sheet
+     (and its ancestors needed for layout). This guarantees only the
+     selected certificate prints, regardless of surrounding app shell,
+     dialogs, tabs, portals, etc. */
+  body * { visibility: hidden !important; }
+  .doc-sheet, .doc-sheet * { visibility: visible !important; }
+  .doc-sheet {
+    position: absolute !important;
+    inset: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
   /* Crisp white surfaces */
   .bg-card, .bg-background, .bg-muted\/40, .bg-muted\/20 {
     background: #ffffff !important;
