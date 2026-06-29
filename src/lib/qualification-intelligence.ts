@@ -490,6 +490,157 @@ export const VARIABLE_DERIVERS: Record<
     options: ["AC", "DCEN", "DCEP", "Pulsed"],
     derive: (v) => deriveCurrentPolarityRange(v),
   },
+
+  // ----- Additional WPQ variables (Inert Gas Backing, AWS Spec, Insert, Weld Deposit, etc.)
+  inert_gas_backing: {
+    label: "Inert Gas Backing",
+    codeRef: "QW-408.5",
+    kind: "select",
+    options: ["With backing gas", "Without backing gas"],
+    derive: (v) => {
+      const s = (v ?? "").toString().toLowerCase();
+      if (!s) return { qualifiedFor: "", codeRef: "QW-408.5" };
+      if (s.includes("without")) {
+        return { qualifiedFor: "With and without backing gas", codeRef: "QW-408.5" };
+      }
+      return {
+        qualifiedFor: "With backing gas only (does NOT qualify without)",
+        codeRef: "QW-408.5",
+        warning: "Deletion of backing gas requires requalification (QW-408.5).",
+      };
+    },
+  },
+  aws_spec: {
+    label: "AWS Specification",
+    codeRef: "QW-404.4",
+    kind: "select",
+    options: [
+      "SFA-5.1", "SFA-5.4", "SFA-5.5", "SFA-5.9", "SFA-5.11", "SFA-5.14",
+      "SFA-5.17", "SFA-5.18", "SFA-5.20", "SFA-5.22", "SFA-5.28", "SFA-5.29",
+    ],
+    derive: (v) => asListed(v, "QW-404.4"),
+  },
+  insert_ring: {
+    label: "Consumable Insert",
+    codeRef: "QW-402.10",
+    kind: "select",
+    options: ["With insert", "Without insert"],
+    derive: (v) => {
+      const s = (v ?? "").toString().toLowerCase();
+      if (!s) return { qualifiedFor: "", codeRef: "QW-402.10" };
+      if (s.includes("without")) {
+        return {
+          qualifiedFor: "Without insert only (adding insert requires requalification)",
+          codeRef: "QW-402.10",
+        };
+      }
+      return {
+        qualifiedFor: "With consumable insert only (removal requires requalification)",
+        codeRef: "QW-402.10",
+      };
+    },
+  },
+  weld_deposit: {
+    label: "T Weld Deposit Thickness (mm)",
+    codeRef: "QW-452.1(b)",
+    kind: "number",
+    placeholder: "mm",
+    derive: (v, extra) => {
+      const t = parseNum(v);
+      if (t == null) return { qualifiedFor: "", codeRef: "QW-452.1(b)" };
+      const dep = asmeDepositThickness(t);
+      const base = asmeBaseThickness(t, !!extra?.withBacking);
+      return {
+        qualifiedFor: `Deposit: ${formatRange(dep)} · Base: ${formatRange(base)}`,
+        codeRef: "QW-452.1(b)",
+      };
+    },
+  },
+  test_specimen: {
+    label: "Test Specimen",
+    codeRef: "QW-452",
+    kind: "select",
+    options: ["Plate", "Pipe", "Plate + Pipe (≥73 mm OD or 6G)"],
+    derive: (v) => {
+      const s = (v ?? "").toString();
+      if (!s) return { qualifiedFor: "", codeRef: "QW-452" };
+      if (s.startsWith("Plate +")) {
+        return { qualifiedFor: "Plate and Pipe (per QW-303)", codeRef: "QW-303 / QW-452" };
+      }
+      if (s === "Pipe") {
+        return {
+          qualifiedFor: "Pipe only (plate not qualified unless OD ≥ 73 mm or 6G)",
+          codeRef: "QW-303",
+        };
+      }
+      return {
+        qualifiedFor: "Plate only (pipe < 73 mm OD not qualified)",
+        codeRef: "QW-303",
+      };
+    },
+  },
+  sfa: {
+    label: "SFA Classification",
+    codeRef: "QW-404.4",
+    kind: "text",
+    placeholder: "e.g. E7018, ER70S-6",
+    derive: (v) => asListed(v, "QW-404.4"),
+  },
+  filler_metal: {
+    label: "Filler Metal Form",
+    codeRef: "QW-404.23",
+    kind: "select",
+    options: ["Solid (Bare)", "Cored (Flux)", "Cored (Metal)", "Covered (Stick)", "Powder", "Strip"],
+    derive: (v) => {
+      const s = (v ?? "").toString();
+      if (!s) return { qualifiedFor: "", codeRef: "QW-404.23" };
+      return {
+        qualifiedFor: `${s} only (change of form is essential)`,
+        codeRef: "QW-404.23",
+      };
+    },
+  },
+  transfer_mode: {
+    label: "Transfer Mode (GMAW)",
+    codeRef: "QW-409.2",
+    kind: "select",
+    options: ["Short-circuiting", "Globular", "Spray", "Pulsed"],
+    derive: (v) => {
+      const s = (v ?? "").toString();
+      if (!s) return { qualifiedFor: "", codeRef: "QW-409.2" };
+      if (s === "Short-circuiting") {
+        return {
+          qualifiedFor: "Short-circuiting only (change to/from short-circuit is essential)",
+          codeRef: "QW-409.2",
+          warning: "GMAW-S qualification does not transfer to other transfer modes.",
+        };
+      }
+      return {
+        qualifiedFor: `${s} (qualifies globular, spray, pulsed interchangeably; not short-circuit)`,
+        codeRef: "QW-409.2",
+      };
+    },
+  },
+  joint_type: {
+    label: "Joint Type",
+    codeRef: "QW-402.1",
+    kind: "select",
+    options: ["Groove", "Fillet", "Groove + Fillet"],
+    derive: (v) => {
+      const s = (v ?? "").toString();
+      if (!s) return { qualifiedFor: "", codeRef: "QW-402.1" };
+      if (s.startsWith("Groove")) {
+        return {
+          qualifiedFor: "Groove and Fillet (groove qualifies fillet per QW-303.1)",
+          codeRef: "QW-303.1",
+        };
+      }
+      return {
+        qualifiedFor: "Fillet only (does NOT qualify groove)",
+        codeRef: "QW-303.2",
+      };
+    },
+  },
 };
 
 /* ================================================================== */
