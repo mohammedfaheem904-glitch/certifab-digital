@@ -31,6 +31,7 @@ import {
 import { QualificationGuidanceStrip } from "@/components/qualifications/QualificationGuidanceStrip";
 import { CollaborationTab } from "@/components/collab/CollaborationTab";
 import { WelderQualificationLineageStrip } from "@/components/qualifications/WelderQualificationLineageStrip";
+import { WelderPhotoUploader } from "@/components/qualifications/WelderPhotoUploader";
 
 export const Route = createFileRoute("/app/qualifications/$qualId")({
   component: QualDetail,
@@ -222,6 +223,15 @@ function QualDetail() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
+          <Card className="p-5">
+            <WelderPhotoUploader
+              qualId={qualId}
+              companyId={q.company_id}
+              value={q.welder_photo_url}
+              welderName={q.welder_name}
+              onChange={() => qc.invalidateQueries({ queryKey: ["qualification", qualId] })}
+            />
+          </Card>
           <Card className="p-5 grid sm:grid-cols-2 gap-3">
             <Edit label="Welder name" value={merged.welder_name} onChange={(v) => setF("welder_name", v)} />
             <Edit label="Employee ID" value={merged.employee_id} onChange={(v) => setF("employee_id", v)} />
