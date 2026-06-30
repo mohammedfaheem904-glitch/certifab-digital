@@ -376,7 +376,7 @@ function QualDetail() {
 
         <TabsContent value="certificate" className="mt-4">
           <WelderQualificationDocument
-            q={q}
+            q={merged}
             variables={bundle.variables.data ?? []}
             tests={bundle.tests.data ?? []}
             signatures={bundle.signatures.data ?? []}
@@ -413,6 +413,8 @@ const positionOptions = [
   "4F (Overhead Fillet)",
   "5F (Fixed Horizontal Pipe Fillet)",
 ];
+
+const processTypeOptions = ["Manual", "Semi-Automatic", "Mechanized", "Automatic"];
 
 function Edit({
   label, value, onChange, type = "text", className = "",
