@@ -1,8 +1,35 @@
+import { useEffect, useState } from "react";
 import { ReportShell, KvTable, SectionTitle } from "@/components/ReportShell";
 import { fmtEngDate } from "@/lib/doc-number";
 import { deriveQualStatus, continuityBroken, continuityWarning } from "@/lib/qualification-status";
 import { QrCodeBlock } from "@/components/QrCodeBlock";
 import { daysUntil } from "@/lib/format";
+import { resolveWelderPhotoUrl } from "@/lib/welder-photo";
+
+function WelderPhoto({ value, alt }: { value?: string | null; alt: string }) {
+  const [src, setSrc] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (!value) {
+      setSrc(null);
+      return;
+    }
+    resolveWelderPhotoUrl(value).then((u) => {
+      if (!cancelled) setSrc(u);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [value]);
+  if (!src) {
+    return (
+      <div className="w-24 h-32 rounded border border-dashed border-border/60 grid place-items-center text-[10px] text-muted-foreground text-center px-1">
+        Welder Photo
+      </div>
+    );
+  }
+  return <img src={src} alt={alt} className="w-24 h-32 object-cover rounded border border-border/60" />;
+}
 
 const QW_VARIABLES: Array<{ key: string; label: string; ref: string }> = [
   { key: "p_no", label: "P-Number (Base Metal Group)", ref: "QW-403" },
