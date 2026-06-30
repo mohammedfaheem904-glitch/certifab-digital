@@ -238,6 +238,7 @@ function QualDetail() {
             <Edit label="WPQ number" value={merged.wpq_number} onChange={(v) => setF("wpq_number", v)} />
             <Edit label="Stamp number" value={merged.stamp_number} onChange={(v) => setF("stamp_number", v)} />
             <Edit label="Process" value={merged.process} onChange={(v) => setF("process", v)} />
+            <SelectEdit label="Process type" value={merged.process_type} onChange={(v) => setF("process_type", v)} options={processTypeOptions} />
             <SelectEdit label="Position" value={merged.position_qualified} onChange={(v) => setF("position_qualified", v)} options={positionOptions} />
             <Edit label="Standard" value={merged.standard} onChange={(v) => setF("standard", v)} />
             <Edit label="Code family" value={merged.code_family} onChange={(v) => setF("code_family", v)} />
@@ -412,6 +413,8 @@ const positionOptions = [
   "4F (Overhead Fillet)",
   "5F (Fixed Horizontal Pipe Fillet)",
 ];
+
+const processTypeOptions = ["Manual", "Semi-Automatic", "Mechanized", "Automatic"];
 
 function Edit({
   label, value, onChange, type = "text", className = "",

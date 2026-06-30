@@ -154,7 +154,7 @@ function QualificationsPage() {
             table="qualifications"
             title="New welder qualification (WPQ)"
             trigger="New WPQ"
-            defaults={{ status: "Active", code_family: "ASME IX", revision: "Rev 0" }}
+            defaults={{ status: "Active", code_family: "ASME IX", revision: "Rev 0", process_type: "Manual" }}
           >
             {({ values, set }) => (
               <div className="grid grid-cols-2 gap-3">

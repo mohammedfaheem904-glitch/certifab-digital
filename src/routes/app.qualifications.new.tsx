@@ -51,6 +51,7 @@ function WpqWizard() {
       revision: "Rev 0",
       result: "Satisfactory",
       status: "Active",
+      process_type: "Manual",
       qualification_date: new Date().toISOString().slice(0, 10),
     };
   });
