@@ -376,7 +376,7 @@ function QualDetail() {
 
         <TabsContent value="certificate" className="mt-4">
           <WelderQualificationDocument
-            q={merged}
+            q={q}
             variables={bundle.variables.data ?? []}
             tests={bundle.tests.data ?? []}
             signatures={bundle.signatures.data ?? []}
