@@ -123,17 +123,7 @@ export function WelderQualificationDocument({
       {/* Header strip with welder photo + QR */}
       <div className="flex items-start justify-between gap-6 border-b border-border/60 pb-4 mb-4">
         <div className="flex gap-4">
-          {q.welder_photo_url ? (
-            <img
-              src={q.welder_photo_url}
-              alt={q.welder_name}
-              className="w-24 h-32 object-cover rounded border border-border/60"
-            />
-          ) : (
-            <div className="w-24 h-32 rounded border border-dashed border-border/60 grid place-items-center text-[10px] text-muted-foreground text-center px-1">
-              Welder Photo
-            </div>
-          )}
+          <WelderPhoto value={q.welder_photo_url} alt={q.welder_name} />
           <div className="space-y-1">
             <div className="text-lg font-semibold">{q.welder_name}</div>
             <div className="text-sm text-muted-foreground">ID: {q.employee_id}</div>
