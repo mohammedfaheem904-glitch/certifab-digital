@@ -284,8 +284,12 @@ export function ReportShell({
                 {sigs.map((s, i) => (
                   <td key={i} className="align-top">
                     <div className="text-[9px] uppercase text-muted-foreground">Signature</div>
-                    <div className="min-h-[26pt] border-b border-foreground/40 italic text-[10pt] text-muted-foreground">
-                      {s.signature ?? ""}
+                    <div className="min-h-[26pt] border-b border-foreground/40 italic text-[10pt] text-muted-foreground flex items-end">
+                      {s.signatureImage ? (
+                        <img src={s.signatureImage} alt="signature" className="max-h-[26pt] object-contain" crossOrigin="anonymous" />
+                      ) : (
+                        <span>{s.signature ?? ""}</span>
+                      )}
                     </div>
                     <div className="text-[9px] uppercase text-muted-foreground mt-1">
                       Date: <span className="font-mono normal-case">{s.date ? fmtEngDate(s.date) : "______________"}</span>
