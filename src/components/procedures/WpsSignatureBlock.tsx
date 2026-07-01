@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { Eraser, PenLine, Loader2 } from "lucide-react";
+import { Eraser, PenLine, Loader2, Upload, Trash2 } from "lucide-react";
 
 const ROLES = [
   "Welding Engineer",
@@ -18,13 +18,28 @@ const ROLES = [
   "Client Representative",
 ];
 
+const ACCEPT = "image/jpeg,image/jpg,image/png,image/webp";
+const MAX_BYTES = 4 * 1024 * 1024;
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(String(fr.result));
+    fr.onerror = () => reject(fr.error);
+    fr.readAsDataURL(file);
+  });
+}
+
 export function WpsSignatureBlock({ procedureId, canEdit }: { procedureId: string; canEdit: boolean }) {
   const { profile, user } = useAuth();
   const qc = useQueryClient();
   const ref = useRef<SignatureCanvas>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(profile?.display_name ?? "");
   const [role, setRole] = useState(ROLES[0]);
   const [busy, setBusy] = useState(false);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   const queryKey = ["wps_signatures", procedureId] as const;
   const q = useQuery({
@@ -40,14 +55,10 @@ export function WpsSignatureBlock({ procedureId, canEdit }: { procedureId: strin
     },
   });
 
-  const save = async () => {
-    if (!profile?.company_id || !ref.current || ref.current.isEmpty()) {
-      toast.error("Please draw a signature.");
-      return;
-    }
+  const persist = async (dataUrl: string) => {
+    if (!profile?.company_id) return toast.error("Missing company context.");
     if (!name.trim()) return toast.error("Name required.");
     setBusy(true);
-    const dataUrl = ref.current.toDataURL("image/png");
     const { error } = await (supabase.from("wps_signatures") as any).insert({
       company_id: profile.company_id,
       procedure_id: procedureId,
@@ -58,8 +69,38 @@ export function WpsSignatureBlock({ procedureId, canEdit }: { procedureId: strin
     });
     setBusy(false);
     if (error) return toast.error(error.message);
-    ref.current.clear();
+    ref.current?.clear();
+    setUploadedUrl(null);
     toast.success("Signature recorded.");
+    qc.invalidateQueries({ queryKey });
+  };
+
+  const saveDrawn = async () => {
+    if (!ref.current || ref.current.isEmpty()) return toast.error("Please draw a signature.");
+    await persist(ref.current.toDataURL("image/png"));
+  };
+
+  const handleFile = async (file: File | null | undefined) => {
+    if (!file) return;
+    if (!ACCEPT.split(",").includes(file.type)) return toast.error("Use JPG, PNG or WebP.");
+    if (file.size > MAX_BYTES) return toast.error("Max size is 4MB.");
+    try {
+      setUploadedUrl(await fileToDataUrl(file));
+    } catch {
+      toast.error("Failed to read image.");
+    }
+  };
+
+  const saveUploaded = async () => {
+    if (!uploadedUrl) return;
+    await persist(uploadedUrl);
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("Delete this signature?")) return;
+    const { error } = await (supabase.from("wps_signatures") as any).delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Signature deleted.");
     qc.invalidateQueries({ queryKey });
   };
 
@@ -71,10 +112,25 @@ export function WpsSignatureBlock({ procedureId, canEdit }: { procedureId: strin
         <div className="grid sm:grid-cols-2 gap-3">
           {(q.data ?? []).map((s: any) => (
             <div key={s.id} className="rounded-md border border-border p-3 bg-card">
-              <div className="text-xs text-muted-foreground">{s.role}</div>
-              <div className="text-sm font-medium">{s.name}</div>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="text-xs text-muted-foreground">{s.role}</div>
+                  <div className="text-sm font-medium">{s.name}</div>
+                </div>
+                {canEdit && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-7 w-7 opacity-60 hover:opacity-100 hover:text-destructive"
+                    onClick={() => remove(s.id)}
+                    aria-label="Delete signature"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                )}
+              </div>
               {s.signature_data_url && (
-                <img src={s.signature_data_url} alt="signature" className="mt-2 h-16 object-contain bg-white rounded" />
+                <img src={s.signature_data_url} alt="signature" className="mt-2 h-16 object-contain bg-white rounded w-full" />
               )}
               <div className="text-[10px] text-muted-foreground mt-1">
                 {new Date(s.signed_at).toLocaleString()}
@@ -99,6 +155,39 @@ export function WpsSignatureBlock({ procedureId, canEdit }: { procedureId: strin
               </select>
             </div>
           </div>
+
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files?.[0]); }}
+            className={`rounded-md border-2 border-dashed p-3 text-center transition-colors ${dragOver ? "border-primary bg-primary/5" : "border-border"}`}
+          >
+            {uploadedUrl ? (
+              <div className="space-y-2">
+                <img src={uploadedUrl} alt="preview" className="mx-auto h-20 object-contain bg-white rounded" />
+                <div className="flex justify-center gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setUploadedUrl(null)}>
+                    <Trash2 className="size-4 me-1" /> Remove
+                  </Button>
+                  <Button size="sm" onClick={saveUploaded} disabled={busy}>
+                    <Upload className="size-4 me-1" /> Save uploaded signature
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="text-xs text-muted-foreground">Drag & drop a signature image here, or</div>
+                <Button size="sm" variant="outline" type="button" onClick={() => fileRef.current?.click()}>
+                  <Upload className="size-4 me-1" /> Browse files
+                </Button>
+                <div className="text-[10px] text-muted-foreground">JPG, PNG, WebP · max 4MB</div>
+              </div>
+            )}
+            <input ref={fileRef} type="file" accept={ACCEPT} className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
+          </div>
+
+          <div className="text-xs text-muted-foreground text-center">— or draw below —</div>
+
           <div className="rounded-md border border-dashed border-border bg-background">
             <SignatureCanvas
               ref={ref}
@@ -111,7 +200,7 @@ export function WpsSignatureBlock({ procedureId, canEdit }: { procedureId: strin
             <Button size="sm" variant="outline" onClick={() => ref.current?.clear()}>
               <Eraser className="size-4 me-1" /> Clear
             </Button>
-            <Button size="sm" onClick={save} disabled={busy}>
+            <Button size="sm" onClick={saveDrawn} disabled={busy}>
               <PenLine className="size-4 me-1" /> Sign & save
             </Button>
           </div>
