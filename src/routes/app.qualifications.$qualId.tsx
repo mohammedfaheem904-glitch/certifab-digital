@@ -314,9 +314,25 @@ function QualDetail() {
             />
             <ul className="text-sm divide-y divide-border rounded-md border border-border">
               {(bundle.attachments.data ?? []).map((a) => (
-                <li key={a.id} className="px-4 py-2 flex justify-between items-center">
-                  <span>{a.filename}</span>
-                  <span className="text-xs text-muted-foreground">
+                <li key={a.id} className="px-4 py-2 flex justify-between items-center gap-3">
+                  <button
+                    type="button"
+                    className="text-left text-primary hover:underline truncate flex-1"
+                    onClick={async () => {
+                      try {
+                        const { data, error } = await supabase.storage
+                          .from("qualification-files")
+                          .createSignedUrl(a.storage_path, 3600);
+                        if (error || !data?.signedUrl) throw error ?? new Error("No URL");
+                        window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+                      } catch (e: any) {
+                        toast.error(e?.message ?? "Unable to open file");
+                      }
+                    }}
+                  >
+                    {a.filename}
+                  </button>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {a.size_bytes ? `${(a.size_bytes / 1024).toFixed(0)} KB` : ""} · {fmtEngDate(a.created_at)}
                   </span>
                 </li>
