@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Trash2 } from "lucide-react";
@@ -64,19 +65,21 @@ export function QualificationTestsTable({
               <th className="text-start font-medium px-3 py-2">Report #</th>
               <th className="text-start font-medium px-3 py-2">Inspector</th>
               <th className="text-start font-medium px-3 py-2">Date</th>
+              <th className="text-start font-medium px-3 py-2">Acceptance</th>
+              <th className="text-start font-medium px-3 py-2">Findings / Observations</th>
               <th className="w-10" />
             </tr>
           </thead>
           <tbody>
             {data.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground text-sm">
+                <td colSpan={8} className="px-4 py-6 text-center text-muted-foreground text-sm">
                   No {category === "ndt" ? "NDT" : "destructive"} tests recorded.
                 </td>
               </tr>
             )}
             {data.map((r) => (
-              <tr key={r.id} className="border-t border-border/60">
+              <tr key={r.id} className="border-t border-border/60 align-top">
                 <td className="px-3 py-2 font-medium">{r.test_type}</td>
                 <td className="px-3 py-2">
                   <select
@@ -98,6 +101,16 @@ export function QualificationTestsTable({
                 <td className="px-3 py-2">
                   <Input type="date" className="h-8 text-sm" defaultValue={r.test_date ?? ""}
                     onBlur={(e) => update(r.id, { test_date: e.target.value || null })} />
+                </td>
+                <td className="px-3 py-2 min-w-[160px]">
+                  <Input className="h-8 text-sm" placeholder="e.g. ASME IX QW-163"
+                    defaultValue={r.acceptance_criteria ?? ""}
+                    onBlur={(e) => update(r.id, { acceptance_criteria: e.target.value })} />
+                </td>
+                <td className="px-3 py-2 min-w-[220px]">
+                  <Textarea className="text-sm min-h-[32px]" rows={2} placeholder="Findings, observations, remarks…"
+                    defaultValue={r.findings ?? ""}
+                    onBlur={(e) => update(r.id, { findings: e.target.value })} />
                 </td>
                 <td className="px-2 py-2">
                   <Button variant="ghost" size="icon" onClick={() => remove(r.id)}>

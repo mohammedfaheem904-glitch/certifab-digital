@@ -2987,9 +2987,11 @@ export type Database = {
       }
       qualification_tests: {
         Row: {
+          acceptance_criteria: string | null
           category: string
           company_id: string
           created_at: string
+          findings: string | null
           id: string
           inspector_name: string | null
           notes: string | null
@@ -3001,9 +3003,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          acceptance_criteria?: string | null
           category: string
           company_id: string
           created_at?: string
+          findings?: string | null
           id?: string
           inspector_name?: string | null
           notes?: string | null
@@ -3015,9 +3019,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          acceptance_criteria?: string | null
           category?: string
           company_id?: string
           created_at?: string
+          findings?: string | null
           id?: string
           inspector_name?: string | null
           notes?: string | null

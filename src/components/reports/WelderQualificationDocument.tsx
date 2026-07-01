@@ -180,7 +180,7 @@ export function WelderQualificationDocument({
       <table className="w-full text-xs">
         <thead>
           <tr>
-            <th>Test</th><th>Result</th><th>Report No.</th><th>Inspector</th><th>Date</th>
+            <th>Test</th><th>Result</th><th>Report No.</th><th>Inspector</th><th>Date</th><th>Acceptance</th><th>Findings / Observations</th>
           </tr>
         </thead>
         <tbody>
@@ -191,6 +191,8 @@ export function WelderQualificationDocument({
               <td>{r.report_number ?? "—"}</td>
               <td>{r.inspector_name ?? "—"}</td>
               <td>{fmtEngDate(r.test_date)}</td>
+              <td>{r.acceptance_criteria ?? "—"}</td>
+              <td className="whitespace-pre-wrap">{r.findings ?? "—"}</td>
             </tr>
           ))}
         </tbody>
@@ -200,7 +202,7 @@ export function WelderQualificationDocument({
       <table className="w-full text-xs">
         <thead>
           <tr>
-            <th>Test</th><th>Result</th><th>Report No.</th><th>Inspector</th><th>Date</th>
+            <th>Test</th><th>Result</th><th>Report No.</th><th>Inspector</th><th>Date</th><th>Acceptance</th><th>Findings / Observations</th>
           </tr>
         </thead>
         <tbody>
@@ -211,6 +213,8 @@ export function WelderQualificationDocument({
               <td>{r.report_number ?? "—"}</td>
               <td>{r.inspector_name ?? "—"}</td>
               <td>{fmtEngDate(r.test_date)}</td>
+              <td>{r.acceptance_criteria ?? "—"}</td>
+              <td className="whitespace-pre-wrap">{r.findings ?? "—"}</td>
             </tr>
           ))}
         </tbody>
