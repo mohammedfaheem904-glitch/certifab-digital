@@ -110,7 +110,7 @@ export function WelderQualificationDocument({
       ]}
       signatories={
         signatures.length > 0
-          ? signatures.map((s) => ({ role: s.role, name: s.name, signedOn: s.signed_at }))
+          ? signatures.map((s) => ({ role: s.role, name: s.name, date: s.signed_at, signatureImage: s.signature_data_url }))
           : [
               { role: "QC Engineer" },
               { role: "QA/QC Manager" },

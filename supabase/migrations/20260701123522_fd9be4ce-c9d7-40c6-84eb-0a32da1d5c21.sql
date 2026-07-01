@@ -1,0 +1,1 @@
+CREATE POLICY "editors delete qs" ON public.qualification_signatures FOR DELETE USING (company_id = current_company_id() AND is_editor(auth.uid()));
