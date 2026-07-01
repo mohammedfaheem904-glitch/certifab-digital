@@ -12,6 +12,8 @@ export type Signatory = {
   date?: string | null;
   /** Optional signature label (e.g., "Electronically signed", "QA Stamp #123"). */
   signature?: string | null;
+  /** Optional signature image (data URL or https URL). Rendered as an inline image when present. */
+  signatureImage?: string | null;
 };
 
 export type ApprovalEntry = {
