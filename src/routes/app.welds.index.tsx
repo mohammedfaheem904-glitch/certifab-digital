@@ -284,8 +284,14 @@ function WeldsPage() {
                   <F label="Base material">
                     <Input value={values.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} placeholder="ASTM A106 Gr B" />
                   </F>
-                  <F label="Heat number">
-                    <Input value={values.heat_number ?? ""} onChange={(e) => set("heat_number", e.target.value)} placeholder="H-23901" />
+                  <F label="AWS Classification">
+                    <Input
+                      value={values.aws_classification ?? ""}
+                      onChange={(e) => set("aws_classification", e.target.value)}
+                      placeholder="ER70S-6 / E7018"
+                      disabled={!!values.aws_classification}
+                      readOnly={!!values.aws_classification}
+                    />
                   </F>
                   <F label="Filler metal">
                     <Input value={values.filler_metal ?? ""} onChange={(e) => set("filler_metal", e.target.value)} placeholder="ER70S-6 / E7018" />
