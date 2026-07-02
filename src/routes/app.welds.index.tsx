@@ -225,6 +225,10 @@ function WeldsPage() {
                         if (hiMin != null && hiMax != null) set("heat_input", `${hiMin}–${hiMax} kJ/mm`);
                         else if (hiMin != null) set("heat_input", `${hiMin} kJ/mm`);
                         else if (hiMax != null) set("heat_input", `${hiMax} kJ/mm`);
+                        const fm = fillerMetals.data?.find((x) => x.procedure_id === v);
+                        set("aws_classification", fm?.aws_classification ?? p.filler_material ?? "");
+                      } else {
+                        set("aws_classification", "");
                       }
                     }}>
                       <SelectTrigger><SelectValue placeholder="Select WPS" /></SelectTrigger>
