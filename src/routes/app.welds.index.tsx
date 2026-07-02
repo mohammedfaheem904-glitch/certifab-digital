@@ -80,6 +80,10 @@ function WeldsPage() {
   });
   const projects = useCompanyRows<Project>("projects");
   const procs = useCompanyRows<Procedure>("procedures");
+  const fillerMetals = useCompanyRows<FillerMetal>("wps_filler_metals", {
+    select: "procedure_id, aws_classification",
+    order: { column: "sort_order", ascending: true },
+  });
   const qualifications = useCompanyRows<Qualification>("qualifications");
 
   const [statusFilter, setStatusFilter] = useState<string>(workflow ?? "all");
