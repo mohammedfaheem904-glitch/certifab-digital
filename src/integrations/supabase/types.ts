@@ -3714,6 +3714,7 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          aws_classification: string | null
           base_material: string | null
           blocked_reason: string | null
           company_id: string
@@ -3749,6 +3750,7 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          aws_classification?: string | null
           base_material?: string | null
           blocked_reason?: string | null
           company_id: string
@@ -3784,6 +3786,7 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          aws_classification?: string | null
           base_material?: string | null
           blocked_reason?: string | null
           company_id?: string

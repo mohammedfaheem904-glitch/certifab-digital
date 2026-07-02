@@ -35,6 +35,7 @@ type Row = {
   line_no: string | null;
   base_material: string | null;
   filler_metal: string | null;
+  aws_classification: string | null;
   joint_type: string | null;
   inspection_status: string | null;
   project_id: string | null;
@@ -50,6 +51,7 @@ type Procedure = {
   heat_input_min?: number | null;
   heat_input_max?: number | null;
 };
+type FillerMetal = { procedure_id: string; aws_classification: string | null };
 type Qualification = { id: string; welder_name: string | null };
 
 const WORKFLOW_STATUSES = [
@@ -78,6 +80,10 @@ function WeldsPage() {
   });
   const projects = useCompanyRows<Project>("projects");
   const procs = useCompanyRows<Procedure>("procedures");
+  const fillerMetals = useCompanyRows<FillerMetal>("wps_filler_metals", {
+    select: "procedure_id, aws_classification",
+    order: { column: "sort_order", ascending: true },
+  });
   const qualifications = useCompanyRows<Qualification>("qualifications");
 
   const [statusFilter, setStatusFilter] = useState<string>(workflow ?? "all");
@@ -219,6 +225,10 @@ function WeldsPage() {
                         if (hiMin != null && hiMax != null) set("heat_input", `${hiMin}–${hiMax} kJ/mm`);
                         else if (hiMin != null) set("heat_input", `${hiMin} kJ/mm`);
                         else if (hiMax != null) set("heat_input", `${hiMax} kJ/mm`);
+                        const fm = fillerMetals.data?.find((x) => x.procedure_id === v);
+                        set("aws_classification", fm?.aws_classification ?? p.filler_material ?? "");
+                      } else {
+                        set("aws_classification", "");
                       }
                     }}>
                       <SelectTrigger><SelectValue placeholder="Select WPS" /></SelectTrigger>
@@ -274,8 +284,14 @@ function WeldsPage() {
                   <F label="Base material">
                     <Input value={values.base_material ?? ""} onChange={(e) => set("base_material", e.target.value)} placeholder="ASTM A106 Gr B" />
                   </F>
-                  <F label="Heat number">
-                    <Input value={values.heat_number ?? ""} onChange={(e) => set("heat_number", e.target.value)} placeholder="H-23901" />
+                  <F label="AWS Classification">
+                    <Input
+                      value={values.aws_classification ?? ""}
+                      onChange={(e) => set("aws_classification", e.target.value)}
+                      placeholder="ER70S-6 / E7018"
+                      disabled={!!values.aws_classification}
+                      readOnly={!!values.aws_classification}
+                    />
                   </F>
                   <F label="Filler metal">
                     <Input value={values.filler_metal ?? ""} onChange={(e) => set("filler_metal", e.target.value)} placeholder="ER70S-6 / E7018" />
