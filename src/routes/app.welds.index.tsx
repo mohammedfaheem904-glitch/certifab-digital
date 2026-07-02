@@ -42,7 +42,14 @@ type Row = {
 };
 
 type Project = { id: string; code: string; name: string };
-type Procedure = { id: string; code: string };
+type Procedure = {
+  id: string;
+  code: string;
+  base_material?: string | null;
+  filler_material?: string | null;
+  heat_input_min?: number | null;
+  heat_input_max?: number | null;
+};
 type Qualification = { id: string; welder_name: string | null };
 
 const WORKFLOW_STATUSES = [
