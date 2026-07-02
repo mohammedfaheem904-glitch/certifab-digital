@@ -35,6 +35,7 @@ type Row = {
   line_no: string | null;
   base_material: string | null;
   filler_metal: string | null;
+  aws_classification: string | null;
   joint_type: string | null;
   inspection_status: string | null;
   project_id: string | null;
@@ -50,6 +51,7 @@ type Procedure = {
   heat_input_min?: number | null;
   heat_input_max?: number | null;
 };
+type FillerMetal = { procedure_id: string; aws_classification: string | null };
 type Qualification = { id: string; welder_name: string | null };
 
 const WORKFLOW_STATUSES = [

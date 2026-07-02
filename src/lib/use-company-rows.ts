@@ -14,7 +14,8 @@ type Tbl =
   | "instrument_calibrations"
   | "equipment_calibrations"
   | "ncrs"
-  | "pqrs";
+  | "pqrs"
+  | "wps_filler_metals";
 
 export function useCompanyRows<T = any>(
   table: Tbl,
