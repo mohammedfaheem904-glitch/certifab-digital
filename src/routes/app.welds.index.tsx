@@ -208,13 +208,26 @@ function WeldsPage() {
                     </Select>
                   </F>
                   <F label="WPS">
-                    <Select value={values.procedure_id ?? ""} onValueChange={(v) => set("procedure_id", v)}>
+                    <Select value={values.procedure_id ?? ""} onValueChange={(v) => {
+                      set("procedure_id", v);
+                      const p = procs.data?.find((x) => x.id === v);
+                      if (p) {
+                        if (p.base_material) set("base_material", p.base_material);
+                        if (p.filler_material) set("filler_metal", p.filler_material);
+                        const hiMin = p.heat_input_min;
+                        const hiMax = p.heat_input_max;
+                        if (hiMin != null && hiMax != null) set("heat_input", `${hiMin}–${hiMax} kJ/mm`);
+                        else if (hiMin != null) set("heat_input", `${hiMin} kJ/mm`);
+                        else if (hiMax != null) set("heat_input", `${hiMax} kJ/mm`);
+                      }
+                    }}>
                       <SelectTrigger><SelectValue placeholder="Select WPS" /></SelectTrigger>
                       <SelectContent>
                         {procs.data?.map((p) => <SelectItem key={p.id} value={p.id}>{p.code}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </F>
+
                   <F label="Welder">
                     <Select
                       value={values.welder_name && values.welder_name !== "__other__" ? values.welder_name : (values._welder_mode === "other" ? "__other__" : "")}
